@@ -19,7 +19,7 @@ _action = 'action'   # handler 함수 -> event['action'] 키값
 #   "body": "{ \"action\": \"aws-lambda_function-container-WarmUp\" }"
 # }
 _cold_start = 'aws-lambda_function-container-WarmUp' 
-
+_chatbot_logger = 'chatbot_logger'   # 카카오 챗봇 로그 전역 변수(객체) 이름
 _botlog_file_path = '/tmp/botlog.txt'   # 아마존 웹서비스(AWS) 람다 함수(Lambda Function) -> 로그 텍스트 파일("/tmp/botlog.txt") 경로
 _time_limit = 3.5   # 챗봇 응답 가능 제한 시간
 

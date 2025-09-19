@@ -1,11 +1,9 @@
-* 파이썬 logging 모듈 사용하여 로그 기록하기 
-참고 URL - https://docs.python.org/ko/3/library/logging.html
-참고 2 URL - https://docs.python.org/ko/3/howto/logging.html#basic-logging-tutorial
-참고 3 URL - https://docs.aws.amazon.com/ko_kr/lambda/latest/dg/python-logging.html
-참고 4 URL - https://wikidocs.net/84432
-참고 5 URL - https://wikidocs.net/123324
-참고 6 URL - https://velog.io/@jeongpar/Python-Logging-%EC%82%AC%EC%9A%A9%EB%B2%95
-참고 7 URL - https://aoc55.tistory.com/10
+* 파이썬 클래스(class), 메서드(method), 함수(function) Docstring - 문서화 작성 예시 
+참고 URL - https://peps.python.org/pep-0257/
+참고 2 URL - https://wikidocs.net/16050
+참고 3 URL - https://soma0sd.tistory.com/130
+참고 4 URL - https://spirit0833.tistory.com/3
+참고 5 URL - https://m.blog.naver.com/withnicebambi/223553537062
 
 * VSCode 파이썬 코드접기 (# region, # endregion)
 참고 URL - https://m.blog.naver.com/cjinnnn/222950485960

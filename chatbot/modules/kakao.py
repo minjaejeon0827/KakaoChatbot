@@ -2,11 +2,20 @@
 
 # 챗봇 응답 타입별 JSON 포맷
 # 참고 URL - https://kakaobusiness.gitbook.io/main/tool/chatbot/skill_guide/answer_json_format
- 
-import logging   # 로그 작성 라이브러리
-from singleton import Log
 
-from commons import chatbot_helper   # 폴더 "commons" -> 챗봇 전용 도움말 텍스트 
+# * 파이썬 클래스(class), 메서드(method), 함수(function) Docstring - 문서화 작성 예시 
+# 참고 URL - https://peps.python.org/pep-0257/
+# 참고 2 URL - https://wikidocs.net/16050
+# 참고 3 URL - https://soma0sd.tistory.com/130
+# 참고 4 URL - https://spirit0833.tistory.com/3
+# 참고 5 URL - https://m.blog.naver.com/withnicebambi/223553537062
+ 
+# 1. 공통 모듈 먼저 import 처리
+from commons import chatbot_helper   # 챗봇 전용 도움말 텍스트
+
+# 2. log 모듈 import 처리 
+from modules.log import logger       # 챗봇 전역 로그 객체(logger)  
+
 
 def outputs_json(outputs):
     """
@@ -407,24 +416,11 @@ def getResFormat(userRequest_msg, masterEntity):
     box_messageTexts = masterEntity.get_box_messageTexts           # [상상진화 BOX 제품 설치 문의] 버튼 메시지 텍스트 리스트 
 
     try:
-        # TODO: 아래 변수 testlogger를 챗봇 프로그램에서 전역 로그 객체로 사용할 수 있도록 싱글톤 패턴으로 구현하기 (2025.09.17 minjae) 
-        testlogger = logging.getLogger()
-        testlogger.setLevel("INFO")
-        testlogger.info('[테스트] 카카오 json 포맷 가져오기 - Start!')
-        logger.log_write(logger._info, '[테스트] 카카오 json 포맷 가져오기', 'Start!')
-        testlogger.info('[테스트] 카카오 json 포맷 가져오기 - Start!') 
-
-        logger.log_write(logger._info, '[테스트] master_datas', master_datas)
-        testlogger.info(f'[테스트] master_datas - {master_datas}')
-
-        logger.log_write(logger._info, '[테스트] chatbot_messageTexts', chatbot_messageTexts)
-        testlogger.info(f'[테스트] chatbot_messageTexts - {chatbot_messageTexts}')
-
-        logger.log_write(logger._info, '[테스트] adsk_messageTexts', adsk_messageTexts)
-        testlogger.info(f'[테스트] adsk_messageTexts - {adsk_messageTexts}')
-
-        logger.log_write(logger._info, '[테스트] box_messageTexts', box_messageTexts)   
-        testlogger.info(f'[테스트] box_messageTexts - {box_messageTexts}')
+        logger.info("[테스트] 카카오 json 포맷 가져오기 - 시작!") 
+        logger.info(f"[테스트] master_datas - {master_datas}")
+        logger.info(f"[테스트] chatbot_messageTexts - {chatbot_messageTexts}")
+        logger.info(f"[테스트] adsk_messageTexts - {adsk_messageTexts}")
+        logger.info(f"[테스트] box_messageTexts - {box_messageTexts}")
     
         # TODO: 아래 주석친 코드 필요시 참고 (2025.08.27 minjae)
         # raise Exception(chatbot_helper._error_title + 
@@ -510,14 +506,12 @@ def getResFormat(userRequest_msg, masterEntity):
         #     else:   # [구현 예정!] '기타 문의', '계정 비밀번호 분실' 제외한 다른 문의 
         #         resFormat, master_data = end_basicCardResFormat(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._etcInfos][chatbot_helper._etcTest])
 
-        logger.log_write(logger._info, '[테스트] 카카오 json 포맷 가져오기', 'OK!')   
-        testlogger.info('[테스트] 카카오 json 포맷 가져오기 - OK!') 
+        logger.info("[테스트] 카카오 json 포맷 가져오기 - 완료!")
         return resFormat, master_data 
         
     except Exception as e:     
         error_msg = str(e)     
-        logger.log_write(logger._error, "[테스트] 오류", error_msg) 
-        testlogger.error(f'[테스트] 오류 - {error_msg}')
+        logger.error(f"[테스트] 오류 - {error_msg}") 
         raise       
 
 def chatbot_carouselResFormat(chatbotCard):
