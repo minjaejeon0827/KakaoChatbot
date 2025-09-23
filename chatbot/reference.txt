@@ -1,9 +1,11 @@
 * 파이썬 클래스(class), 메서드(method), 함수(function) Docstring - 문서화 작성 예시 
 참고 URL - https://peps.python.org/pep-0257/
 참고 2 URL - https://wikidocs.net/16050
-참고 3 URL - https://soma0sd.tistory.com/130
-참고 4 URL - https://spirit0833.tistory.com/3
-참고 5 URL - https://m.blog.naver.com/withnicebambi/223553537062
+참고 3 URL - https://wikidocs.net/276151
+참고 4 URL - https://soma0sd.tistory.com/130
+참고 5 URL - https://spirit0833.tistory.com/3
+참고 6 URL - https://m.blog.naver.com/withnicebambi/223553537062
+
 
 * VSCode 파이썬 코드접기 (# region, # endregion)
 참고 URL - https://m.blog.naver.com/cjinnnn/222950485960

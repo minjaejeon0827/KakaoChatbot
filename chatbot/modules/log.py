@@ -1,8 +1,8 @@
-# TODO: 파이썬 logging 라이브러리 사용해서 전역 로그 객체(logger) 및 로그 기록 기능 구현하기 (2025.09.18 minjae)
+# 파이썬 logging 라이브러리 사용해서 전역 로그 객체(logger) 및 로그 기록 기능 구현하기 (2025.09.18 minjae)
 # 참고 URL - https://claude.ai/chat/8fc1ceeb-fe95-4d1b-8517-ecec83beb3f2
 
 import sys
-import logging   
+import logging   # 로그 작성 전용 모듈
 
 # 1. 공통 모듈 먼저 import 처리
 from commons import chatbot_helper   # 챗봇 전용 도움말 텍스트
@@ -31,8 +31,8 @@ formatter = KSTFormatter('[%(levelname)s] [%(asctime)s] [%(filename)s | %(funcNa
 # streamHandler = logging.StreamHandler()
 streamHandler = logging.StreamHandler(sys.stdout)
 
-# TODO: fileHandler 생성 및 전역 로그 객체(logger)에 handler 추가 후 OpenAI 기능 함수 openAI.getMessageFromGPT(prompt) 실행시 
-#       카카오톡 채팅방에 아래와 같은 메시지가 추가로 출력되어 나오므로 fileHandler 생성 및 전역 로그 객체(logger)에 handler 추가하는 로직 주석 처리 진행 (2025.09.19 minjae)
+# fileHandler 생성 및 전역 로그 객체(logger)에 handler 추가 후 OpenAI 기능 함수 openAI.getMessageFromGPT(prompt) 실행시 
+# 카카오톡 채팅방에 아래와 같은 메시지가 추가로 출력되어 나오므로 fileHandler 생성 및 전역 로그 객체(logger)에 handler 추가하는 로직 주석 처리 진행 (2025.09.19 minjae)
 # * 주의사항: 기술지원 챗봇은 실수를 할 수 있습니다. 응답을 반드시 다시 확인해 주세요.
 # [INFO] [2025-09-19 16:11:44] [lambda_function.py | handler - L157]: [테스트] 챗봇 답변 채팅 정보 - {"version": "2.0", "template": {"outputs": [{"simpleText": {"text": "\uc694\uccad\uc0ac\ud56d \ud655\uc778 \uc911\uc774\uc5d0\uc694.\n\uc7a0\uc2dc\ud6c4 \uc544\ub798 \ub9d0\ud48d\uc120\uc744 \ub20c\ub7ec\uc8fc\uc138\uc694."}}], "quickReplies": [{"action": "message", "label": "\uc0dd\uac01 \ub2e4 \ub05d\ub0ac\ub098\uc694?", "messageText": "\uc0dd\uac01 \ub2e4 \ub05d\ub0ac\ub098\uc694?"}]}}
 # [INFO] [2025-09-19 16:11:46] [lambda_function.py | handler - L93]: [테스트] 사용자 입력 채팅 정보 - {"bot":{"id":"67a961ce1e098a447d574fe7","name":"TestImbuChatBot"},"intent":{"id":"67a961ce1e098a447d574feb","name":"폴백 블록","extra":{"reason":{"code":1,"message":"OK"}}},"action":{"id":"67a99c2e92df7f65390d32f5","name":"kakaobot","params":{},"detailParams":{},"clientExtra":{}},"userRequest":{"block":{"id":"67a961ce1e098a447d574feb","name":"폴백 블록"},"user":{"id":"1b2bfc8caf85a5dff8fadd1bf4cc70125b533fea7b665d0cdb0fb493a135e94b4d","type":"botUserKey","properties":{"botUserKey":"1b2bfc8caf85a5dff8fadd1bf4cc70125b533fea7b665d0cdb0fb493a135e94b4d","isFriend":true,"plusfriendUserKey":"OL1xAnN6qN4s","bot_user_key":"1b2bfc8caf85a5dff8fadd1bf4cc70125b533fea7b665d0cdb0fb493a135e94b4d","plusfriend_user_key":"OL1xAnN6qN4s"}},"utterance":"생각 다 끝났나요?","params":{"surface":"Kakaotalk.plusfriend"},"lang":"ko","timezone":"Asia/Seoul"},"contexts":[],"flow":{"lastBlock":{"id":"67a961ce1e098a447d574feb","name":"폴백 블록"},"trigger":{"type":"QUICKREPLY_BUTTON_MESSAGE","referrerBlock":{"id":"67a961ce1e098a447d574feb","name":"폴백 블록"}}}}

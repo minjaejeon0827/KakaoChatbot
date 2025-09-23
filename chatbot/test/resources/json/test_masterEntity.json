@@ -1,0 +1,5 @@
+
+{
+   "body": "{ \"start_Btns\": [\"채팅 상담\", \"챗봇 문의\", \"원격 지원\"], \"askChatbot_Btns\": [\"Autodesk 제품\", \"상상진화 BOX 제품\", \"계정 & 제품배정\"], \"mepSKID_items\": [{\"title\": \"01\", \"description\": \"원클릭으로 이루어지는\\nSKID 설계 자동화\"}, {\"title\": \"02\", \"description\": \"쉽고 간편한 설계검토\"}, {\"title\": \"03\", \"description\": \"간단한 도면 자동화\"}], \"revitBOX_items\": [{\"title\": \"01\", \"description\": \"반복되는 설계 작업 자동화\"}, {\"title\": \"02\", \"description\": \"객체를 통한 바닥 작성 및\\n형상 결합 처리 자동화\"}, {\"title\": \"03\", \"description\": \"설계에 용이한 시트 작성 배치\\n자동화 기능 제공\"}], \"dynamoCivil_items\": [{\"title\": \"01\", \"description\": \"지하공동구 BIM 모델\\n전달 및 활용\"}, {\"title\": \"02\", \"description\": \"토목시설물 배치 자동화\\n(흙막이시설, 암거 및 수로)\"}, {\"title\": \"03\", \"description\": \"지반층 생성 자동화\"}] }"
+}
+

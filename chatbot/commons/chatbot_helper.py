@@ -39,7 +39,7 @@ _secondWord_Idx = 1   # 공백('')단위로 분리한 두 번째 단어(last_upd
 _thirdWord_Idx = 2   # 공백('')단위로 분리한 세 번째 단어(last_update.split()[2]) 인덱스 
 _askPrefix_Len = 4   # 접두사 길이 (공백 포함) (예) "ask "
 
-_masterEntity_json_file_path = './resources/json/masterEntity.json'   # 마스터 데이터 json 파일 경로
+_masterEntity_json_file_path = './resources/json/masterEntity.json'   # 전체 마스터 데이터 json 파일 상대 경로
 
 # endregion 챗봇 (lambda_function.py)  
 

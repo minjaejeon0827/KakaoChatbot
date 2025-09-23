@@ -2,13 +2,6 @@
 
 # 챗봇 응답 타입별 JSON 포맷
 # 참고 URL - https://kakaobusiness.gitbook.io/main/tool/chatbot/skill_guide/answer_json_format
-
-# * 파이썬 클래스(class), 메서드(method), 함수(function) Docstring - 문서화 작성 예시 
-# 참고 URL - https://peps.python.org/pep-0257/
-# 참고 2 URL - https://wikidocs.net/16050
-# 참고 3 URL - https://soma0sd.tistory.com/130
-# 참고 4 URL - https://spirit0833.tistory.com/3
-# 참고 5 URL - https://m.blog.naver.com/withnicebambi/223553537062
  
 # 1. 공통 모듈 먼저 import 처리
 from commons import chatbot_helper   # 챗봇 전용 도움말 텍스트
@@ -103,8 +96,8 @@ def basicCard_json(card, buttons):
     """
     outputs = []
 
-    # TODO: card[chatbot_helper._botRes]에 할당된 값이 null 또는 공백("")일 경우 basicCard 가 카카오톡 채팅방에 출력 안되는 오류 발생함. 
-    #       하여 null 또는 공백("")이 아닌 문자열로 할당 해야함. (2025.09.03 minjae)
+    # card[chatbot_helper._botRes]에 할당된 값이 null 또는 공백("")일 경우 basicCard 가 카카오톡 채팅방에 출력 안되는 오류 발생함. 
+    # 하여 null 또는 공백("")이 아닌 문자열로 할당 해야함. (2025.09.03 minjae)
     # 참고 URL - https://stackoverflow.com/questions/9573244/how-to-check-if-the-string-is-empty-in-python
     # 참고 2 URL - https://hello-bryan.tistory.com/131
     # 참고 3 URL - https://jino-dev-diary.tistory.com/42
@@ -405,10 +398,10 @@ def getResFormat(userRequest_msg, masterEntity):
 
     resFormat = None   
 
-    # TODO: 아래와 같은 오류 메시지 출력되어 (기존) masterEntity.get_master_datas() -> (변경) masterEntity.get_master_datas 처리함. (2025.09.16 minjae)
+    # 아래와 같은 오류 메시지 출력되어 (기존) masterEntity.get_master_datas() -> (변경) masterEntity.get_master_datas 처리함. (2025.09.16 minjae)
     # 오류 메시지 - 'dict' object is not callable
     # master_datas = masterEntity.get_master_datas()
-    master_datas = masterEntity.get_master_datas   # 전체 마스터 데이터 담는 Dictionary 객체 
+    master_datas = masterEntity.get_master_datas   # 전체 마스터 데이터 객체 (Dictionary) 
     master_data = None     
 
     chatbot_messageTexts = masterEntity.get_chatbot_messageTexts   # [챗봇 문의] 버튼 메시지 텍스트 리스트    
@@ -487,8 +480,8 @@ def getResFormat(userRequest_msg, masterEntity):
         elif chatbot_helper._survey in userRequest_msg:   # 만족도 조사
             resFormat, master_data = common_basicCardResFormat(master_datas[chatbot_helper._surveyCard])
         
-        # TODO: 사용자가 카카오 챗봇 버튼이 아닌 일반 메시지를 채팅창에 입력시 아래처럼 오류 메시지가 출력되어 원인 파악 결과 resFormat 변수가 None으로 리턴되어 
-        #       lambda_function.py 소스파일 -> resChatbot 함수에서 res_queue.put(resFormat) 실행할 때 발생하는 오류로 확인 되어 아래처럼 else 절 코드 추가 (2025.09.12 minjae)
+        # 사용자가 카카오 챗봇 버튼이 아닌 일반 메시지를 채팅창에 입력시 아래처럼 오류 메시지가 출력되어 원인 파악 결과 resFormat 변수가 None으로 리턴되어 
+        # lambda_function.py 소스파일 -> resChatbot 함수에서 res_queue.put(resFormat) 실행할 때 발생하는 오류로 확인 되어 아래처럼 else 절 코드 추가 (2025.09.12 minjae)
         # 참고 URL - https://claude.ai/chat/2035baf1-0f86-4d08-af37-0091c8358dbb
         # 오류 메시지 - "TypeError: 'NoneType' object is not subscriptable"
         else:   # 기술지원 문의 제외 일반 문의 
@@ -665,7 +658,7 @@ def end_basicCardResFormat(endCard, endInfos):
     endButtons = []
     outputs = []
 
-    # TODO: 오류 메시지 "string indices must be integers, not 'str'" 출력되어 아래처럼 코드 변경 처리함. (2025.08.28 minjae)
+    # 오류 메시지 "string indices must be integers, not 'str'" 출력되어 아래처럼 코드 변경 처리함. (2025.08.28 minjae)
     # (기존) endCard -> (변경) endCard[chatbot_helper._buttons]  
     for endButton in endCard[chatbot_helper._buttons]:   # 처음으로, 동영상, 만족도 조사 버튼 텍스트 및 메세지 추가
         if (chatbot_helper._video == endButton[chatbot_helper._label] 
