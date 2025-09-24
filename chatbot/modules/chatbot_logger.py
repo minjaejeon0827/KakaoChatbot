@@ -1,10 +1,14 @@
+"""
+* 챗봇 커스텀 로그 작성 모듈
+"""
+
 import inspect
-import os    # 상위 호출자 파일 이름 구하는 용도
+import os   # 상위 호출자 파일 이름 구하는 용도
 from datetime import datetime
 from zoneinfo import ZoneInfo    # 대한민국 표준시 포맷 변환 용도
 
 """
-# 로그 레벨 종류 
+* 로그 레벨 종류 
 |   Level   |   Value   |   When to use
 |   DEBUG   |     10    | (주로 문제 해결을 할때 필요한) 자세한 정보. - 개발 과정에서 오류 원인 파악하고자 할 때 사용
 |   INFO    |     20    | 작업이 정상적으로 작동하고 있다는 메시지. 
@@ -28,10 +32,10 @@ def _callerInfo():
     Parameters: 없음.
 
     Returns: 
-    str: 1. 상위 호출자 파일 이름 (file_name)
-         2. 함수 이름 (function_name)
+        str: 1. 상위 호출자 파일 이름 (file_name)
+             2. 함수 이름 (function_name)
 
-    int: 라인 번호 (lineno)
+        int: 라인 번호 (lineno)
     """
 
     # 상위 호출자 파일명 가져오기 
@@ -51,7 +55,7 @@ def _formatTime():
     Parameters: 없음.
 
     Returns: 
-    str: 현재 날짜 및 시간을 대한민국 표준시로 포맷된 문자열 (datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S"))
+        str: 현재 날짜 및 시간을 대한민국 표준시로 포맷된 문자열 (datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S"))
     """
         
     global kst
@@ -74,13 +78,14 @@ def _formatTime():
  
 def _log_write(log_level, msg):
     """
-    Description: 레벨별 로그 기록 출력 
-                 공통 로그 출력 함수 기능 구현 (2025.09.22 minjae) 
-                 참고 URL - https://chatgpt.com/c/6847d34f-9700-8010-92fb-2d063eff183a
+    Description: 
+        레벨별 로그 기록 출력 
+        공통 로그 출력 함수 기능 구현 (2025.09.22 minjae) 
+        참고 URL - https://chatgpt.com/c/6847d34f-9700-8010-92fb-2d063eff183a
 
     Parameters: 
-    log_level (str): 로그 레벨
-    msg (str): 로그 메시지
+        log_level (str): 로그 레벨
+        msg (str): 로그 메시지
 
     Returns: 없음.
     """
@@ -94,7 +99,7 @@ def debug(msg):
     Description: DEBUG 로그 기록 출력 
 
     Parameters: 
-    msg (str): 로그 메시지 
+        msg (str): 로그 메시지 
 
     Returns: 없음.     
     """
@@ -106,7 +111,7 @@ def info(msg):
     Description: INFO 로그 기록 출력
 
     Parameters: 
-    msg (str): 로그 메시지
+        msg (str): 로그 메시지
 
     Returns: 없음.
     """
@@ -118,7 +123,7 @@ def warning(msg):
     Description: WARNING 로그 기록 출력
 
     Parameters: 
-    msg (str): 로그 메시지
+        msg (str): 로그 메시지
 
     Returns: 없음.
     """
@@ -130,7 +135,7 @@ def error(msg):
     Description: ERROR 로그 기록 출력
 
     Parameters: 
-    msg (str): 로그 메시지
+        msg (str): 로그 메시지
 
     Returns: 없음.
     """
@@ -142,7 +147,7 @@ def crictical(msg):
     Description: CRICTICAL 로그 기록 출력
 
     Parameters: 
-    msg (str): 로그 메시지
+        msg (str): 로그 메시지
 
     Returns: 없음.
     """

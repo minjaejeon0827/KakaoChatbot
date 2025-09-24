@@ -1,8 +1,10 @@
-# [카카오톡 서버 전송 용도] json 포맷 전용 모듈
+"""
+* [카카오톡 서버 전송 용도] json 포맷 전용 모듈
 
-# 챗봇 응답 타입별 JSON 포맷
-# 참고 URL - https://kakaobusiness.gitbook.io/main/tool/chatbot/skill_guide/answer_json_format
- 
+챗봇 응답 타입별 JSON 포맷
+참고 URL - https://kakaobusiness.gitbook.io/main/tool/chatbot/skill_guide/answer_json_format
+"""
+
 # 1. 공통 모듈 먼저 import 처리
 from commons import chatbot_helper   # 챗봇 전용 도움말 텍스트
 
@@ -15,10 +17,10 @@ def outputs_json(outputs):
     Description: 출력 그룹 json 포맷 가져오기
 
     Parameters:
-    outputs (list): 출력 그룹 리스트
+        outputs (list): 출력 그룹 리스트
 
     Returns:
-    Dictionary: 출력 그룹 json 포맷
+        dict: 출력 그룹 json 포맷
     """
 
     return {
@@ -34,11 +36,11 @@ def quickReplies_json(replies, quickReplies):
     Description: 바로가기 그룹 json 포맷 가져오기
 
     Parameters:
-    replies (Dictionary): 특정 마스터 데이터 객체  
-    quickReplies (list): 버튼 리스트 (label + messageText)
+        replies (dict): 특정 마스터 데이터 객체  
+        quickReplies (list): 버튼 리스트 (label + messageText)
 
     Returns:
-    Dictionary: 바로가기 그룹 json 포맷
+        dict: 바로가기 그룹 json 포맷
     """
 
     return {
@@ -60,11 +62,11 @@ def textCard_json(card, buttons):
     Description: 텍스트 카드 json 포맷 가져오기
 
     Parameters:
-    card (Dictionary): 특정 마스터 데이터 객체
-    buttons (list): 버튼 리스트 (label + messageText) 
+        card (dict): 특정 마스터 데이터 객체
+        buttons (list): 버튼 리스트 (label + messageText) 
 
     Returns:
-    Dictionary: 텍스트 카드 json 포맷
+        dict: 텍스트 카드 json 포맷
     """
 
     return {
@@ -89,10 +91,10 @@ def basicCard_json(card, buttons):
     Description: 기본형 카드 json 포맷 가져오기 
 
     Parameters:
-    card (Dictionary): 특정 마스터 데이터 객체
-    buttons (list): 버튼 리스트 (label + messageText) 
+        card (dict): 특정 마스터 데이터 객체
+        buttons (list): 버튼 리스트 (label + messageText) 
     Returns:
-    Dictionary: 기본형 카드 json 포맷
+        dict: 기본형 카드 json 포맷
     """
     outputs = []
 
@@ -130,11 +132,11 @@ def carousel_json(card, items):
     Description: 아이템형 케로셀 json 포맷 가져오기
 
     Parameters:
-    card (Dictionary): 특정 마스터 데이터 객체
-    items (list): 아이템 리스트 (imageTitle + thumbnail + itemList 등등...) 
+        card (dict): 특정 마스터 데이터 객체
+        items (list): 아이템 리스트 (imageTitle + thumbnail + itemList 등등...) 
 
     Returns:
-    Dictionary: 아이템형 케로셀 json 포맷 
+        dict: 아이템형 케로셀 json 포맷 
     """
     
     return {
@@ -159,13 +161,14 @@ def carousel_json(card, items):
 # TODO: 아래 함수 base_ResFormat 필요시 로직 수정 예정 (2025.09.03 minjae) 
 def base_ResFormat():
     """
-    Description: 기술지원 문의 제외 일반 문의 json 포맷 가져오기
-                 카카오톡 채팅방에 응답 메시지를 출력하고 싶지 않은 경우 비어있는 메세지 전송 
+    Description: 
+        기술지원 문의 제외 일반 문의 json 포맷 가져오기
+        카카오톡 채팅방에 응답 메시지를 출력하고 싶지 않은 경우 비어있는 메세지 전송 
 
     Parameters: 없음.
 
     Returns: 
-    Dictionary: 기술지원 문의 제외 일반 문의 json 포맷
+        dict: 기술지원 문의 제외 일반 문의 json 포맷
     """
 
     return {
@@ -178,14 +181,15 @@ def base_ResFormat():
 
 def simple_textResFormat(botRes):
     """
-    Description: 텍스트 메세지 json 포맷 가져오기
-                 카카오톡 채팅방에 텍스트 메시지(botRes) 전송 
+    Description: 
+        텍스트 메세지 json 포맷 가져오기
+        카카오톡 채팅방에 텍스트 메시지(botRes) 전송 
 
     Parameters:
-    botRes (str): 챗봇 답변 내용  
+        botRes (str): 챗봇 답변 내용  
 
     Returns:
-    Dictionary: 텍스트 메세지 json 포맷
+        dict: 텍스트 메세지 json 포맷
     """
  
     return {
@@ -204,15 +208,16 @@ def simple_textResFormat(botRes):
 
 def simple_imageResFormat(botRes, prompt):
     """
-    Description: DALLE2 이미지 json 포맷 가져오기
-                 카카오톡 채팅방에 DALLE2 이미지 전송
+    Description: 
+        DALLE2 이미지 json 포맷 가져오기
+        카카오톡 채팅방에 DALLE2 이미지 전송
 
     Parameters:
-    botRes (str): DALLE2 이미지 URL 주소 
-    prompt (str): 사용자가 카카오톡 채팅방에 그려 달라고 요청한 이미지 설명 
+        botRes (str): DALLE2 이미지 URL 주소 
+        prompt (str): 사용자가 카카오톡 채팅방에 그려 달라고 요청한 이미지 설명 
     
     Returns:
-    Dictionary: DALLE2 이미지 json 포맷
+        dict: DALLE2 이미지 json 포맷
     """
 
     output_text = prompt + "내용에 관한 이미지 입니다"
@@ -234,14 +239,15 @@ def simple_imageResFormat(botRes, prompt):
 
 def error_textResFormat(error_msg):
     """
-    Description: 오류 메세지 json 포맷 가져오기
-                 카카오톡 채팅방에 오류 메세지 전송
+    Description: 
+        오류 메세지 json 포맷 가져오기
+        카카오톡 채팅방에 오류 메세지 전송
 
     Parameters:
-    error_msg (str): 오류 메세지
+        error_msg (str): 오류 메세지
 
     Returns:
-    Dictionary: 오류 메세지 json 포맷
+        dict: 오류 메세지 json 포맷
     """
  
     return {
@@ -266,14 +272,15 @@ def error_textResFormat(error_msg):
 
 def timeover_quickRepliesResFormat(requestAgain_msg):
     """
-    Description: 응답 재요청 json 포맷 가져오기
-                 챗봇 응답 시간 5초 초과시 응답 재요청 메세지 전송
+    Description: 
+        응답 재요청 json 포맷 가져오기
+        챗봇 응답 시간 5초 초과시 응답 재요청 메세지 전송
 
     Parameters:
-    requestAgain_msg (str): 응답 재요청 메세지
+        requestAgain_msg (str): 응답 재요청 메세지
 
     Returns:
-    Dictionary: 응답 재요청 json 포맷
+        dict: 응답 재요청 json 포맷
     """
 
     return {
@@ -301,11 +308,11 @@ def common_basicCardResFormat(card):
     Description: 공통 - 기본형 카드 json 포맷 가져오기 
 
     Parameters:
-    card (Dictionary): 특정 마스터 데이터 객체
+        card (dict): 특정 마스터 데이터 객체
 
     Returns:
-    Dictionary: 1. 공통 - 기본형 카드 json 포맷
-                2. 특정 마스터 데이터 객체
+        dict: 1. 공통 - 기본형 카드 json 포맷
+                    2. 특정 마스터 데이터 객체
     """
 
     buttons = []
@@ -332,11 +339,11 @@ def common_quickRepliesResFormat(replies):
     Description: 공통 - 바로가기 그룹 json 포맷 가져오기
 
     Parameters:
-    replies (Dictionary): 특정 마스터 데이터 객체
+        replies (dict): 특정 마스터 데이터 객체
 
     Returns:
-    Dictionary: 1. 공통 - 바로가기 그룹 json 포맷
-                2. 특정 마스터 데이터 객체
+        dict: 1. 공통 - 바로가기 그룹 json 포맷
+                    2. 특정 마스터 데이터 객체
     """
 
     quickReplies = []
@@ -363,12 +370,12 @@ def common_ver_quickRepliesResFormat(userRequest_msg, verReplies):
     Description: 공통 - Autodesk or 상상진화 BOX 제품 버전 바로가기 그룹 json 포맷 가져오기 
 
     Parameters: 
-    userRequest_msg (str): 사용자 입력 채팅 메세지 
-    verReplies (Dictionary): 특정 마스터 데이터 객체
+        userRequest_msg (str): 사용자 입력 채팅 메세지 
+        verReplies (dict): 특정 마스터 데이터 객체
 
     Returns:
-    Dictionary: 1. 공통 - Autodesk or 상상진화 BOX 제품 버전 바로가기 그룹 json 포맷
-                2. 특정 마스터 데이터 객체
+        dict: 1. 공통 - Autodesk or 상상진화 BOX 제품 버전 바로가기 그룹 json 포맷
+                    2. 특정 마스터 데이터 객체
     """
 
     verQuickReplies = []
@@ -388,12 +395,12 @@ def getResFormat(userRequest_msg, masterEntity):
     Description: 카카오 json 포맷 가져오기  
 
     Parameters:
-    userRequest_msg (str): 사용자 입력 채팅 메세지 
-    masterEntity (Dictionary): 마스터 데이터 담는 싱글톤 객체   
+        userRequest_msg (str): 사용자 입력 채팅 메세지 
+        masterEntity (dict): 마스터 데이터 담는 싱글톤(singleton) 객체   
 
     Returns:
-    resFormat (Dictionary): 카카오 json 포맷 기반 챗봇 답변 내용
-    master_data (Dictionary): 특정 마스터 데이터 객체 (예) 아이템 카드 (basicCard, carousel) or 바로가기 그룹 (quickReplies)
+        resFormat (dict): 카카오 json 포맷 기반 챗봇 답변 내용
+        master_data (dict): 특정 마스터 데이터 (예) 아이템 카드 (basicCard, carousel) or 바로가기 그룹 (quickReplies)
     """
 
     resFormat = None   
@@ -401,12 +408,12 @@ def getResFormat(userRequest_msg, masterEntity):
     # 아래와 같은 오류 메시지 출력되어 (기존) masterEntity.get_master_datas() -> (변경) masterEntity.get_master_datas 처리함. (2025.09.16 minjae)
     # 오류 메시지 - 'dict' object is not callable
     # master_datas = masterEntity.get_master_datas()
-    master_datas = masterEntity.get_master_datas   # 전체 마스터 데이터 객체 (Dictionary) 
-    master_data = None     
+    master_datas = masterEntity.get_master_datas   # 전체 마스터 데이터  
+    master_data = None   # 특정 마스터 데이터     
 
-    chatbot_messageTexts = masterEntity.get_chatbot_messageTexts   # [챗봇 문의] 버튼 메시지 텍스트 리스트    
-    adsk_messageTexts = masterEntity.get_adsk_messageTexts         # [Autodesk 제품 설치 문의] 버튼 메시지 텍스트 리스트
-    box_messageTexts = masterEntity.get_box_messageTexts           # [상상진화 BOX 제품 설치 문의] 버튼 메시지 텍스트 리스트 
+    chatbot_messageTexts = masterEntity.get_chatbot_messageTexts   # [챗봇 문의] 버튼 메시지 리스트    
+    adsk_messageTexts = masterEntity.get_adsk_messageTexts         # [Autodesk 제품 설치 문의] 버튼 메시지 리스트
+    box_messageTexts = masterEntity.get_box_messageTexts           # [상상진화 BOX 제품 설치 문의] 버튼 메시지 리스트 
 
     try:
         logger.info("[테스트] 카카오 json 포맷 가져오기 - 시작!") 
@@ -512,11 +519,11 @@ def chatbot_carouselResFormat(chatbotCard):
     Description: 챗봇 문의 아이템형 케로셀 json 포맷 가져오기
 
     Parameters:
-    chatbotCard (Dictionary): 특정 마스터 데이터 객체
+        chatbotCard (dict): 특정 마스터 데이터 객체
 
     Returns:
-    Dictionary: 1. 챗봇 문의 아이템형 케로셀 json 포맷
-                2. 특정 마스터 데이터 객체
+        dict: 1. 챗봇 문의 아이템형 케로셀 json 포맷
+                    2. 특정 마스터 데이터 객체
     """
 
     chatbotButtons = []
@@ -560,12 +567,12 @@ def subCat_basicCardResFormat(userRequest_msg, subCatCard):
     Description: 문의 유형 기본형 카드 json 포맷 가져오기 
 
     Parameters:
-    userRequest_msg (str): 사용자 입력 채팅 메세지
-    subCatCard (Dictionary): 특정 마스터 데이터 객체
+        userRequest_msg (str): 사용자 입력 채팅 메세지
+        subCatCard (dict): 특정 마스터 데이터 객체
 
     Returns:
-    Dictionary: 1. 문의 유형 기본형 카드 json 포맷
-                2. 특정 마스터 데이터 객체
+        dict: 1. 문의 유형 기본형 카드 json 포맷
+                    2. 특정 마스터 데이터 객체
     """
 
     subCatButtons = []
@@ -597,12 +604,12 @@ def subCat_basicCardResFormat(userRequest_msg, subCatCard):
 #     Description: Autodesk 제품 설치 언어 텍스트 카드 json 포맷 가져오기
 
 #     Parameters:
-#     userRequest_msg (str): 사용자 입력 채팅 메세지
-#     adskLangCard (Dictionary): 특정 마스터 데이터 객체
+#         userRequest_msg (str): 사용자 입력 채팅 메세지
+#         adskLangCard (dict): 특정 마스터 데이터 객체
 
 #     Returns:
-#     Dictionary: 1. Autodesk 제품 설치 언어 텍스트 카드 json 포맷
-#                 2. 특정 마스터 데이터 객체
+#         dict: 1. Autodesk 제품 설치 언어 텍스트 카드 json 포맷
+#                     2. 특정 마스터 데이터 객체
 #     """
 
 #     adskLangButtons = []
@@ -622,11 +629,11 @@ def subCat_basicCardResFormat(userRequest_msg, subCatCard):
 #     Description: 계정 & 제품배정 문의 바로가기 그룹 json 포맷 가져오기
 
 #     Parameters:
-#     accountReplies (Dictionary): 특정 마스터 데이터 객체
+#         accountReplies (dict): 특정 마스터 데이터 객체
 
 #     Returns: 
-#     Dictionary: 1. 계정 & 제품배정 문의 바로가기 그룹 json 포맷
-#                 2. 특정 마스터 데이터 객체
+#         dict: 1. 계정 & 제품배정 문의 바로가기 그룹 json 포맷
+#                     2. 특정 마스터 데이터 객체
 #     """
 
 #     accountQuickReplies = []
@@ -647,12 +654,12 @@ def end_basicCardResFormat(endCard, endInfos):
     Description: 마지막화면 기본형 카드 json 포맷 가져오기 
 
     Parameters:
-    endCard (Dictionary): 특정 마스터 데이터 객체
-    endInfos (list): 특정 기술지원 정보 리스트 (예) 설치 (Autodesk or 상상진화 BOX 제품), 계정 & 제품배정 등등...
+        endCard (dict): 특정 마스터 데이터 객체
+        endInfos (list): 특정 기술지원 정보 리스트 (예) 설치 (Autodesk or 상상진화 BOX 제품), 계정 & 제품배정 등등...
 
     Returns:
-    Dictionary: 1. 마지막화면 기본형 카드 json 포맷
-                2. 특정 마스터 데이터 객체
+        dict: 1. 마지막화면 기본형 카드 json 포맷
+                    2. 특정 마스터 데이터 객체
     """
 
     endButtons = []

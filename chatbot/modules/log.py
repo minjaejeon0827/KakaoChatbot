@@ -1,14 +1,18 @@
-# 파이썬 logging 라이브러리 사용해서 전역 로그 객체(logger) 및 로그 기록 기능 구현하기 (2025.09.18 minjae)
-# 참고 URL - https://claude.ai/chat/8fc1ceeb-fe95-4d1b-8517-ecec83beb3f2
+"""
+* 챗봇 전역 로그 모듈
+
+파이썬 logging 라이브러리 사용해서 전역 로그 객체(logger) 및 로그 기록 기능 구현 (2025.09.18 minjae)
+참고 URL - https://claude.ai/chat/8fc1ceeb-fe95-4d1b-8517-ecec83beb3f2
+"""
 
 import sys
-import logging   # 로그 작성 전용 모듈
+import logging   # 로그 작성 
 
 # 1. 공통 모듈 먼저 import 처리
 from commons import chatbot_helper   # 챗봇 전용 도움말 텍스트
 
 # 2. singleton 모듈 import 처리 
-from modules.singleton import KSTFormatter   # 싱글톤(singleton) 패턴 전용 모듈
+from modules.singleton import KSTFormatter   # 싱글톤(singleton) 패턴 
 
 # 1. 전역 로그 객체(logger) 설정 - logger의 이름(__name__)을 명시해서 전역 로그 객체(logger) 설정하기
 # logger = logging.getLogger()   # 최상위 로그 객체(root) 가져오기 
@@ -48,25 +52,23 @@ streamHandler.setFormatter(formatter)
 logger.addHandler(streamHandler)
 # logger.addHandler(fileHandler)
 
-
-# 참고 
-# * 파이썬 logging 모듈 사용하여 로그 기록하기 
-# 참고 URL - https://docs.python.org/ko/3/library/logging.html
-# 참고 2 URL - https://docs.python.org/ko/3/howto/logging.html#basic-logging-tutorial
-# 참고 3 URL - https://docs.aws.amazon.com/ko_kr/lambda/latest/dg/python-logging.html
-# 참고 4 URL - https://wikidocs.net/84432
-# 참고 5 URL - https://wikidocs.net/123324
-# 참고 6 URL - https://velog.io/@jeongpar/Python-Logging-%EC%82%AC%EC%9A%A9%EB%B2%95
-# 참고 7 URL - https://aoc55.tistory.com/10
-
-# * 파이썬 logging 모듈 사용하여 전역 로그 기능 구현하기 
-# 참고 URL - https://chuun92.tistory.com/7
-# 참고 2 URL - https://malwareanalysis.tistory.com/527
-# 참고 3 URL - https://github.com/sungwook-practice/python_logging_logger.git
-# 참고 4 URL - https://velog.io/@qlgks1/python-python-logging-%ED%95%B4%EB%B6%80
-
-
 """
+* 참고 
+파이썬 logging 모듈 사용하여 로그 기록하기 
+참고 URL - https://docs.python.org/ko/3/library/logging.html
+참고 2 URL - https://docs.python.org/ko/3/howto/logging.html#basic-logging-tutorial
+참고 3 URL - https://docs.aws.amazon.com/ko_kr/lambda/latest/dg/python-logging.html
+참고 4 URL - https://wikidocs.net/84432
+참고 5 URL - https://wikidocs.net/123324
+참고 6 URL - https://velog.io/@jeongpar/Python-Logging-%EC%82%AC%EC%9A%A9%EB%B2%95
+참고 7 URL - https://aoc55.tistory.com/10
+
+파이썬 logging 모듈 사용하여 전역 로그 기능 구현하기 
+참고 URL - https://chuun92.tistory.com/7
+참고 2 URL - https://malwareanalysis.tistory.com/527
+참고 3 URL - https://github.com/sungwook-practice/python_logging_logger.git
+참고 4 URL - https://velog.io/@qlgks1/python-python-logging-%ED%95%B4%EB%B6%80
+
 import logging  # 로깅 함수 호출
 
 ​1. instance 설정 - log(로그) instance 설정
@@ -77,10 +79,8 @@ import logging  # 로깅 함수 호출
 6. 기록할 log level 지정 - 로그 레벨 지정 (DEBUG, INFO, WARNING, ERROR, CRICTICAL)
 7. log 함수 선 호출 - 아래에 구현한 함수 log() 선호출  
 8. log 기록 - 원하는 지점에 로그 기록하기 
-"""
 
-"""
-# 로그 포맷(format) formatter
+* 로그 포맷(format) formatter
 |     이름    |   포멧           |   설명   |
 | asctime     | %(asctime)s     | 날짜 시간, ex) 2021.04.10 11:21:48,162
 | created     | %(created)f     | 생성 시간 출력
@@ -99,10 +99,7 @@ import logging  # 로깅 함수 호출
 | thread      | %(thread)d      | Thread ID
 | threadName  | %(threadName)s  | Thread Name
 
-"""
-
-"""
-# 로그 레벨 종류 
+* 로그 레벨 종류 
 |   Level   |   Value   |   When to use
 |   DEBUG   |     10    | (주로 문제 해결을 할때 필요한) 자세한 정보. - 개발 과정에서 오류 원인 파악하고자 할 때 사용
 |   INFO    |     20    | 작업이 정상적으로 작동하고 있다는 메시지. 

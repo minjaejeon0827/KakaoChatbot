@@ -1,3 +1,7 @@
+"""
+* 챗봇 전용 도움말 텍스트 
+"""
+
 # region 공통 
 
 # 오류 안내 메시지 (raise Exception)
@@ -12,8 +16,9 @@ _error_ssflex = '상상플렉스 커뮤니티\n(https://www.ssflex.co.kr/communi
 _body = 'body'   # handler 함수 -> event['body'] 키값
 _action = 'action'   # handler 함수 -> event['action'] 키값
 
-# coldStart(콜드 스타트)
-# coldStart는 아마존 웹서비스(AWS) 람다 함수(Lambda Function)가 처음 호출되거나 오랜 시간 동안 호출되지 않다가 다시 호출될 때 발생하는 초기화 과정(container-WarmUp)이다.
+# ColdStart(콜드 스타트)
+# ColdStart는 아마존 웹서비스(AWS) 람다 함수(Lambda Function)가 처음 호출되거나 오랜 시간 동안 호출되지 않다가 다시 호출될 때 발생하는 초기화 과정(container-WarmUp)이다.
+# ColdStart - 아마존 웹서비스(AWS) 람다 함수(Lambda Function) 초기 응답 속도 느림(Cold Start) 의미
 # json 페이로드 형식
 # {
 #   "body": "{ \"action\": \"aws-lambda_function-container-WarmUp\" }"
@@ -43,7 +48,7 @@ _masterEntity_json_file_path = './resources/json/masterEntity.json'   # 전체 �
 
 # endregion 챗봇 (lambda_function.py)  
 
-# region 카카오 전용 모듈 (kakao.py)  
+# region 카카오 json 포맷 (kakao.py)  
 
 # 기술지원 업무 프로세스
 _inst = '설치'
@@ -92,8 +97,8 @@ _video = '동영상'
 _survey = '만족도 조사'  
 
 # 버튼 인덱스 번호
-_videoButton_Idx = 1   # [마지막 화면] 버튼 "동영상" (masterEntity.json -> "endCard" Dictionary -> "buttons" list 객체 인덱스 번호)  
-_webLinkUrl_Idx = 0   # [마지막 화면] 버튼 "동영상"과 연동할 webLinkUrl 인덱스 번호 (masterEntity.json -> "endCard" Dictionary -> "autoCADInfos", "revitInfos", "navisworksManageInfos", "infraWorksInfos", "civil3DInfos", "revitBoxInfos", "cadBoxInfos", "energyBoxInfos", "accountInfos" list 객체 인덱스 번호
+_videoButton_Idx = 1   # [마지막 화면] 버튼 "동영상" (masterEntity.json -> "endCard" dict -> "buttons" list 객체 인덱스 번호)  
+_webLinkUrl_Idx = 0   # [마지막 화면] 버튼 "동영상"과 연동할 webLinkUrl 인덱스 번호 (masterEntity.json -> "endCard" dict -> "autoCADInfos", "revitInfos", "navisworksManageInfos", "infraWorksInfos", "civil3DInfos", "revitBoxInfos", "cadBoxInfos", "energyBoxInfos", "accountInfos" list 객체 인덱스 번호
 _botRes_Idx = 0   # [마지막 화면] Autodesk, Box 제품별 챗봇 응답 내용 인덱스 번호
 
 # 동영상 시청 
@@ -127,12 +132,12 @@ _energyBox = 'EnergyBOX'
 # _resetPassword = 'resetPassword'
 # _etcTest = 'etcTest'
 
-# endregion 카카오 전용 모듈 (kakao.py)  
+# endregion 카카오 json 포맷 (kakao.py)  
 
-# region 마스터 데이터(masterEntity.json) 파일
+# region 전체 마스터 데이터(masterEntity.json) 파일
 
 # json 데이터 파싱(parsing) 용도 사용 
-_masterEntity = 'masterEntity'   # 마스터 데이터(masterEntity.json) 파일 객체 
+_masterEntity = 'masterEntity'   # 전체 마스터 데이터(masterEntity.json) 파일 객체 
 
 # 공통 - 카드 or 바로가기 그룹 객체 안에 속한 키(key)
 _levelNo = 'levelNo'
@@ -165,7 +170,7 @@ _surveyCard = 'surveyCard'
 # 카드 객체(endCard) 안에 속한 메타 데이터 키 (key) 
 # 메타 데이터 
 # 참고 URL - https://ko.wikipedia.org/wiki/%EB%A9%94%ED%83%80%EB%8D%B0%EC%9D%B4%ED%84%B0#cite_note-1
-# 참고 2 URL - https://terms.tta.or.kr/dictionary/dictionaryView.do?subject=%EB%A9%94%ED%83%80+%EB%8D%B0%EC%9D%B4%ED%84%B0
+# 참고 2 URL - https://terms.tta.or.kr/dict/dictionaryView.do?subject=%EB%A9%94%ED%83%80+%EB%8D%B0%EC%9D%B4%ED%84%B0
 # 참고 3 URL - https://claude.ai/chat/99872ec0-7105-4e08-8107-fab2d351e7bb
 _autoCADInfos = 'autoCADInfos'
 _revitInfos = 'revitInfos'
@@ -178,7 +183,7 @@ _energyBoxInfos = 'energyBoxInfos'
 _accountInfos = 'accountInfos'
 _etcInfos = 'etcInfos'
 
-# endregion 카카오 전용 모듈 (kakao.py)  
+# endregion 전체 마스터 데이터(masterEntity.json) 파일
 
 # region 참고 
 
