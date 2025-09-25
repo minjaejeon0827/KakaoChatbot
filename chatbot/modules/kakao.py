@@ -311,8 +311,8 @@ def common_basicCardResFormat(card):
         card (dict): 특정 마스터 데이터 객체
 
     Returns:
-        dict: 1. 공통 - 기본형 카드 json 포맷
-                    2. 특정 마스터 데이터 객체
+        basicCard_json(card, buttons) (dict): 공통 - 기본형 카드 json 포맷
+        card (dict): 특정 마스터 데이터 객체
     """
 
     buttons = []
@@ -342,8 +342,8 @@ def common_quickRepliesResFormat(replies):
         replies (dict): 특정 마스터 데이터 객체
 
     Returns:
-        dict: 1. 공통 - 바로가기 그룹 json 포맷
-                    2. 특정 마스터 데이터 객체
+        quickReplies_json(replies, quickReplies) (dict): 공통 - 바로가기 그룹 json 포맷
+        replies (dict): 특정 마스터 데이터 객체
     """
 
     quickReplies = []
@@ -374,8 +374,8 @@ def common_ver_quickRepliesResFormat(userRequest_msg, verReplies):
         verReplies (dict): 특정 마스터 데이터 객체
 
     Returns:
-        dict: 1. 공통 - Autodesk or 상상진화 BOX 제품 버전 바로가기 그룹 json 포맷
-                    2. 특정 마스터 데이터 객체
+        quickReplies_json(verReplies, verQuickReplies) (dict): 공통 - Autodesk or 상상진화 BOX 제품 버전 바로가기 그룹 json 포맷
+        verReplies (dict): 특정 마스터 데이터 객체
     """
 
     verQuickReplies = []
@@ -434,7 +434,7 @@ def getResFormat(userRequest_msg, masterEntity):
             resFormat = base_ResFormat()
             master_data = master_datas[chatbot_helper._startCard]
 
-        elif chatbot_helper._chatbot == userRequest_msg:   # level1 - 챗봇 문의 
+        elif chatbot_helper._ask_chatbot == userRequest_msg:   # level1 - 챗봇 문의 
             resFormat, master_data = chatbot_carouselResFormat(master_datas[chatbot_helper._chatbotCard])
 
         elif userRequest_msg in chatbot_messageTexts:   # level2 - 문의 유형 
@@ -522,8 +522,8 @@ def chatbot_carouselResFormat(chatbotCard):
         chatbotCard (dict): 특정 마스터 데이터 객체
 
     Returns:
-        dict: 1. 챗봇 문의 아이템형 케로셀 json 포맷
-                    2. 특정 마스터 데이터 객체
+        carousel_json(chatbotCard, chatbot_items) (dict): 챗봇 문의 아이템형 케로셀 json 포맷
+        chatbotCard (dict): 특정 마스터 데이터 객체
     """
 
     chatbotButtons = []
@@ -571,8 +571,8 @@ def subCat_basicCardResFormat(userRequest_msg, subCatCard):
         subCatCard (dict): 특정 마스터 데이터 객체
 
     Returns:
-        dict: 1. 문의 유형 기본형 카드 json 포맷
-                    2. 특정 마스터 데이터 객체
+        basicCard_json(subCatCard, subCatButtons) (dict): 문의 유형 기본형 카드 json 포맷
+        subCatCard (dict): 특정 마스터 데이터 객체
     """
 
     subCatButtons = []
@@ -608,8 +608,8 @@ def subCat_basicCardResFormat(userRequest_msg, subCatCard):
 #         adskLangCard (dict): 특정 마스터 데이터 객체
 
 #     Returns:
-#         dict: 1. Autodesk 제품 설치 언어 텍스트 카드 json 포맷
-#                     2. 특정 마스터 데이터 객체
+#         textCard_json(adskLangCard, adskLangButtons) (dict): Autodesk 제품 설치 언어 텍스트 카드 json 포맷
+#         adskLangCard (dict): 특정 마스터 데이터 객체
 #     """
 
 #     adskLangButtons = []
@@ -632,8 +632,8 @@ def subCat_basicCardResFormat(userRequest_msg, subCatCard):
 #         accountReplies (dict): 특정 마스터 데이터 객체
 
 #     Returns: 
-#         dict: 1. 계정 & 제품배정 문의 바로가기 그룹 json 포맷
-#                     2. 특정 마스터 데이터 객체
+#         quickReplies_json(accountReplies, accountQuickReplies) (dict): 계정 & 제품배정 문의 바로가기 그룹 json 포맷
+#         accountReplies (dict): 특정 마스터 데이터 객체
 #     """
 
 #     accountQuickReplies = []
@@ -658,8 +658,8 @@ def end_basicCardResFormat(endCard, endInfos):
         endInfos (list): 특정 기술지원 정보 리스트 (예) 설치 (Autodesk or 상상진화 BOX 제품), 계정 & 제품배정 등등...
 
     Returns:
-        dict: 1. 마지막화면 기본형 카드 json 포맷
-                    2. 특정 마스터 데이터 객체
+        outputs_json(outputs) (dict): 마지막화면 기본형 카드 json 포맷
+        endCard (dict): 특정 마스터 데이터 객체
     """
 
     endButtons = []

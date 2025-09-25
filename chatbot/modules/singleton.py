@@ -91,7 +91,7 @@ class MasterEntity(object):
             **kwargs (dict): 키워드 가변 인자
 
         Returns: 
-            object: 마스터 데이터 싱글톤(singleton) 클래스(MasterEntity) 객체
+            _class._instance (object): 마스터 데이터 싱글톤(singleton) 클래스(MasterEntity) 객체
         """
 
         if not hasattr(_class, "_instance"):   # 해당 클래스에 _instance 속성(property - 객체)이 없다면
@@ -132,7 +132,7 @@ class MasterEntity(object):
             self (object): 마스터 데이터 싱글톤(singleton) 클래스 객체 자신 (MasterEntity class)
 
         Returns: 
-        dict: 전체 마스터 데이터 
+            self.__master_datas (dict): 전체 마스터 데이터 
         """
         
         return self.__master_datas
@@ -161,7 +161,7 @@ class MasterEntity(object):
             self (object): 마스터 데이터 싱글톤(singleton) 클래스 객체 자신 (MasterEntity class)
 
         Returns: 
-            list: [챗봇 문의] 버튼 메시지 리스트
+            self.__chatbot_messageTexts (list): [챗봇 문의] 버튼 메시지 리스트
         """
 
         return self.__chatbot_messageTexts
@@ -190,7 +190,7 @@ class MasterEntity(object):
             self (object): 마스터 데이터 싱글톤(singleton) 클래스 객체 자신 (MasterEntity class)
 
         Returns: 
-            list: [Autodesk 제품 설치 문의] 버튼 메시지 리스트
+            self.__adsk_messageTexts (list): [Autodesk 제품 설치 문의] 버튼 메시지 리스트
         """
 
         return self.__adsk_messageTexts
@@ -219,7 +219,7 @@ class MasterEntity(object):
             self (object): 마스터 데이터 싱글톤(singleton) 클래스 객체 자신 (MasterEntity class)
 
         Returns: 
-            list: [상상진화 BOX 제품 설치 문의] 버튼 메시지 리스트
+            self.__box_messageTexts (list): [상상진화 BOX 제품 설치 문의] 버튼 메시지 리스트
         """
 
         return self.__box_messageTexts
@@ -248,7 +248,7 @@ class MasterEntity(object):
             self (object): 마스터 데이터 싱글톤(singleton) 클래스 객체 자신 (MasterEntity class)
 
         Returns: 
-            list: 마스터 데이터 유효성 검사 대상 리스트
+            self.__valid_targets (list): 마스터 데이터 유효성 검사 대상 리스트
         """
                 
         return self.__valid_targets
@@ -277,7 +277,7 @@ class MasterEntity(object):
             self (object): 마스터 데이터 싱글톤(singleton) 클래스 객체 자신 (MasterEntity class)
 
         Returns: 
-            bool: 마스터 데이터 유효성 검사 결과
+            self.__isValid (bool): 마스터 데이터 유효성 검사 결과
         """
 
         return self.__isValid
@@ -422,7 +422,7 @@ class KSTFormatter(logging.Formatter):
             **kwargs (dict): 키워드 가변 인자
 
         Returns: 
-            object: 대한민국 표준시 설정 싱글톤(singleton) 클래스(KSTFormatter) 객체
+            _class._instance (object): 대한민국 표준시 설정 싱글톤(singleton) 클래스(KSTFormatter) 객체
         """
 
         if not hasattr(_class, "_instance"):   # 해당 클래스에 _instance 속성(property - 객체)이 없다면 
@@ -469,7 +469,7 @@ class KSTFormatter(logging.Formatter):
             self (object): 대한민국 표준시 설정 Formatter 싱글톤(singleton) 클래스 객체 자신 (KSTFormatter class)
 
         Returns: 
-            object: 대한민국 표준시 설정 (ZoneInfo class) 
+            self.__kst (object): 대한민국 표준시 설정 (ZoneInfo class) 
         """
 
         return self.__kst
@@ -512,7 +512,7 @@ class KSTFormatter(logging.Formatter):
             datefmt (str): 날짜 출력 형식 문자열. datefmt 값이 None일 경우 기본 값 사용 (예) self.default_time_format = '%Y-%m-%d %H:%M:%S'.
 
         Returns: 
-            str: 지정된 LogRecord(record)의 생성 시간(현재 날짜 및 시간)을 대한민국 표준시 포맷된 문자열 (time_stamp.strftime(datefmt) / time_stamp.strftime('%Y-%m-%d %H:%M:%S'))
+            time_stamp.strftime(datefmt) / time_stamp.strftime('%Y-%m-%d %H:%M:%S') (str): 지정된 LogRecord(record)의 생성 시간(현재 날짜 및 시간)을 대한민국 표준시 포맷된 문자열
         """
                 
         # zoneinfo 파이썬 라이브러리 사용하여 로그 출력시 대한민국 표준시 출력 기능 구현 (2025.06.13 minjae)

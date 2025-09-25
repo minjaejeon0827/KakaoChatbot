@@ -9,7 +9,7 @@ import json         # json 데이터 처리
 import threading    # 멀티스레드 패키지 
 import time         # 챗봇 답변 시간 계산 
 import queue as q   # 자료구조 queue(deque 기반) 
-import os           # 답변 결과 로그 텍스트 파일('/tmp/botlog.txt') 저장  
+import os           # 답변 결과 임시 로그 텍스트 파일('/tmp/botlog.txt') 저장  
 
 # 1. 공통 모듈 먼저 import 처리
 from commons import chatbot_helper   # 챗봇 전용 도움말 텍스트  
@@ -39,6 +39,8 @@ valid_targets = [ chatbot_helper._buttons,
 
 masterEntity = MasterEntity(valid_targets)   # 마스터 데이터 싱글톤(singleton) 클래스 객체   
 
+prev_userRequest_msg = None   # 이전 사용자 입력 채팅 메세지 (챗봇 응답 시간 5초 초과시 응답 재요청 할 때 사용)
+
 def handler(event, context):
     """
     Description: 
@@ -47,7 +49,7 @@ def handler(event, context):
         파이썬 또는 C/C++ 프로그래밍 언어에서 main 함수와 같은 역할을 한다.
 
     Parameters:
-        event (dict): 카카오톡 채팅방에 사용자가 입력한 채팅 정보 (event['body'] - 카카오톡 채팅방의 실제 채팅 정보 저장된 변수 의미)
+        event (dict): 카카오톡 채팅방에 사용자가 입력한 채팅 정보 (event['body'] - 카카오톡 채팅방 실제 채팅 정보 저장된 변수)
         context (object): AWS Lambda Function에 속한 메타데이터(metadata) 객체 (LambdaContext class)
 
         참고 URL - https://docs.aws.amazon.com/ko_kr/lambda/latest/dg/python-context.html
@@ -80,18 +82,16 @@ def handler(event, context):
         event_body = json.loads(event[chatbot_helper._body])   
         logger.info(f"[테스트] event_body['action'] - {event_body[chatbot_helper._action]}")
           
-        if chatbot_helper._cold_start in event_body[chatbot_helper._action]:   # ColdStart(콜드 스타트)인 경우 - 아마존 웹서비스(AWS) 람다 함수(Lambda Function) 초기 응답 속도 느림(Cold Start) 의미  
+        if chatbot_helper._cold_start in event_body[chatbot_helper._action]:   # ColdStart(콜드 스타트)인 경우 - 아마존 웹서비스(AWS) 람다 함수(Lambda Function) 초기 응답 속도 느림(Cold Start) 현상  
             logger.info("[ColdStart -> WarmUp] AWS Lambda Function 컨테이너 초기화 - 완료!")
             return
 
-        kakao_request = event_body   # dict 객체(event_body) 변수 kakao_request 저장    
+        kakao_request = event_body       
 
         file_name = chatbot_helper._botlog_file_path
         
-        if False == os.path.exists(file_name):
-            dbReset(file_name)
-        else:   # 아마존 웹서비스(AWS) 람다 함수(Lambda Function) -> 로그 텍스트 파일('/tmp/botlog.txt') 존재하는 경우    
-            logger.info("파일 존재 여부 - File Exists!")   # 지금 현재 파일이 있다고 메시지 "File Exists!" 로그 기록 
+        if False == os.path.exists(file_name): dbReset(file_name)
+        else: logger.info("임시 로그 텍스트 파일('/tmp/botlog.txt') 존재 여부 - File Exists!")   
 
         res_queue = q.Queue()   
 
@@ -100,20 +100,19 @@ def handler(event, context):
         
         request_respond.start()
 
-    except Exception as e:   # 하위 코드 블록에서 예외가 발생해도 변수 e에다 넣고 아래 코드 실행됨
+    except Exception as e:
         error_msg = str(e)  # str() 함수 사용해서 Exception 클래스 객체 e를 문자열로 변환 및 오류 메시지 변수 error_msg에 할당 (문자열로 변환 안할시 챗봇에서 스킬서버 오류 출력되면서 챗봇이 답변도 안하고 장시간 멈춤 상태 발생.)
         # logger._error('[테스트] 오류 - %s' %error_msg)
         logger.error(f"[테스트] 오류 - {error_msg}")
-    finally:   # 예외 발생 여부와 상관없이 항상 마지막에 실행할 코드
-        
-        if None is res_queue:   # 챗봇 답변 내용 담을 큐 객체 res_queue가 None인 경우 
-            logger.info("[테스트] handler - finally 강제 종료 - [사유] 큐(res_queue) 객체 생성 안 함.")
+    finally:
+        if None is res_queue:   # 챗봇 답변 내용 담을 큐(queue) 객체 res_queue 값이 None인 경우 
+            logger.info("[테스트] handler - finally 강제 종료 - [사유] 큐(queue) 객체 res_queue 생성 안 함.")
             return   # finally 문 종료 
              
         while(time.time() - start_time < chatbot_helper._time_limit):   # 챗봇 응답 시간 3.5초 이내인 경우
             if False == res_queue.empty():
-                resFormat = res_queue.get()  # 큐(res_queue)에서 데이터 가져오기 
-                res_queue.task_done()   # 큐(res_queue)에서 가져온 데이터에 대한 작업 완료
+                resFormat = res_queue.get()  # 큐(queue) 객체 res_queue 에서 데이터 가져오기 
+                res_queue.task_done()   # 큐(queue) 객체 res_queue 에서 가져온 데이터에 대한 작업 완료
                 logger.info(f"[테스트] 카카오 json 포맷 기반 챗봇 답변 내용 - {resFormat}")
 
                 run_flag= True   
@@ -135,19 +134,26 @@ def handler(event, context):
             }
         }
     
------ def resChatbot(kakao_request, res_queue, file_name):
+def resChatbot(kakao_request, res_queue, file_name):
     """
-    Description: 챗봇 답변 요청 및 큐 객체(res_queue) 답변 내용 추가
+    Description: 챗봇 답변 요청 및 큐(queue) 객체 res_queue 답변 내용 추가
 
     Parameters:
-        kakao_request (dict):
-        res_queue (object):
-        file_name (str):
+        kakao_request (dict): 카카오톡 채팅방 실제 채팅 정보
+        res_queue (object): 챗봇 답변 내용 담을 큐(queue) 객체 (Queue class)
+        file_name (str): 아마존 웹서비스(AWS) 람다 함수(Lambda Function) -> 임시 로그 텍스트 파일('/tmp/botlog.txt') 상대 경로
+
+        * 참고 
+        /tmp 임시 디렉터리(스토리지) - 아마존 웹서비스(AWS) 람다 함수(Lambda Function)에서 파일을 저장할 수 있는 임시 로컬 스토리지 영역
+        실행 결과(Execution results)는 람다 함수(Lambda Function) 콘솔 "테스트" 탭에서 함수 실행 성공 여부, 실행 결과, 임시 로그 확인 가능
+        참고 URL - https://docs.aws.amazon.com/ko_kr/lambda/latest/dg/configuration-ephemeral-storage.html#configuration-ephemeral-storage-use-cases
+        참고 2 URL - https://inpa.tistory.com/entry/AWS-%F0%9F%93%9A-%EB%9E%8C%EB%8B%A4-tmp-%EC%9E%84%EC%8B%9C-%EC%8A%A4%ED%86%A0%EB%A6%AC%EC%A7%80-%EC%82%AC%EC%9A%A9-%EB%B0%A9%EB%B2%95
 
     Returns: 없음.
     """
 
-    global masterEntity   # 마스터 데이터 싱글톤(singleton) 클래스 객체 
+    global masterEntity   # 마스터 데이터 싱글톤(singleton) 클래스 객체
+    global prev_userRequest_msg   # 이전 사용자 입력 채팅 메세지 (챗봇 응답 시간 5초 초과시 응답 재요청 할 때 사용)
  
     botRes = None         # 챗봇 답변 내용  
     resFormat = None      # 카카오 json format 형식 기반 챗봇 답변 내용
@@ -162,33 +168,41 @@ def handler(event, context):
                 last_update = f.read()  
                 logger.info(f"[테스트] last_update - {last_update}")
 
-            if len(last_update.split()) >= chatbot_helper._multiWord:   # 변수 last_update에 저장된 문자열을 공백('')단위로 분리한 단어들의 개수가 1개보다 많은 경우 (여러 단어로 구성)
-                kind = last_update.split()[chatbot_helper._firstWord_Idx]    # 변수 last_update에 저장된 문자열을 공백('')단위로 분리한 첫 번째 단어 변수 kind에 저장 (예) ask, img 등등...
+            botRes = prev_userRequest_msg
+            logger.info(f"[테스트] 응답 재요청 채팅 메세지 - {botRes}")
+            res_queue.put(kakao.simple_textResFormat(botRes))
+            dbReset(file_name)
 
-                if kind == "img":   # 변수 kind에 저장된 문자열이 'img'인 경우 
-                    botRes, prompt = last_update.split()[chatbot_helper._secondWord_Idx], last_update.split()[chatbot_helper._thirdWord_Idx]   # 변수 last_update에 저장된 문자열 중 공백('')단위로 분리한 두 번째와 세 번째 단어 각각 botRes와 prompt에 저장
-                    logger.info(f"[테스트] /img - botRes (last_update.split()[chatbot_helper._secondWord_Idx]) - {botRes}")
-                    logger.info(f"[테스트] /img - prompt (last_update.split()[chatbot_helper._thirdWord_Idx]) - {prompt}")
-                    res_queue.put(kakao.simple_imageResFormat(botRes,prompt))
+            # TODO: 추후 필요시 아래 주석친 코드 참고 예정 (2025.09.12 minjae)
+            # if len(last_update.split()) >= chatbot_helper._multiWord:   # 변수 last_update에 저장된 문자열을 공백('')단위로 분리한 단어들의 개수가 1개보다 많은 경우 (여러 단어로 구성)
+            #     kind = last_update.split()[chatbot_helper._firstWord_Idx]    # 변수 last_update에 저장된 문자열을 공백('')단위로 분리한 첫 번째 단어 변수 kind에 저장 (예) ask, img 등등...
 
-                else:    # 변수 kind에 저장된 문자열이 'img' 아닌 경우 
-                    botRes = last_update[chatbot_helper._askPrefix_Len:]   # 변수 last_update에 저장된 문자열 중 다섯 번째 문자(last_update[chatbot_helper._askPrefix_Length:]) 부터 끝까지 변수 botRes에 저장 (숫자 4 의미 - "ask "(공백 '' 포함) 문자열 제거하고 나머지 텍스트 가져옴)
-                    logger.info(f"[테스트] /ask - botRes (last_update[4:]) - {botRes}")
-                    res_queue.put(kakao.simple_textResFormat(botRes))
+            #     if kind == "img":   # 변수 kind에 저장된 문자열이 'img'인 경우 
+            #         botRes, prompt = last_update.split()[chatbot_helper._secondWord_Idx], last_update.split()[chatbot_helper._thirdWord_Idx]   # 변수 last_update에 저장된 문자열 중 공백('')단위로 분리한 두 번째와 세 번째 단어 각각 botRes와 prompt에 저장
+            #         logger.info(f"[테스트] /img - botRes (last_update.split()[chatbot_helper._secondWord_Idx]) - {botRes}")
+            #         logger.info(f"[테스트] /img - prompt (last_update.split()[chatbot_helper._thirdWord_Idx]) - {prompt}")
+            #         res_queue.put(kakao.simple_imageResFormat(botRes,prompt))
 
-                dbReset(file_name)
+            #     else:    # 변수 kind에 저장된 문자열이 'img' 아닌 경우 
+            #         botRes = last_update[chatbot_helper._askPrefix_Len:]   # 변수 last_update에 저장된 문자열 중 다섯 번째 문자(last_update[chatbot_helper._askPrefix_Length:]) 부터 끝까지 변수 botRes에 저장 (숫자 4 의미 - "ask "(공백 '' 포함) 문자열 제거하고 나머지 텍스트 가져옴)
+            #         logger.info(f"[테스트] /ask - botRes (last_update[4:]) - {botRes}")
+            #         res_queue.put(kakao.simple_textResFormat(botRes))
+
+            #     dbReset(file_name)
 
         elif True == masterEntity.get_isValid:   # 마스터 데이터 유효성 검사 결과 성공한 경우   
             resFormat, master_data = kakao.getResFormat(userRequest_msg, masterEntity)
+            prev_userRequest_msg = userRequest_msg
 
             if master_data is not None:   # 특정 마스터 데이터 값이 존재하는 경우 (예) 아이템 카드 (basicCard, carousel) or 바로가기 그룹 (quickReplies) 
                 saveLog(file_name, f"({master_data[chatbot_helper._levelNo]}: {master_data[chatbot_helper._displayName]} - 사용자 입력 채팅 정보: '{userRequest_msg}')")
             else:   # 특정 마스터 데이터 값이 존재하지 않는 경우 (예) 아이템 카드 (basicCard, carousel) or 바로가기 그룹 (quickReplies) 
                 saveLog(file_name, f"(etc: [기술지원 문의 제외 일반 문의] - 사용자 입력 채팅 정보: '{userRequest_msg}')")
 
+            # time.sleep(5)   # 테스트 - 5초 대기
             res_queue.put(resFormat)
 
-        else:   # 마스터 데이터 유효성 검사 결과 실패인 경우
+        else:   
             raise Exception(chatbot_helper._error_title + 
                             "사유: 마스터 데이터 유효성 검사 결과 실패!\n" + 
                             chatbot_helper._error_ssflex)
@@ -198,57 +212,72 @@ def handler(event, context):
         #     base_res = kakao.base_ResFormat()
         #     res_queue.put(base_res)
 
-    except Exception as e:   # 하위 코드 블록에서 예외가 발생해도 변수 e에다 넣고 아래 코드 실행됨  
+    except Exception as e:
         error_msg = str(e) 
         logger.error(f"[테스트] 오류 - {error_msg}")
         res_queue.put(kakao.error_textResFormat(error_msg))
-        raise    # raise로 함수 resChatbot의 현재 예외를 다시 발생시켜서 함수 resChatbot 호출한 상위 코드 블록으로 넘김                             
+        raise    # raise로 함수 resChatbot의 현재 예외를 다시 발생시켜서 함수 resChatbot 호출한 상위 코드 블록으로 넘김
 
-# 아마존 웹서비스(AWS) 람다 함수(Lambda Function) -> 로그 텍스트 파일('/tmp/botlog.txt') 전용 함수 
-# 로그(텍스트) 초기화 및 작성 
-def saveLog(file_name, botlog_msg):
-    """
-    Description: 
-
-    Parameters:
-
-    Returns:
-    """
-
-    dbReset(file_name)   
-    logger.info(f"[테스트] AWS 로그 텍스트 파일('/tmp/botlog.txt') 작성 내용 - {botlog_msg}")
-    dbSave(file_name, botlog_msg)
-
-# TODO: 아래 로그(텍스트) 초기화 함수 코드를 f.write("") 사용 안 해도 logger.info("")로 추가해도 로그 텍스트 파일('/tmp/botlog.txt')에 공백("")이 정상적으로 추가되는지 확인하기 (2025.09.18 minjae)
-# 아마존 웹서비스(AWS) 람다 함수(Lambda Function) 실행 결과는 Lambda 콘솔의 "테스트" 탭에서 함수 실행 성공 여부, 실행 결과, 그리고 로그를 확인 가능
-# 참고 URL - https://inpa.tistory.com/entry/AWS-%F0%9F%93%9A-%EB%9E%8C%EB%8B%A4-tmp-%EC%9E%84%EC%8B%9C-%EC%8A%A4%ED%86%A0%EB%A6%AC%EC%A7%80-%EC%82%AC%EC%9A%A9-%EB%B0%A9%EB%B2%95
-# 로그(텍스트) 초기화  
 def dbReset(file_name):
     """
-    Description: 
+    Description: 임시 로그 초기화
 
     Parameters:
+        file_name (str): 아마존 웹서비스(AWS) 람다 함수(Lambda Function) -> 임시 로그 텍스트 파일('/tmp/botlog.txt') 상대 경로
 
-    Returns:
+    Returns: 없음.
     """
 
-    # logger.info("")
     with open(file_name, 'w') as f:
         f.write("")
 
-# TODO: 아래 로그(텍스트) 작성 함수 코드를 f.write(botlog_msg) 사용 안 해도 logger.info(f"{botlog_msg}")로 추가해도 로그 텍스트 파일('/tmp/botlog.txt')에 메세지(botlog_msg)이 정상적으로 추가되는지 확인하기 (2025.09.18 minjae)
-# 아마존 웹서비스(AWS) 람다 함수(Lambda Function) 실행 결과는 Lambda 콘솔의 "테스트" 탭에서 함수 실행 성공 여부, 실행 결과, 그리고 로그를 확인 가능
-# 참고 URL - https://inpa.tistory.com/entry/AWS-%F0%9F%93%9A-%EB%9E%8C%EB%8B%A4-tmp-%EC%9E%84%EC%8B%9C-%EC%8A%A4%ED%86%A0%EB%A6%AC%EC%A7%80-%EC%82%AC%EC%9A%A9-%EB%B0%A9%EB%B2%95
-# 로그(텍스트) 작성  
-def dbSave(file_name, botlog_msg):
+def dbSave(file_name, msg):
     """
-    Description: 
+    Description: 임시 로그 기록
 
     Parameters:
+        file_name (str): 아마존 웹서비스(AWS) 람다 함수(Lambda Function) -> 임시 로그 텍스트 파일('/tmp/botlog.txt') 상대 경로
+        msg (str): 로그 메시지
 
-    Returns:
+    Returns: 없음.
     """
 
-    # logger.info(f"{botlog_msg}")
     with open(file_name, 'w') as f:
-        f.write(botlog_msg)
+        f.write(msg)
+
+def saveLog(file_name, msg):
+    """
+    Description: 임시 로그 초기화 및 기록
+
+    Parameters:
+        file_name (str): 아마존 웹서비스(AWS) 람다 함수(Lambda Function) -> 임시 로그 텍스트 파일('/tmp/botlog.txt') 상대 경로
+        msg (str): 로그 메시지
+
+    Returns: 없음.
+    """
+
+    dbReset(file_name)   
+    logger.info(f"[테스트] 임시 로그 텍스트 파일({file_name}) 로그 메시지 - {msg}")
+    dbSave(file_name, msg)
+
+"""
+* 참고
+ColdStart(콜드 스타트)
+아마존 웹서비스(AWS) 람다 함수(Lambda Function) 초기 응답 속도 느림(Cold Start) 개선 (2025.07.16 minjae)
+참고 URL - https://docs.aws.amazon.com/ko_kr/lambda/latest/dg/provisioned-concurrency.html
+참고 2 URL - https://jeonghwan-kim.github.io/dev/2021/04/01/aws-lambda-cold-start.html  
+참고 3 URL - https://blog.naver.com/chandong83/221975639559
+참고 4 URL - https://wave35.tistory.com/150
+참고 5 URL - https://chatgpt.com/c/687872f0-2ad0-8010-9eb3-2b4e8dba2ba8
+참고 6 URL - https://chatgpt.com/c/6878b74a-b478-8010-b277-313b21eeceee
+
+아마존 웹서비스(AWS) 람다 함수(Lambda Function)와 EventBridge 조합으로 일정 시간마다 함수 handler 호출하여 초기 응답 속도 느림(Cold Start) 개선 (2025.07.18 minjae)
+참고 URL - https://docs.aws.amazon.com/ko_kr/eventbridge/latest/userguide/eb-run-lambda-schedule.html
+참고 2 URL - https://docs.aws.amazon.com/ko_kr/AmazonCloudWatch/latest/logs/example_cross_LambdaScheduledEvents_section.html
+참고 3 URL - https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/python/example_code/lambda#readme
+참고 4 URL - https://docs.aws.amazon.com/ko_kr/lambda/latest/dg/with-eventbridge-scheduler.html
+참고 5 URL - https://jimmy-ai.tistory.com/505
+참고 6 URL - https://www.freeconvert.com/ko/time/utc-to-kst
+참고 7 URL - https://chatgpt.com/c/687df65c-c718-8010-802f-8f8d03c81f5f
+참고 8 URL - https://chatgpt.com/c/6886e63d-c67c-8010-9056-c578b981c95e
+"""

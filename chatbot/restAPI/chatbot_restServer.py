@@ -17,7 +17,7 @@ async def getMasterDownLoadAsync(masterEntity_json_file_path):
         masterEntity_json_file_path (str): 전체 마스터 데이터 json 파일 상대 경로
 
     Returns:
-        dict: 전체 마스터 데이터 
+        master_datas (dict): 전체 마스터 데이터 
     """
 
     master_datas = None   # 전체 마스터 데이터
