@@ -1,0 +1,178 @@
+# TODO : Dockerfile 명령어 "RUN pip install --no-cache-dir -r requirements.txt" 실행시 
+#        아래와 같은 오류 메시지 출력되어 파이썬 패키지 onnxruntime 버전 변경함. (2025.05.14 minjae)
+#        (기존) onnxruntime==1.22.0 -> (변경) onnxruntime==1.15.1
+# 파이썬 패키지 onnxruntime==1.22.0 삭제 명령어 - pip uninstall onnxruntime
+# 파이썬 패키지 onnxruntime==1.15.1 설치 명령어 - pip install onnxruntime==1.15.1
+# 참고 URL - https://chatgpt.com/c/68243d50-f008-8010-8b2b-80fd542b30e3
+# 오류 메시지
+# ERROR: Ignored the following versions that require a different python version: 
+# 1.21.2 Requires-Python >=3.7,<3.11; 
+# ...
+# ERROR: Could not find a version that satisfies the requirement onnxruntime==1.22.0
+
+# 오류 메시지 2
+# ERROR: Ignored the following versions that require a different python version: 1.21.2 Requires-Python >=3.7,<3.11; 1.21.3 Requires-Python >=3.7,<3.11; 1.21.4 Requires-Python >=3.7,<3.11; 1.21.5 Requires-Python >=3.7,<3.11; 1.21.6 Requires-Python >=3.7,<3.11
+# ERROR: Could not find a version that satisfies the requirement onnxruntime==1.22.0 (from versions: 1.15.0, 1.15.1, 1.16.0, 1.16.1, 1.16.2, 1.16.3)
+# ERROR: No matching distribution found for onnxruntime==1.22.0
+
+# Docker 이미지 아마존 웹서비스(AWS) ECR(Elastic Container Registry) 배포 순서  
+# 참고 URL - https://chatgpt.com/c/6822e459-65f8-8010-b848-afebf01bf52e
+# 참고 2 URL - https://chatgpt.com/c/6823d65b-23c8-8010-8e97-4b64d38f226f
+# 1. 파일 탐색기 실행 -> 폴더 경로 "D:\minjae" 이동 -> 키보드 "Shift" 키 누르고 -> 폴더 "testKakaoChatbot" 마우스 우클릭 -> "여기에 PowerShell 창 열기(S)" 클릭 
+# 2. Windows PowerShell 창 실행 -> 터미널창에 아래 명령어 순서대로 입력 
+# 3. 명령어 aws configure 입력 및 엔터
+# 명령어 AWS Access Key ID [None]: 액세스 키 입력 및 엔터
+# 명령어 AWS Secret Access Key [None]: 비밀(Secret) 액세스 키 입력 및 엔터
+# 명령어 Default region name [None]: ap-northeast-2 입력 및 엔터
+# 명령어 Default output format [None]: json 입력 및 엔터
+# 명령어 type $env:USERPROFILE\.aws\credentials 입력 및 엔터 -> 아래처럼 액세스키, 시크릿 액세스 키 출력
+# [default]
+# aws_access_key_id = 액세스 키
+# aws_secret_access_key = 비밀(Secret) 액세스 키
+# 명령어 aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 980921720325.dkr.ecr.ap-northeast-2.amazonaws.com 입력 및 엔터 
+# -> 아래처럼 로그인 성공 출력 
+# Login Succeeded
+# 자격증명 명령어 aws sts get-caller-identity 입력 및 엔터 
+# -> 아래처럼 자격증명 결과 출력
+# {
+#     "UserId": "AIDA6IY35TYC7JM4K6R5E",
+#     "Account": "980921720325",
+#     "Arn": "arn:aws:iam::980921720325:user/codingapple1"
+# }
+
+# 4. 명령어 $env:DOCKER_BUILDKIT=0 입력 및 엔터 
+# CASE 1: 별도 버전 필요 없는 경우 
+# 5. 명령어 docker build -t test_kakao_repo . 입력 및 엔터
+# 6. 명령어 docker tag test_kakao_repo:latest 980921720325.dkr.ecr.ap-northeast-2.amazonaws.com/test_kakao_repo:latest 입력 및 엔터 
+# 7. 명령어 docker push 980921720325.dkr.ecr.ap-northeast-2.amazonaws.com/test_kakao_repo:latest 입력 및 엔터 
+
+# TODO: 아마존 웹서비스(AWS) 람다 함수(Lambda Function) 초기 응답 속도 느림(Cold Start) 개선하기 (2025.07.16 minjae)
+# 참고 URL - https://docs.aws.amazon.com/ko_kr/lambda/latest/dg/provisioned-concurrency.html
+# 참고 2 URL - https://jeonghwan-kim.github.io/dev/2021/04/01/aws-lambda-cold-start.html  
+# 참고 3 URL - https://blog.naver.com/chandong83/221975639559
+# 참고 4 URL - https://wave35.tistory.com/150
+# 참고 5 URL - https://chatgpt.com/c/687872f0-2ad0-8010-9eb3-2b4e8dba2ba8
+# 참고 6 URL - https://chatgpt.com/c/6878b74a-b478-8010-b277-313b21eeceee
+# TODO: docker 명령어 "docker tag test_kakao_repo:1 980921720325.dkr.ecr.ap-northeast-2.amazonaws.com/test_kakao_repo:1" 실행시 
+#       아래와 같은 오류 발생하여 docker build 명령어에 태그(tag) "1" 추가함(test_kakao_repo:1). 
+# 참고 URL - https://chatgpt.com/c/6878890b-e8d4-8010-92c4-989b6ed5b61a
+# 오류 메시지 - Error response from daemon: No such image: test_kakao_repo:1
+# CASE 2: 별도 버전 필요한 경우 (예) 버전 "1"로 설정 
+# 8. 명령어 docker build -t test_kakao_repo:1 . 입력 및 엔터
+# 9. 명령어 docker tag test_kakao_repo:1 980921720325.dkr.ecr.ap-northeast-2.amazonaws.com/test_kakao_repo:1 입력 및 엔터 
+# 10. 명령어 docker push 980921720325.dkr.ecr.ap-northeast-2.amazonaws.com/test_kakao_repo:1 입력 및 엔터 
+
+# TODO: PowerShell 화면에서 아래 명령어 입력시 백슬래시(\) 때문에 오류가 발생하므로 백슬래시(\) 제외하고 명령어 입력 필수 (2025.07.17 minjae)
+# 참고 URL - https://chatgpt.com/c/68788b83-bf48-8010-9892-446614b04d1f
+# 오류 발생 명령어: aws lambda put-provisioned-concurrency-config \ --function-name test_kakao \ --qualifier 1 \ --provisioned-concurrent-executions 2
+# 오류 수정 명령어: aws lambda put-provisioned-concurrency-config --function-name test_kakao --qualifier 1 --provisioned-concurrent-executions 2
+
+# 오류 메세지 : PS D:\minjae\testKakaoChatbot\chatbot> aws lambda put-provisioned-concurrency-config \ --function-name test_kakao \ --qualifier 1 \ --provisioned-concurrent-executions 2
+# usage: aws [options] <command> <subcommand> [<subcommand> ...] [parameters]
+# To see help text, you can run:
+
+#   aws help
+#   aws <command> help
+#   aws <command> <subcommand> help
+
+# Unknown options: \, \, \
+
+
+# 11. 아래 명령어 입력 및 엔터  
+# aws lambda put-provisioned-concurrency-config \ --function-name test_kakao \ --qualifier 1 \ --provisioned-concurrent-executions 2
+
+# ** 11번 명령어 설명 **  
+# --qualifier 1 : 위에서 발행한 버전 (예: "1")
+# --provisioned-concurrent-executions 2 : 항상 2개 인스턴스를 Warm 상태로 유지
+
+# TODO: 아래와 같은 오류 메시지 출력되어 아마존 웹서비스(AWS) Service Quotas -> AWS 서비스 -> AWS Lambda -> Concurrent executions 들어가서 
+#       적용된 계정 수준 할당량 값 (기존) 10 count -> (변경) 1,000 count 증가 요청 (2025.07.17 minjae)
+# 오류 메시지 1
+# PS D:\minjae\testKakaoChatbot\chatbot> aws lambda put-provisioned-concurrency-config --function-name test_kakao --qualifier 1 --provisioned-concurrent-executions 1
+# An error occurred (InvalidParameterValueException) when calling the PutProvisionedConcurrencyConfig operation: Specified ConcurrentExecutions for function decreases account's UnreservedConcurrentExecution below its minimum value of [10].
+
+# 오류 메시지 2
+# PS D:\minjae\testKakaoChatbot\chatbot> aws lambda put-provisioned-concurrency-config --function-name test_kakao --qualifier 1 --provisioned-concurrent-executions 2
+# An error occurred (AccessDeniedException) when calling the PutProvisionedConcurrencyConfig operation: User: arn:aws:iam::980921720325:user/codingapple1 is not authorized to perform: lambda:PutProvisionedConcurrencyConfig on resource: arn:aws:lambda:ap-northeast-2:980921720325:function:test_kakao:1 because no identity-based policy allows the lambda:PutProvisionedConcurrencyConfig action
+# 참고 URL - https://docs.aws.amazon.com/ko_kr/lambda/latest/dg/example_lambda_PutProvisionedConcurrencyConfig_section.html
+# 참고 2 URL - https://chatgpt.com/c/68788b83-bf48-8010-9892-446614b04d1f
+# 참고 3 URL - https://chatgpt.com/c/68788c9c-2488-8010-af77-471c4ea377a3
+
+
+# Dockerfile 명령어
+# Base image (Amazon Linux 기반의 Lambda 런타임)
+FROM public.ecr.aws/lambda/python:3.11
+
+# 필수 패키지 설치
+RUN yum install -y \
+    gcc \
+    gcc-c++ \
+    make \
+    cmake \
+    swig \
+    python3-devel \
+    wget \
+    git
+
+# requirements.txt 사용해서 Python 패키지 설치
+COPY requirements.txt .
+RUN pip install --upgrade pip
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 전체 파일 복사 (디렉토리 - chatbot_env, 파일 - Dockerfile, 파일 - .git는 무시됨)
+COPY . .
+
+# Lambda 핸들러 설정
+CMD ["lambda_function.handler"]
+
+
+# Dockerfile 명령어 예시 1
+# 참고 URL - https://docs.aws.amazon.com/ko_kr/prescriptive-guidance/latest/patterns/deploy-lambda-functions-with-container-images.html
+# FROM public.ecr.aws/lambda/python:3.11
+
+# # Copy function code
+# COPY app.py ${LAMBDA_TASK_ROOT} 
+# COPY requirements.txt  ${LAMBDA_TASK_ROOT} 
+
+# # install dependencies
+# RUN pip3 install --user -r requirements.txt
+
+# # Set the CMD to your handler (could also be done as a parameter override outside of the Dockerfile)
+# CMD [ "app.lambda_handler" ]
+
+# Dockerfile 명령어 예시 2 
+# 참고 URL - https://only-advance.tistory.com/entry/Docker%EB%A5%BC-%EC%9D%B4%EC%9A%A9%ED%95%9C-ChromaDB%EC%99%80-%EB%8D%B0%EC%9D%B4%ED%84%B0-%EC%83%9D%EC%84%B1-%EC%BB%A8%ED%85%8C%EC%9D%B4%EB%84%88-%EC%97%B0%EB%8F%99%ED%95%98%EA%B8%B0
+# FROM python:3.9-slim
+
+# RUN pip install chromadb
+
+# CMD [ "chromadb", "start", "--host", "0.0.0.0", "--port", "8000" ]
+
+# Dockerfile 명령어 예시 3 
+# 참고 URL - https://only-advance.tistory.com/entry/Docker%EB%A5%BC-%EC%9D%B4%EC%9A%A9%ED%95%9C-ChromaDB%EC%99%80-%EB%8D%B0%EC%9D%B4%ED%84%B0-%EC%83%9D%EC%84%B1-%EC%BB%A8%ED%85%8C%EC%9D%B4%EB%84%88-%EC%97%B0%EB%8F%99%ED%95%98%EA%B8%B0
+# FROM python:3.9-slim 
+
+# WORKDIR /app
+
+# COPY requirements.txt .
+# RUN pip install -r requirements.txt
+
+# COPY data.py .
+# CMD ["python", "data.py"]
+
+# Dockerfile 명령어 예시
+# # Python 3.11 베이스 이미지 사용
+# FROM python:3.11-slim
+
+# # 작업 디렉토리 설정
+# WORKDIR /app
+
+# # requirements.txt 복사 후 패키지 설치
+# COPY requirements.txt .
+# RUN pip install --no-cache-dir -r requirements.txt
+
+# # 프로젝트 전체 복사
+# COPY . .
+
+# # 엔트리포인트 설정 (예: lambda_function 실행)
+# CMD ["python", "lambda_function.py"]

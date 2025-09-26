@@ -6,7 +6,7 @@
 """
 
 import sys
-import logging   # 로그 작성 
+import logging   # 로그 기록 
 
 # 1. 공통 모듈 먼저 import 처리
 from commons import chatbot_helper   # 챗봇 전용 도움말 텍스트
@@ -27,9 +27,9 @@ for handler in logger.handlers[:]:
 logger.propagate = False
 
 # 4. formatter 생성 (로그 기록/출력/저장에 사용할 날짜 + 로그 메시지)
-# 원하는 출력 형태 예시: [INFO] [2025-09-18 10:49:19] [kakao.py | getResFormat - L282]: [테스트] 카카오 json 포맷 가져오기 - Start!
-# formatter = logging.Formatter('[%(levelname)s] [%(asctime)s] [%(filename)s | %(funcName)s - L%(lineno)d]: %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
-formatter = KSTFormatter('[%(levelname)s] [%(asctime)s] [%(filename)s | %(funcName)s - L%(lineno)d]: %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+# 원하는 출력 형태 예시: [INFO] [2025-09-18 10:49:19] [kakao.py | getResFormat - L282]: [테스트] 카카오 json 포맷 가져오기 - 시작!
+# formatter = logging.Formatter('[%(levelname)s] [%(asctime)s] [%(filename)s | %(funcName)s - L%(lineno)d]: %(message)s', datefmt=chatbot_helper._datefmt)
+formatter = KSTFormatter('[%(levelname)s] [%(asctime)s] [%(filename)s | %(funcName)s - L%(lineno)d]: %(message)s', datefmt=chatbot_helper._datefmt)
 
 # 5. handler 생성 (streamHandler: 콘솔 출력용 // fileHandler: 파일 기록용)
 # streamHandler = logging.StreamHandler()
@@ -72,7 +72,7 @@ logger.addHandler(streamHandler)
 import logging  # 로깅 함수 호출
 
 ​1. instance 설정 - log(로그) instance 설정
-2. formatter 생성 - log(로그)를 저장(작성/기록)할 포맷(format) 지정 
+2. formatter 생성 - log(로그)를 저장(기록)할 포맷(format) 지정 
 3. handler 생성 - log(로그)를 담을 수 있는 핸들러(handler) 생성 (log(로그)를 콘솔창에 출력 할건지? 아니면 파일에 저장 할건지? 이런 저장하는 핸들러(handler) 생성하기)
 4. handler에 formatter 지정 - 2번에서 지정한 포맷(format)을 핸들러(handler)에 지정
 5. 입력받는 instance에 handler 추가 - 4번에서 지정한 포맷(format)을 핸들러(handler)에 지정한 이후 해당 핸들러(handler)를 log(로그) instance에 추가하여 "입력받는 값"을 핸들러(콘솔 또는 파일)로 가져올 수 있도록 또 설정하기 

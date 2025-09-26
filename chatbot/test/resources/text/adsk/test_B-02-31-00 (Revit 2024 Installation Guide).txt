@@ -1,0 +1,41 @@
+Revit 2024 버전 설치 방법
+
+Revit 2024 제품 설치방법을 안내 드립니다.
+
+1. 먼저 manage.autodesk.com 홈페이지로 접속합니다.
+2. 홈페이지에서 흰색 로그인 버튼을 클릭합니다.
+3. 먼저 아이디를 입력하고, "다음" 버튼을 클릭합니다.
+4. 비밀번호를 입력하고, "로그인" 버튼을 클릭합니다.
+5. 2차 인증을 진행하고 코드입력 버튼을 클릭합니다.
+6. manage.autodesk.com 포털창에서 "제품 및 서비스" 탭을 클릭합니다.
+7. Revit 항목을 찾고, 필요한 제품의 버전 및 언어를 선택합니다. 검정색 "설치" 버튼을 클릭하고 "동의" 버튼을 클릭합니다.
+8. 다운로드된 웹브라우저 설치파일을 실행합니다.
+9. 설치 구성요소가 준비될때까지 대기하십시오.
+
+*만약 정상적으로 수행하기 힘드시다면 수동 설치파일 다운로드 링크를 안내드립니다.*
+해당 링크에 게시된 모든 설치파일을 다운로드 하고, 1번 파일을 실행합니다.
+1번 파일
+https://efulfillment.autodesk.com/NetSWDLD/2024/RVT/E7F68AA6-4954-3ACE-8543-D2FCC9B0A356/SFX/Revit_2024_G1_Win_64bit_dlm_001_005.sfx.exe?authparam=1748765345_426e04af99acc2c0780e6d523b828686
+2번 파일
+https://efulfillment.autodesk.com/NetSWDLD/2024/RVT/E7F68AA6-4954-3ACE-8543-D2FCC9B0A356/SFX/Revit_2024_G1_Win_64bit_dlm_002_005.sfx.exe?authparam=1748765345_7c099e3dc842711e01bfcfa3e8d45b0a
+3번 파일
+https://efulfillment.autodesk.com/NetSWDLD/2024/RVT/E7F68AA6-4954-3ACE-8543-D2FCC9B0A356/SFX/Revit_2024_G1_Win_64bit_dlm_003_005.sfx.exe?authparam=1748765345_f43467e36d0493c9d25ec00974d42953
+4번 파일
+https://efulfillment.autodesk.com/NetSWDLD/2024/RVT/E7F68AA6-4954-3ACE-8543-D2FCC9B0A356/SFX/Revit_2024_G1_Win_64bit_dlm_004_005.sfx.exe?authparam=1748765345_5a1a12c3e8a127d2836906cd14014f66
+5번 파일
+https://efulfillment.autodesk.com/NetSWDLD/2024/RVT/E7F68AA6-4954-3ACE-8543-D2FCC9B0A356/SFX/Revit_2024_G1_Win_64bit_dlm_005_005.sfx.exe?authparam=1748765345_a6fef386fbf7e59602273648985311e6
+
+10. 설치 UI가 활성화되면 "다음"을 클릭합니다.
+11. *유의사항* 설치위치는 C:\Program Files\Autodesk에 고정합니다 변경하지 마십시오
+12. "설치"를 클릭합니다.
+13. 설치가 100% 전부 다 진행될 때까지 기다립니다.
+14. "시작" 버튼을 눌러 Revit을 실행합니다.
+
+* 라이센스 활성화 *
+
+- Autodesk ID로 로그인을 클릭합니다.
+- 인터넷 창이 별도로 활성화 되며, "제품으로 이동"을 클릭합니다.
+- 라이센스 정보가 리디렉션 되면서 인증이 완료됩니다. Revit의 라이선스 인증이 이루어집니다.  
+
+* 상상플렉스 커뮤니티(기술지원 문의)
+https://www.ssflex.co.kr/community/open

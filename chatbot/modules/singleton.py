@@ -2,11 +2,11 @@
 * 싱글톤(singleton) 패턴 전용 모듈 
 """
 
-import logging   # 로그 작성 
+import logging   # 로그 기록 
 import asyncio   # 비동기 프로그래밍(async - await)  
 
 from commons import chatbot_helper   # 챗봇 전용 도움말 텍스트
-from modules import chatbot_logger   # 챗봇 커스텀 로그 작성 모듈 -> 챗봇 전역 로그 객체(logger) 사용 못하는 경우 import 처리
+from modules import chatbot_logger   # 챗봇 커스텀 로그 기록 모듈 -> 챗봇 전역 로그 객체(logger) 사용 못하는 경우 import 처리
 
 # TODO: 순환 임포트(circular import) 문제(modules.singleton.py → modules.log import 처리 <-> modules.log.py → modules.singleton.KSTFormatter import 처리)로 인해 아래와 같은 오류 발생하여 챗봇 전역 로그 객체(logger) import 처리문 주석 처리 진행 (2025.09.19 minjae)
 # 참고 URL - https://claude.ai/chat/b9d2cade-0c63-4549-98cb-6a35f03c86c9

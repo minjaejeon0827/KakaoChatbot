@@ -4,6 +4,8 @@
 
 # region 공통 
 
+_datefmt='%Y-%m-%d %H:%M:%S'   # 로그 기록시 사용할 년-월-일 시:분:초 형식
+
 # 오류 안내 메시지 (raise Exception)
 _error_title = '[테스트] [오류 안내]\n'
 _error_ssflex = '상상플렉스 커뮤니티\n(https://www.ssflex.co.kr/community/open)\n문의 부탁드립니다.'

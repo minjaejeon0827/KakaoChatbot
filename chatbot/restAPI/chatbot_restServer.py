@@ -6,7 +6,7 @@ import json      # json 데이터 처리
 import asyncio   # 비동기 프로그래밍(async - await)
  
 from commons import chatbot_helper   # 챗봇 전용 도움말 텍스트 
-from modules import chatbot_logger   # 챗봇 커스텀 로그 작성 모듈 -> 챗봇 전역 로그 객체(logger) 사용 못하는 경우 import 처리
+from modules import chatbot_logger   # 챗봇 커스텀 로그 기록 모듈 -> 챗봇 전역 로그 객체(logger) 사용 못하는 경우 import 처리
 
 # TODO: 추후 테스트 웹서버 구축 후 마스터 데이터 다운로드 Rest API 함수 getMasterDownLoadAsync 로직 수정 예정 (2025.09.11 minjae)
 async def getMasterDownLoadAsync(masterEntity_json_file_path):
