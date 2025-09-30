@@ -1,24 +1,27 @@
 """
 * 싱글톤(singleton) 패턴 전용 모듈 
-"""
+"""  
 
-import logging   # 로그 기록 
-import asyncio   # 비동기 프로그래밍(async - await)  
-
+# 1. 공통 모듈 먼저 import 처리
 from commons import chatbot_helper   # 챗봇 전용 도움말 텍스트
-from modules import chatbot_logger   # 챗봇 커스텀 로그 기록 모듈 -> 챗봇 전역 로그 객체(logger) 사용 못하는 경우 import 처리
+
+# 2. 챗봇 커스텀 로그 기록 모듈 import 처리
+from modules import chatbot_logger   # log.py -> 챗봇 전역 로그 객체(logger) 사용 못하는 경우 import 처리
+
+# 3. 나머지 모듈 import 처리
+import logging   # 로그 기록 
+import asyncio   # 비동기 프로그래밍(async - await) 
+
+from datetime import datetime 
+from zoneinfo import ZoneInfo    # 대한민국 표준시 설정
 
 # TODO: 순환 임포트(circular import) 문제(modules.singleton.py → modules.log import 처리 <-> modules.log.py → modules.singleton.KSTFormatter import 처리)로 인해 아래와 같은 오류 발생하여 챗봇 전역 로그 객체(logger) import 처리문 주석 처리 진행 (2025.09.19 minjae)
 # 참고 URL - https://claude.ai/chat/b9d2cade-0c63-4549-98cb-6a35f03c86c9
 # 오류 메시지 
 # 1. [ERROR] Runtime.ImportModuleError: Unable to import module 'lambda_function': cannot import name 'logger' from partially initialized module 'modules.log' (most likely due to a circular import) (/var/task/modules/log.py)Traceback (most recent call last):
 # 2. [ERROR] Runtime.ImportModuleError: Unable to import module 'lambda_function': cannot import name 'KSTFormatter' from partially initialized module 'modules.singleton' (most likely due to a circular import) (/var/task/modules/singleton.py)Traceback (most recent call last):
-# from modules.log import logger    # 챗봇 전역 로그 객체(logger)  
-from restAPI import chatbot_restServer    # 챗봇 웹서버 Rest API 메서드 
-
-from datetime import datetime 
-from zoneinfo import ZoneInfo    # 대한민국 표준시 설정 
-
+# from modules.log import logger   # 챗봇 전역 로그 객체(logger)  
+from restAPI import chatbot_restServer   # 챗봇 웹서버 Rest API 메서드 
 from enum import Enum    # Enum 열거형 구조체 
 
 class EnumValidator(Enum):
@@ -47,15 +50,28 @@ class MasterEntity(object):
         참고 2 URL - https://wiki1.kr/index.php/%EB%A7%88%EC%8A%A4%ED%84%B0%EB%8D%B0%EC%9D%B4%ED%84%B0#cite_note-masterdata_synopsis-2
         참고 3 URL - https://claude.ai/chat/5a7fdfc5-6cb8-4286-bb10-a3082e164934 
 
-    Attributes: 없음.
+        class Docstring 작성 가이드라인
+        참고 URL - https://claude.ai/chat/0556e5bc-59d5-4d40-8b12-acf1e8388ee9
+ 
+        Properties Docstring 작성 가이드라인
+        참고 URL - https://claude.ai/chat/37ddea1f-89db-470b-b789-1781893801b7
+
+    Attributes: 
+        _instance (MasterEntity): 마스터 데이터 싱글톤(singleton) 클래스 인스턴스
+        _init (bool): 인스턴스 초기화 완료 여부 (True: 완료, False: 실패)
+
+        __master_datas (dict): 전체 마스터 데이터 
+        __chatbot_messageTexts (list): [챗봇 문의] 버튼 메시지 리스트
+        __adsk_messageTexts (list): [Autodesk 제품 설치 문의] 버튼 메시지 리스트
+        __box_messageTexts (list): [상상진화 BOX 제품 설치 문의] 버튼 메시지 리스트
+        __valid_targets (list): 마스터 데이터 유효성 검사 시 확인할 대상 키(key) 리스트
+        __isValid (bool): 마스터 데이터 유효성 검사 통과 여부 (True: 유효함, False: 유효하지 않음)
 
     Parameters: 
-        * __init__(self, valid_targets):
-        self (object): 마스터 데이터 싱글톤(singleton) 클래스(MasterEntity) 객체 자신
         valid_targets (list): 마스터 데이터 유효성 검사 대상 리스트
+        (예시) [ "buttons", "items", "autoCADInfos", "revitInfos", "navisworksManageInfos", "infraWorksInfos", "civil3DInfos", "revitBoxInfos", "cadBoxInfos", "energyBoxInfos", "accountInfos", "etcInfos" ]
 
-    Properties: 
-        * getter
+    Properties (읽기 전용): 
         get_master_datas (dict): 전체 마스터 데이터 가져오기
         get_chatbot_messageTexts (list): [챗봇 문의] 버튼 메시지 리스트 가져오기
         get_adsk_messageTexts (list): [Autodesk 제품 설치 문의] 버튼 메시지 리스트 가져오기
@@ -63,20 +79,22 @@ class MasterEntity(object):
         get_valid_targets (list): 마스터 데이터 유효성 검사 대상 리스트 가져오기
         get_isValid (bool): 마스터 데이터 유효성 검사 결과 가져오기
 
-        * 참고 
-        Properties Docstring 작성 가이드라인
-        참고 URL - https://claude.ai/chat/37ddea1f-89db-470b-b789-1781893801b7
-
     Methods:
         initSettingAsync(self, valid_targets): 마스터 데이터 초기 설정  
         isValidator(self): 마스터 데이터 유효성 검사
+
+    Notes:
+        - 싱글톤 패턴으로 구현되어 여러 번 인스턴스를 생성해도 동일한 객체 반환
+        - 아마존 웹서비스 람다 함수(AWS Lambda function) 환경에서는 단일 스레드(single thread)로 실행되므로 스레드 락(_lock = threading.Lock()) 불필요
+        _lock = threading.Lock()   # _lock = threading.Lock() 용도 - 일반적인 Python 응용 프로그램 환경에서 여러 스레드가 동시에 싱글톤을 생성하려 할 때 또는 Race condition으로 인해 여러 인스턴스가 생성될 가능성이 있을 때 사용한다.
     """
+
+    # _lock = threading.Lock()   # _lock = threading.Lock() 용도 - 일반적인 Python 응용 프로그램 환경에서 여러 스레드가 동시에 싱글톤을 생성하려 할 때 또는 Race condition으로 인해 여러 인스턴스가 생성될 가능성이 있을 때 사용한다.
 
     def __new__(_class, *args, **kwargs):      
         """
         Description: 
-            객체 생성자
-            부모 클래스(object) 상속 받아 재정의된 생성자(__new__) 이다. 
+            객체 생성자 - 부모 클래스(object) 상속 받아 재정의된 생성자(__new__) 이다. 
                      
             *** 주요 특징 ***         
             1. __new__ 메서드는 해당 클래스(MasterEntity)에 정의되어 있지 않으면 알아서 부모 클래스(object)의 __new__ 메서드가 호출되어 객체 생성
@@ -97,6 +115,7 @@ class MasterEntity(object):
         if not hasattr(_class, "_instance"):   # 해당 클래스에 _instance 속성(property - 객체)이 없다면
             _class._instance = super().__new__(_class)  
             chatbot_logger.info("[테스트] MasterEntity __new__ 메서드 - 호출 완료!")
+
         return _class._instance                         
 
     def __init__(self, valid_targets):  
@@ -315,8 +334,8 @@ class MasterEntity(object):
             chatbot_logger.info(f"[테스트] chatbot_restServer.getMasterDownLoadAsync 함수 속성 __doc__ 사용 및 docstring 내용 확인 - {chatbot_restServer.getMasterDownLoadAsync.__doc__}")
 
             self.__master_datas = await chatbot_restServer.getMasterDownLoadAsync(chatbot_helper._masterEntity_json_file_path)   # 전체 마스터 데이터 다운로드  
-            # TODO: 리스트 컴프리헨션 문법 사용하여 "buttons" 리스트 객체(master_datas[chatbot_helper._chatbotCard][chatbot_helper._buttons])에 속한 
-            #       키(key) 'messageText'에 할당된 값(button[chatbot_helper._messageText])만 추출하여 리스트 객체([button[chatbot_helper._messageText] for button in master_datas[chatbot_helper._chatbotCard][chatbot_helper._buttons]])로 변환 처리 (2025.08.25 minjae) 
+            # TODO: 리스트 컴프리헨션 문법 사용하여 "buttons" 리스트 객체(self.__master_datas[chatbot_helper._chatbotCard][chatbot_helper._buttons])에 속한 
+            #       키(key) 'messageText'에 할당된 값(chatbotButton[chatbot_helper._messageText])만 추출하여 리스트 객체 self.__chatbot_messageTexts 값 할당 처리 (2025.08.25 minjae) 
             # 참고 URL - https://docs.python.org/ko/3.13/tutorial/datastructures.html#list-comprehensions
             # 참고 2 URL - https://claude.ai/chat/a6e38078-6a1f-4c67-a1f2-442f04d86938
             self.__chatbot_messageTexts = [ chatbotButton[chatbot_helper._messageText] for chatbotButton in self.__master_datas[chatbot_helper._chatbotCard][chatbot_helper._buttons] ]   # [챗봇 문의] 버튼 메시지 리스트  
@@ -356,7 +375,7 @@ class MasterEntity(object):
             if None is master_datas:    
                 raise Exception("전체 마스터 데이터 로드 실패!")
 
-            # TODO: dict 객체 master_datas를 for문으로 루핑하기 위해 items() 메서드 사용 구현 (2025.09.02 minjae)
+            # dict 객체 master_datas를 for문으로 루핑하기 위해 items() 메서드 호출 (2025.09.02 minjae)
             # 참고 URL - https://docs.python.org/ko/3.13/tutorial/datastructures.html#looping-techniques 
             for parent_key, parent_value in master_datas.items():
                 chatbot_logger.info(f"[테스트] master_datas - parent_key: {parent_key} / parent_value: {parent_value}")
@@ -365,7 +384,7 @@ class MasterEntity(object):
                     if child_key in valid_targets:   # 유효성 검사 대상 키들만 확인
                         chatbot_logger.info(f"[테스트] master_data - child_key: {child_key} / child_value: {child_value}")
                         # 파이썬 함수 len 사용하여 문자열, 리스트 객체 길이 구하기
-                        # 참고 URL - https://wikidocs.net/215513            
+                        # 참고 URL - https://docs.python.org/ko/3/library/functions.html#len                               
                         if (None is child_value or EnumValidator.NOT_EXISTENCE.value >= len(child_value)):   # child_value 값이 존재하지 않거나(None) 길이가 0보다 작거나 같은 경우 
                             chatbot_logger.info("[테스트] 마스터 데이터 유효성 검사 결과 - 오류!")
                             return False   
@@ -384,30 +403,42 @@ class KSTFormatter(logging.Formatter):
         대한민국 표준시 설정 싱글톤(singleton) 클래스 (pytz 라이브러리 사용 안 함.)
         참고 URL - https://claude.ai/chat/8fc1ceeb-fe95-4d1b-8517-ecec83beb3f2
 
-    Attributes: 없음.
+        class Docstring 작성 가이드라인
+        참고 URL - https://claude.ai/chat/6c33a991-97cf-4736-8bcd-724cbf1a58ee
 
-    Parameters: 
-        * __init__(self, *args, **kwargs):
-        self (object): 대한민국 표준시 설정 싱글톤(singleton) 클래스(KSTFormatter) 객체 자신
-        *args (tuple): 위치 가변 인자
-        **kwargs (dict): 키워드 가변 인자
+        Properties Docstring 작성 가이드라인
+        참고 URL - https://claude.ai/chat/37ddea1f-89db-470b-b789-1781893801b7
 
-    Properties:
-        * getter
-        get_kst (object): 대한민국 표준시 설정 가져오기 (ZoneInfo class) 
+    Attributes: 
+        _instance (KSTFormatter): 대한민국 표준시 설정 싱글톤(singleton) 클래스 인스턴스
+        _init (bool): 인스턴스 초기화 완료 여부 (True: 완료, False: 실패)
+        __kst (object): 대한민국 표준시(Asia/Seoul) ZoneInfo 클래스 객체
+
+    Parameters (__init__ 메서드): 
+        *args (tuple): logging.Formatter 위치 가변 인자 (fmt, datefmt 등)
+        **kwargs (dict): logging.Formatter 키워드 가변 인자
+
+        사용 예시:
+            formatter = KSTFormatter('[%(levelname)s] [%(asctime)s] [%(filename)s | %(funcName)s - L%(lineno)d]: %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+
+    Properties (읽기 전용):
+        get_kst (object): 설정된 대한민국 표준시(Asia/Seoul) ZoneInfo 클래스 객체 가져오기 
     
     Methods:
-        formatTime(self, record, datefmt=None): 지정된 LogRecord(record)의 생성 시간(현재 날짜 및 시간)을 대한민국 표준시 포맷된 문자열로 가져오기 
+        formatTime(self, record, datefmt=None): LogRecord(record)의 생성 시간(현재 날짜 및 시간)을 대한민국 표준시로 변환하여 포맷된 문자열 가져오기 
+
+    Notes:
+        - 싱글톤 패턴으로 구현되어 여러 번 인스턴스를 생성해도 동일한 객체 반환
+        - 아마존 웹서비스 람다 함수(AWS Lambda function) 환경에서는 단일 스레드(single thread)로 실행되므로 스레드 락(_lock = threading.Lock()) 불필요
+        _lock = threading.Lock()   # _lock = threading.Lock() 용도 - 일반적인 Python 응용 프로그램 환경에서 여러 스레드가 동시에 싱글톤을 생성하려 할 때 또는 Race condition으로 인해 여러 인스턴스가 생성될 가능성이 있을 때 사용한다.
     """
             
-    # 아마존 웹서비스 람다 함수(AWS Lambda function) 환경에서는 단일 스레드(single thread)로 실행되므로 아래 주석친 코드(_lock = threading.Lock()) 사용할 필요 없음. (2025.09.18 minjae)
     # _lock = threading.Lock()   # _lock = threading.Lock() 용도 - 일반적인 Python 응용 프로그램 환경에서 여러 스레드가 동시에 싱글톤을 생성하려 할 때 또는 Race condition으로 인해 여러 인스턴스가 생성될 가능성이 있을 때 사용한다.
 
     def __new__(_class, *args, **kwargs):      
         """
         Description: 
-            객체 생성자
-            부모 클래스(logging.Formatter) 상속 받아 재정의된 생성자(__new__) 이다.
+            객체 생성자 - 부모 클래스(logging.Formatter) 상속 받아 재정의된 생성자(__new__) 이다.
                      
             *** 주요 특징 ***         
             1. __new__ 메서드는 해당 클래스(KSTFormatter)에 정의되어 있지 않으면 알아서 부모 클래스(logging.Formatter)의 __new__ 메서드가 호출되어 객체 생성
@@ -428,6 +459,7 @@ class KSTFormatter(logging.Formatter):
         if not hasattr(_class, "_instance"):   # 해당 클래스에 _instance 속성(property - 객체)이 없다면 
             _class._instance = super().__new__(_class)  
             chatbot_logger.info("[테스트] KSTFormatter __new__ 메서드 - 호출 완료!")
+            
         return _class._instance                         
 
     def __init__(self, *args, **kwargs):
@@ -451,7 +483,7 @@ class KSTFormatter(logging.Formatter):
                 
         _class = type(self)
         if not hasattr(_class, "_init"):   # 해당 클래스에 _init 속성(property)이 없다면
-            # 아래와 같은 오류 메시지 출력되어 부모 클래스(logging.Formatter) __init__ 메서드(super().__init__(*args, **kwargs)) 호출 구현 (2025.09.18 minjae)
+            # 아래와 같은 오류 메시지 출력되어 부모 클래스(logging.Formatter) __init__ 메서드(super().__init__(*args, **kwargs)) 호출 (2025.09.18 minjae)
             # 오류 메시지: AttributeError: 'KSTFormatter' object has no attribute '_style'
             super().__init__(*args, **kwargs)
 
@@ -463,13 +495,13 @@ class KSTFormatter(logging.Formatter):
     @property
     def get_kst(self):   
         """
-        Description: 대한민국 표준시 설정 가져오기 (ZoneInfo class) 
+        Description: 설정된 대한민국 표준시(Asia/Seoul) ZoneInfo 클래스 객체 가져오기 (ZoneInfo class) 
 
         Parameters: 
             self (object): 대한민국 표준시 설정 Formatter 싱글톤(singleton) 클래스 객체 자신 (KSTFormatter class)
 
         Returns: 
-            self.__kst (object): 대한민국 표준시 설정 (ZoneInfo class) 
+            self.__kst (object): 설정된 대한민국 표준시(Asia/Seoul) ZoneInfo 클래스 객체 (ZoneInfo class) 
         """
 
         return self.__kst
@@ -478,11 +510,11 @@ class KSTFormatter(logging.Formatter):
     # @get_kst.setter
     # def set_kst(self, kst):   
     #     """
-    #     Description: 대한민국 표준시 설정 설정 (ZoneInfo class)  
+    #     Description: 설정된 대한민국 표준시(Asia/Seoul) ZoneInfo 클래스 객체 설정 (ZoneInfo class)  
 
     #     Parameters: 
     #         self (object): 대한민국 표준시 설정 Formatter 싱글톤(singleton) 클래스 객체 자신 (KSTFormatter class)
-    #         kst (object): 대한민국 표준시 설정 (ZoneInfo class) 
+    #         kst (object): 설정된 대한민국 표준시(Asia/Seoul) ZoneInfo 클래스 객체 (ZoneInfo class) 
 
     #     Returns: 없음.
     #     """
@@ -492,8 +524,8 @@ class KSTFormatter(logging.Formatter):
     def formatTime(self, record, datefmt=None):
         """
         Description: 
-            지정된 LogRecord(record)의 생성 시간(현재 날짜 및 시간)을 대한민국 표준시 포맷된 문자열로 가져오기
-            아래 코드처럼 매개변수 record 사용하지 않더라도 생략하고 구현시 오류 발생하여 매개변수 record 작성 필수! (2025.09.18 minjae)
+            LogRecord(record)의 생성 시간(현재 날짜 및 시간)을 대한민국 표준시로 변환하여 포맷된 문자열 가져오기
+            아래 코드처럼 매개변수 record 생략하고 구현시 오류 발생하여 매개변수 record 작성 필수! (2025.09.18 minjae)
             def formatTime(self, datefmt=None):
                      
             파이썬 공식 문서 
@@ -507,12 +539,12 @@ class KSTFormatter(logging.Formatter):
             참고 3 URL - https://docs.python.org/ko/3/library/logging.html#logrecord-attributes  
 
         Parameters:  
-            self (object): 대한민국 표준시 포맷 객체 자신 (KSTFormatter class) 
+            self (object): 대한민국 표준시 설정 Formatter 싱글톤(singleton) 클래스 객체 자신 (KSTFormatter class)
             record (object): 지정된 LogRecord(record) 객체 (logging.LogRecord class)
             datefmt (str): 날짜 출력 형식 문자열. datefmt 값이 None일 경우 기본 값 사용 (예) self.default_time_format = '%Y-%m-%d %H:%M:%S'.
 
         Returns: 
-            time_stamp.strftime(datefmt) / time_stamp.strftime('%Y-%m-%d %H:%M:%S') (str): 지정된 LogRecord(record)의 생성 시간(현재 날짜 및 시간)을 대한민국 표준시 포맷된 문자열
+            time_stamp.strftime(datefmt) / time_stamp.strftime(chatbot_helper._datefmt) (str): 지정된 LogRecord(record)의 생성 시간(현재 날짜 및 시간)을 대한민국 표준시 포맷된 문자열
         """
                 
         # zoneinfo 파이썬 라이브러리 사용하여 로그 출력시 대한민국 표준시 출력 기능 구현 (2025.06.13 minjae)
@@ -524,7 +556,7 @@ class KSTFormatter(logging.Formatter):
         # 대한민국 현재 날짜와 시간을 특정 포맷으로 변환하기 구현 (2025.03.27 minjae)
         # 참고 URL - https://wikidocs.net/269063
         if datefmt: return time_stamp.strftime(datefmt)
-        else: return time_stamp.strftime('%Y-%m-%d %H:%M:%S')
+        else: return time_stamp.strftime(chatbot_helper._datefmt)
 
 """
 * 참고
@@ -532,11 +564,20 @@ class KSTFormatter(logging.Formatter):
 참고 URL - https://wikidocs.net/69361
 참고 2 URL - https://wikidocs.net/3693  
 
+파이썬 용어 정리  
+Argument (인자) - 함수를 호출할 때 함수 (또는 메서드)로 전달되는 값.  
+Parameter (매개변수) - 함수 (또는 메서드) 정의에서 함수가 받을 수 있는 인자 (또는 어떤 경우 인자들)를 지정하는 이름 붙은 엔티티
+Attribute (어트리뷰트) - 흔히 점표현식을 사용하는 이름으로 참조되는 객체와 결합한 값. (예를 들어, 객체 o가 어트리뷰트 a를 가지면, o.a처럼 참조)
+참고 URL - https://docs.python.org/ko/3.10/glossary.html
+참고 2 URL - https://peps.python.org/pep-0570/
+참고 3 URL - https://peps.python.org/pep-3102/
+참고 4 URL - https://leffept.tistory.com/418
+
 파이썬 가변인자 *args / **kwargs
 *args - 위치 가변 인자라고 불리며, 함수를 정의할 때 인자값의 개수를 가변적으로 정의해주는 기능이며, 함수 호출부에서 서로 다른 개수의 인자를 전달하고자 할 때 가변 인자(Variable argument)를 사용함. (예) foo(1, 2, 3), foo(1, 2, 3, 4) 
-        함수 호출시 args라는 변수는 여러 개의 입력에 대해 튜플로 저장한 후 이 튜플 객체를 바인딩한다. (예) (1, 2, 3), (1, 2, 3, 4)
+        함수 호출시 args라는 변수는 여러 개의 입력에 대해 튜플(tuple)로 저장한 후 이 튜플(tuple) 객체를 바인딩한다. (예) (1, 2, 3), (1, 2, 3, 4)
 **kwargs - 키워드 가변 인자라고 불리며, keyword arguments의 약어(kwargs)이다. 예를들어 함수 호출부에서 a=1, b=2, c=3과 어떤 키워드와 해당 키워드에 값을 전달힌다. (예) foo(a=1, b=2, c=3)
-           함수의 결과를 살펴보면 kwargs라는 변수가 딕셔너리 객체를 바인딩함을 알 수 있습니다. 이때 딕셔너리에는 함수 호출부에서 전달한 키워드와 값이 저장된다. (예) {'a': 1, 'b': 2, 'c': 3}
+           함수의 결과를 살펴보면 kwargs라는 변수가 딕셔너리(dict) 객체를 바인딩함을 알 수 있다. 이때 딕셔너리(dict)에는 함수 호출부에서 전달한 키워드와 값이 저장된다. (예) {'a': 1, 'b': 2, 'c': 3}
 참고 URL - https://wikidocs.net/69363
 참고 2 URL - https://claude.ai/chat/601e10e4-39ad-48fe-aa73-7070ba600f3d
 
@@ -544,7 +585,7 @@ class KSTFormatter(logging.Formatter):
 파이썬에서 class을 지원하기 때문에 setter/getter 또한 지원함.
 참고 URL - https://wikidocs.net/21053
 
-비동기 프로그래밍  asyncio (asyncio는 async/await 구문을 사용하여 동시성 코드를 작성하는 라이브러리이다.)
+비동기 프로그래밍 asyncio (asyncio는 async/await 구문을 사용하여 동시성 코드를 작성하는 라이브러리이다.)
 참고 URL - https://docs.python.org/3/library/asyncio.html
 참고 2 URL - https://docs.python.org/ko/3/library/asyncio-task.html
 참고 3 URL - https://dojang.io/mod/page/view.php?id=2469

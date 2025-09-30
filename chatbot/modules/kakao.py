@@ -1,7 +1,7 @@
 """
 * [카카오톡 서버 전송 용도] json 포맷 전용 모듈
 
-챗봇 응답 타입별 JSON 포맷
+챗봇 응답 타입별 json 포맷
 참고 URL - https://kakaobusiness.gitbook.io/main/tool/chatbot/skill_guide/answer_json_format
 """
 
@@ -10,7 +10,6 @@ from commons import chatbot_helper   # 챗봇 전용 도움말 텍스트
 
 # 2. log 모듈 import 처리 
 from modules.log import logger       # 챗봇 전역 로그 객체(logger)  
-
 
 def outputs_json(outputs):
     """
@@ -92,10 +91,12 @@ def basicCard_json(card, buttons):
 
     Parameters:
         card (dict): 특정 마스터 데이터 객체
-        buttons (list): 버튼 리스트 (label + messageText) 
+        buttons (list): 버튼 리스트 (label + messageText)
+
     Returns:
         dict: 기본형 카드 json 포맷
     """
+
     outputs = []
 
     # card[chatbot_helper._botRes]에 할당된 값이 null 또는 공백("")일 경우 basicCard 가 카카오톡 채팅방에 출력 안되는 오류 발생함. 
@@ -206,36 +207,37 @@ def simple_textResFormat(botRes):
         }
     }    
 
-def simple_imageResFormat(botRes, prompt):
-    """
-    Description: 
-        DALLE2 이미지 json 포맷 가져오기
-        카카오톡 채팅방에 DALLE2 이미지 전송
+# TODO: 아래 주석친 코드 필요시 사용 예정 (2025.09.29 minjae)
+# def simple_imageResFormat(botRes, prompt):
+#     """
+#     Description: 
+#         DALLE2 이미지 json 포맷 가져오기
+#         카카오톡 채팅방에 DALLE2 이미지 전송
 
-    Parameters:
-        botRes (str): DALLE2 이미지 URL 주소 
-        prompt (str): 사용자가 카카오톡 채팅방에 그려 달라고 요청한 이미지 설명 
+#     Parameters:
+#         botRes (str): DALLE2 이미지 URL 주소 
+#         prompt (str): 사용자가 카카오톡 채팅방에 그려 달라고 요청한 이미지 설명 
     
-    Returns:
-        dict: DALLE2 이미지 json 포맷
-    """
+#     Returns:
+#         dict: DALLE2 이미지 json 포맷
+#     """
 
-    output_text = prompt + "내용에 관한 이미지 입니다"
+#     output_text = prompt + "내용에 관한 이미지 입니다"
 
-    return {
-        'version': '2.0', 
-        'template': {
-            'outputs': [
-                {
-                    "simpleImage": {
-                        "imageUrl": botRes,
-                        "altText": output_text
-                    }
-                }
-            ], 
-            'quickReplies': []
-        }
-    }   
+#     return {
+#         'version': '2.0', 
+#         'template': {
+#             'outputs': [
+#                 {
+#                     "simpleImage": {
+#                         "imageUrl": botRes,
+#                         "altText": output_text
+#                     }
+#                 }
+#             ], 
+#             'quickReplies': []
+#         }
+#     }   
 
 def error_textResFormat(error_msg):
     """
@@ -262,7 +264,7 @@ def error_textResFormat(error_msg):
             ], 
             "quickReplies": [
                 {
-                    "action": "message",
+                    "action": chatbot_helper._message,
                     "label": chatbot_helper._beginning,
                     "messageText": chatbot_helper._beginning
                 }
@@ -284,7 +286,7 @@ def timeover_quickRepliesResFormat(requestAgain_msg):
     """
 
     return {
-        "version":"2.0",
+        "version": "2.0",
         "template": {
             "outputs": [
                 {
@@ -295,7 +297,7 @@ def timeover_quickRepliesResFormat(requestAgain_msg):
             ],
             "quickReplies": [
                 {
-                    "action": "message",
+                    "action": chatbot_helper._message,
                     "label": requestAgain_msg,
                     "messageText": requestAgain_msg
                 }
@@ -320,14 +322,14 @@ def common_basicCardResFormat(card):
     for basicButton in card[chatbot_helper._buttons]:   # 공통 - 기본형 카드 버튼 텍스트 및 메세지 추가 
         if basicButton[chatbot_helper._webLinkUrl]:   # basicButton[chatbot_helper._webLinkUrl]에 할당된 값이 null 또는 공백("")이 아닌 경우 (None or Empty String Check)
             buttons.append({
-                "action": "webLink",
+                "action": chatbot_helper._webLink,
                 "label": basicButton[chatbot_helper._label], 
                 "webLinkUrl": basicButton[chatbot_helper._webLinkUrl]
             })
 
         else:   # basicButton[chatbot_helper._webLinkUrl]에 할당된 값이 null 또는 공백("")인 경우
             buttons.append({
-                "action": "message",
+                "action": chatbot_helper._message,
                 "label": basicButton[chatbot_helper._label],
                 "messageText": basicButton[chatbot_helper._messageText]
             })
@@ -351,14 +353,14 @@ def common_quickRepliesResFormat(replies):
     for repliesButton in replies[chatbot_helper._buttons]:   # 공통 - 바로가기 그룹 버튼 텍스트 및 메세지 추가 
         if repliesButton[chatbot_helper._webLinkUrl]:   # repliesButton[chatbot_helper._webLinkUrl]에 할당된 값이 null 또는 공백("")이 아닌 경우 (None or Empty String Check)
             quickReplies.append({
-                "action": "webLink",
+                "action": chatbot_helper._webLink,
                 "label": repliesButton[chatbot_helper._label], 
                 "webLinkUrl": repliesButton[chatbot_helper._webLinkUrl]
             })
 
         else:   # repliesButton[chatbot_helper._webLinkUrl]에 할당된 값이 null 또는 공백("")인 경우
             quickReplies.append({
-                "action": "message",
+                "action": chatbot_helper._message,
                 "label": repliesButton[chatbot_helper._label],
                 "messageText": repliesButton[chatbot_helper._messageText]
             }) 
@@ -382,7 +384,7 @@ def common_ver_quickRepliesResFormat(userRequest_msg, verReplies):
      
     for verButton in verReplies[chatbot_helper._buttons]:   # 공통 - Autodesk or 상상진화 BOX 제품 버전 바로가기 그룹 버튼 텍스트 및 메세지 추가
         verQuickReplies.append({
-            "action": "message",
+            "action": chatbot_helper._message,
             "label": verButton[chatbot_helper._label],
             "messageText": f"{chatbot_helper._instType} {userRequest_msg} {verButton[chatbot_helper._messageText]}"
         })
@@ -417,10 +419,10 @@ def getResFormat(userRequest_msg, masterEntity):
 
     try:
         logger.info("[테스트] 카카오 json 포맷 가져오기 - 시작!") 
-        logger.info(f"[테스트] master_datas - {master_datas}")
-        logger.info(f"[테스트] chatbot_messageTexts - {chatbot_messageTexts}")
-        logger.info(f"[테스트] adsk_messageTexts - {adsk_messageTexts}")
-        logger.info(f"[테스트] box_messageTexts - {box_messageTexts}")
+        # logger.info(f"[테스트] master_datas - {master_datas}")
+        # logger.info(f"[테스트] chatbot_messageTexts - {chatbot_messageTexts}")
+        # logger.info(f"[테스트] adsk_messageTexts - {adsk_messageTexts}")
+        # logger.info(f"[테스트] box_messageTexts - {box_messageTexts}")
     
         # TODO: 아래 주석친 코드 필요시 참고 (2025.08.27 minjae)
         # raise Exception(chatbot_helper._error_title + 
@@ -456,20 +458,19 @@ def getResFormat(userRequest_msg, masterEntity):
         # elif chatbot_helper._ask_accountProduct == userRequest_msg:   # level3 - 계정 & 제품배정 문의 
         #     resFormat, master_data = account_quickRepliesResFormat(master_datas[chatbot_helper._accountReplies])
 
-        # TODO: 추후 필요시 동영상 시청 가능할 경우("videoYn": "Y")만 master_datas[chatbot_helper._endCard][chatbot_helper._buttons][chatbot_helper._videoButton_Idx][chatbot_helper._webLinkUrl] 속성에 값 할당 기능 구현하기 (2025.08.27 minjae)
         elif (chatbot_helper._instType in userRequest_msg):   # end - 텍스트 + basicCard Autodesk or 상상진화 BOX 제품 설치 방법 
-            # 상상진화 BOX 제품 2025, 2026 버전 공통 설치 방법 텍스트 가져오기
+            # 상상진화 BOX 제품 2025, 2026 버전 공통 설치 방법
             if (chatbot_helper._revitBox in userRequest_msg):   # RevitBOX     
                 resFormat, master_data = end_basicCardResFormat(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._revitBoxInfos])  
 
             elif (chatbot_helper._cadBox in userRequest_msg):   # CADBOX
                 resFormat, master_data = end_basicCardResFormat(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._cadBoxInfos])
      
-            elif (chatbot_helper._energyBox  in userRequest_msg):   # EnergyBOX
+            elif (chatbot_helper._energyBox in userRequest_msg):   # EnergyBOX
                 resFormat, master_data = end_basicCardResFormat(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._energyBoxInfos])
 
-            # Autodesk 제품 2025, 2026 버전 공통 설치 방법 텍스트 가져오기
-            elif (chatbot_helper._autoCAD in userRequest_msg):     # AutoCAD  
+            # Autodesk 제품 2025, 2026 버전 공통 설치 방법
+            elif (chatbot_helper._autoCAD in userRequest_msg):   # AutoCAD  
                 resFormat, master_data = end_basicCardResFormat(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._autoCADInfos])   
 
             elif (chatbot_helper._revit in userRequest_msg):   # Revit 
@@ -493,7 +494,6 @@ def getResFormat(userRequest_msg, masterEntity):
         # 오류 메시지 - "TypeError: 'NoneType' object is not subscriptable"
         else:   # 기술지원 문의 제외 일반 문의 
             resFormat = base_ResFormat()
-
 
         # TODO: 아래 주석친 코드 필요시 사용 예정 (2025.09.05 minjae)
         # elif (chatbot_helper._accountType in userRequest_msg):  # end - 텍스트 + basicCard 계정 & 제품배정 
@@ -530,7 +530,7 @@ def chatbot_carouselResFormat(chatbotCard):
      
     for chatbotButton in chatbotCard[chatbot_helper._buttons]:   # 챗봇 문의 아이템형 케로셀 3가지 버튼 텍스트 및 메세지 추가
         chatbotButtons.append({
-            "action": "message",
+            "action": chatbot_helper._message,
             "label": chatbotButton[chatbot_helper._label],
             "messageText": chatbotButton[chatbot_helper._messageText]
         })
@@ -591,7 +591,7 @@ def subCat_basicCardResFormat(userRequest_msg, subCatCard):
         if None is messageText: continue   # 위 2가지 조건에 해당되지 않는 경우 continue 처리
 
         subCatButtons.append({
-            "action": "message",
+            "action": chatbot_helper._message,
             "label": subCatButton[chatbot_helper._label],
             "messageText": messageText
         })
@@ -616,7 +616,7 @@ def subCat_basicCardResFormat(userRequest_msg, subCatCard):
      
 #     for adskLangButton in adskLangCard[chatbot_helper._buttons]:   # Autodesk 제품 설치 언어 텍스트 카드 버튼 텍스트 및 메세지 추가
 #         adskLangButtons.append({
-#             "action": "message",
+#             "action": chatbot_helper._message,
 #             "label": adskLangButton[chatbot_helper._label],
 #             "messageText": f"{userRequest_msg} {adskLangButton[chatbot_helper._messageText]}"
 #         })
@@ -641,7 +641,7 @@ def subCat_basicCardResFormat(userRequest_msg, subCatCard):
 #     for accountButton in accountReplies[chatbot_helper._buttons]:   # 계정 & 제품배정 문의 바로가기 그룹 버튼 텍스트 및 메세지 추가 
 #         messageText = f"{chatbot_helper._accountType} {accountButton[chatbot_helper._messageText]}"
 #         accountQuickReplies.append({
-#             "action": "message",
+#             "action": chatbot_helper._message,
 #             "label": accountButton[chatbot_helper._label],
 #             "messageText": messageText
 #         })
@@ -671,13 +671,13 @@ def end_basicCardResFormat(endCard, endInfos):
         if (chatbot_helper._video == endButton[chatbot_helper._label] 
             and chatbot_helper._yes == endInfos[chatbot_helper._webLinkUrl_Idx][chatbot_helper._videoYn]):   # 버튼이 '동영상'이고 동영상 시청 가능할 경우 ("videoYn": "Y") 
             endButtons.append({
-                "action": "webLink",
+                "action": chatbot_helper._webLink,
                 "label": endButton[chatbot_helper._label],
                 "webLinkUrl": endInfos[chatbot_helper._webLinkUrl_Idx][chatbot_helper._webLinkUrl]
             })
         else:   # 동영상 시청이 불가능 ("videoYn": "N") 하거나 버튼이 "동영상" 아닐 경우 
             endButtons.append({
-                "action": "message",
+                "action": chatbot_helper._message,
                 "label": endButton[chatbot_helper._label],
                 "messageText": endButton[chatbot_helper._messageText]
             })

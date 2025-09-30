@@ -19,15 +19,15 @@ _body = 'body'   # handler 함수 -> event['body'] 키값
 _action = 'action'   # handler 함수 -> event['action'] 키값
 
 # ColdStart(콜드 스타트)
-# ColdStart는 아마존 웹서비스(AWS) 람다 함수(Lambda Function)가 처음 호출되거나 오랜 시간 동안 호출되지 않다가 다시 호출될 때 발생하는 초기화 과정(container-WarmUp)이다.
-# ColdStart - 아마존 웹서비스(AWS) 람다 함수(Lambda Function) 초기 응답 속도 느림(Cold Start) 현상
+# ColdStart는 아마존 웹서비스 람다 함수(AWS Lambda function)가 처음 호출되거나 오랜 시간 동안 호출되지 않다가 다시 호출될 때 발생하는 초기화 과정(container-WarmUp)이다.
+# ColdStart - 아마존 웹서비스 람다 함수(AWS Lambda function) 초기 응답 속도 느림(Cold Start) 현상
 # json 페이로드 형식
 # {
 #   "body": "{ \"action\": \"aws-lambda_function-container-WarmUp\" }"
 # }
 _cold_start = 'aws-lambda_function-container-WarmUp' 
 _chatbot_logger = 'chatbot_logger'   # 카카오 챗봇 로그 전역 변수(객체) 이름
-_botlog_file_path = '/tmp/botlog.txt'   # 아마존 웹서비스(AWS) 람다 함수(Lambda Function) -> 임시 로그 텍스트 파일('/tmp/botlog.txt') 상대 경로
+_botlog_file_path = '/tmp/botlog.txt'   # 아마존 웹서비스 람다 함수(AWS Lambda function) -> 임시 로그 텍스트 파일('/tmp/botlog.txt') 상대 경로
 _time_limit = 3.5   # 챗봇 응답 가능 제한 시간
 
 # 큐(res_queue) 폴링(polling) 간격 변수명 짓기 (2025.08.20 minjae)
@@ -51,6 +51,11 @@ _masterEntity_json_file_path = './resources/json/masterEntity.json'   # 전체 �
 # endregion lambda_function.py  
 
 # region kakao.py  
+
+# 필드명 
+# action - 버튼 클릭시 수행될 작업
+_webLink = 'webLink'   # 웹 브라우저 열고 webLinkUrl 주소로 이동
+_message = 'message'   # 사용자의 발화로 messageText 실행. (바로가기 응답의 메세지 연결 기능과 동일)
 
 # 기술지원 업무 프로세스
 _inst = '설치'

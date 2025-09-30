@@ -23,7 +23,7 @@ logger.setLevel(logging.INFO)
 for handler in logger.handlers[:]:
     logger.removeHandler(handler)
 
-# 3. 아마존 웹서비스(AWS) 람다 함수(Lambda Function)의 최상위 로그 객체(root)와 분리하기 위해 propagate 속성(property) 값을 False로 설정 (False일 경우, chatbot_logger의 로깅 메시지가 최상위 로그 객체(root)의 처리기로 전달되지 않는다.)
+# 3. 아마존 웹서비스 람다 함수(AWS Lambda function)의 최상위 로그 객체(root)와 분리하기 위해 propagate 속성(property) 값을 False로 설정 (False일 경우, chatbot_logger의 로깅 메시지가 최상위 로그 객체(root)의 처리기로 전달되지 않는다.)
 logger.propagate = False
 
 # 4. formatter 생성 (로그 기록/출력/저장에 사용할 날짜 + 로그 메시지)
@@ -36,13 +36,13 @@ formatter = KSTFormatter('[%(levelname)s] [%(asctime)s] [%(filename)s | %(funcNa
 streamHandler = logging.StreamHandler(sys.stdout)
 
 # fileHandler 생성 및 전역 로그 객체(logger)에 handler 추가 후 OpenAI 기능 함수 openAI.getMessageFromGPT(prompt) 실행시 
-# 카카오톡 채팅방에 아래와 같은 메시지가 추가로 출력되어 나오므로 fileHandler 생성 및 전역 로그 객체(logger)에 handler 추가하는 로직 주석 처리 진행 (2025.09.19 minjae)
+# 카카오톡 채팅방에 아래와 같은 메시지가 추가로 출력되어 나오므로 fileHandler 생성 및 전역 로그 객체(logger)에 handler 추가하는 로직 주석 처리 + OpenAI 기능 모듈(openAI.py) 삭제 처리 진행 (2025.09.19 minjae)
 # * 주의사항: 기술지원 챗봇은 실수를 할 수 있습니다. 응답을 반드시 다시 확인해 주세요.
 # [INFO] [2025-09-19 16:11:44] [lambda_function.py | handler - L157]: [테스트] 챗봇 답변 채팅 정보 - {"version": "2.0", "template": {"outputs": [{"simpleText": {"text": "\uc694\uccad\uc0ac\ud56d \ud655\uc778 \uc911\uc774\uc5d0\uc694.\n\uc7a0\uc2dc\ud6c4 \uc544\ub798 \ub9d0\ud48d\uc120\uc744 \ub20c\ub7ec\uc8fc\uc138\uc694."}}], "quickReplies": [{"action": "message", "label": "\uc0dd\uac01 \ub2e4 \ub05d\ub0ac\ub098\uc694?", "messageText": "\uc0dd\uac01 \ub2e4 \ub05d\ub0ac\ub098\uc694?"}]}}
 # [INFO] [2025-09-19 16:11:46] [lambda_function.py | handler - L93]: [테스트] 사용자 입력 채팅 정보 - {"bot":{"id":"67a961ce1e098a447d574fe7","name":"TestImbuChatBot"},"intent":{"id":"67a961ce1e098a447d574feb","name":"폴백 블록","extra":{"reason":{"code":1,"message":"OK"}}},"action":{"id":"67a99c2e92df7f65390d32f5","name":"kakaobot","params":{},"detailParams":{},"clientExtra":{}},"userRequest":{"block":{"id":"67a961ce1e098a447d574feb","name":"폴백 블록"},"user":{"id":"1b2bfc8caf85a5dff8fadd1bf4cc70125b533fea7b665d0cdb0fb493a135e94b4d","type":"botUserKey","properties":{"botUserKey":"1b2bfc8caf85a5dff8fadd1bf4cc70125b533fea7b665d0cdb0fb493a135e94b4d","isFriend":true,"plusfriendUserKey":"OL1xAnN6qN4s","bot_user_key":"1b2bfc8caf85a5dff8fadd1bf4cc70125b533fea7b665d0cdb0fb493a135e94b4d","plusfriend_user_key":"OL1xAnN6qN4s"}},"utterance":"생각 다 끝났나요?","params":{"surface":"Kakaotalk.plusfriend"},"lang":"ko","timezone":"Asia/Seoul"},"contexts":[],"flow":{"lastBlock":{"id":"67a961ce1e098a447d574feb","name":"폴백 블록"},"trigger":{"type":"QUICKREPLY_BUTTON_MESSAGE","referrerBlock":{"id":"67a961ce1e098a447d574feb","name":"폴백 블록"}}}}
 # [INFO] [2025-09-19 16:11:46] [lambda_function.py | handler - L102]: [테스트] event_body['action'] - {'id': '67a99c2e92df7f65390d32f5', 'name': 'kakaobot', 'params': {}, 'detailParams': {}, 'clientExtra': {}}
 # [INFO] [2025-09-19 16:11:46] [lambda_function.py | handler - L122]: 파일 존재 여부 - File Exists!
-# fileHandler = logging.FileHandler(chatbot_helper._botlog_file_path)    # 아마존 웹서비스(AWS) 람다 함수(Lambda Function)에 로그 기록할 파일 이름(경로) "/tmp/botlog.txt" 지정 (파일 이름은 다른 것으로 변경해도 된다.)
+# fileHandler = logging.FileHandler(chatbot_helper._botlog_file_path)    # 아마존 웹서비스 람다 함수(AWS Lambda function)에 로그 기록할 파일 이름(경로) "/tmp/botlog.txt" 지정 (파일 이름은 다른 것으로 변경해도 된다.)
 
 # 6. 각각의 Handler에 formatter 설정(할당) 적용
 streamHandler.setFormatter(formatter)
@@ -69,16 +69,15 @@ logger.addHandler(streamHandler)
 참고 3 URL - https://github.com/sungwook-practice/python_logging_logger.git
 참고 4 URL - https://velog.io/@qlgks1/python-python-logging-%ED%95%B4%EB%B6%80
 
-import logging  # 로깅 함수 호출
-
+* 챗봇 전역 로그 모듈 구현 순서 및 로그 기록 방법 
 ​1. instance 설정 - log(로그) instance 설정
-2. formatter 생성 - log(로그)를 저장(기록)할 포맷(format) 지정 
-3. handler 생성 - log(로그)를 담을 수 있는 핸들러(handler) 생성 (log(로그)를 콘솔창에 출력 할건지? 아니면 파일에 저장 할건지? 이런 저장하는 핸들러(handler) 생성하기)
-4. handler에 formatter 지정 - 2번에서 지정한 포맷(format)을 핸들러(handler)에 지정
-5. 입력받는 instance에 handler 추가 - 4번에서 지정한 포맷(format)을 핸들러(handler)에 지정한 이후 해당 핸들러(handler)를 log(로그) instance에 추가하여 "입력받는 값"을 핸들러(콘솔 또는 파일)로 가져올 수 있도록 또 설정하기 
-6. 기록할 log level 지정 - 로그 레벨 지정 (DEBUG, INFO, WARNING, ERROR, CRICTICAL)
-7. log 함수 선 호출 - 아래에 구현한 함수 log() 선호출  
-8. log 기록 - 원하는 지점에 로그 기록하기 
+2. 기록할 log level 지정 - 로그 레벨 지정 (DEBUG, INFO, WARNING, ERROR, CRICTICAL)
+3. formatter 생성 - log(로그)를 저장(기록)할 포맷(format) 지정 
+4. handler 생성 - log(로그)를 담을 수 있는 핸들러(handler) 생성 (log(로그)를 콘솔창에 출력 할건지? 아니면 파일에 저장 할건지? 이런 저장하는 핸들러(handler) 생성하기)
+5. handler에 formatter 지정 - 2번에서 지정한 포맷(format)을 핸들러(handler)에 지정
+6. 입력받는 instance에 handler 추가 - 4번에서 지정한 포맷(format)을 핸들러(handler)에 지정한 이후 해당 핸들러(handler)를 log(로그) instance에 추가하여 "입력받는 값"을 핸들러(콘솔 또는 파일)로 가져올 수 있도록 또 설정하기 
+7. 다른 파이썬 스크립트 파일에서 챗봇 전역 로그 모듈 import 처리 - from modules.log import logger   # 챗봇 전역 로그 객체(logger)  
+8. 원하는 지점에 로그 기록하기 (예) logger.info("[테스트] ~~~"), logger.error(f"[테스트] 오류 - {error_msg}") 등등...
 
 * 로그 포맷(format) formatter
 |     이름    |   포멧           |   설명   |
@@ -87,7 +86,7 @@ import logging  # 로깅 함수 호출
 | filename    | %(filename)s    | 파일명
 | funcName    | %(funcName)s    | 함수명
 | levelname   | %(levelname)s   | 로그 레벨(DEBUG, INFO, WARNING, ERROR, CRITICAL)
-| levelno     | %(levelno)s     | 로그 레벨을 수치화해서 출력(10, 20, 30, …)
+| levelno     | %(levelno)s     | 로그 레벨 수치화해서 출력(10, 20, 30, …)
 | lineno      | %(lineno)d      | 소스의 라인 넘버
 | module      | %(module)s      | 모듈 이름
 | msecs       | %(msecs)d       | 로그 생성 시간에서 밀리세컨드 시간 부분만 출력

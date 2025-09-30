@@ -6,7 +6,6 @@
 참고 5 URL - https://spirit0833.tistory.com/3
 참고 6 URL - https://m.blog.naver.com/withnicebambi/223553537062
 
-
 * VSCode 파이썬 코드접기 (# region, # endregion)
 참고 URL - https://m.blog.naver.com/cjinnnn/222950485960
 
@@ -23,16 +22,14 @@
 아래처럼 저장된다. (include, Lib, Scripts 등등...)
 
 * 파이썬 가상환경 활성화 방법
-터미널창 열고 -> 터미널 명령어  "가상환경이름"\Scripts\activate.bat 입력 및 엔터
+터미널창 열고 -> 터미널 명령어 "가상환경이름"\Scripts\activate.bat 입력 및 엔터
 예) chatbot_env\Scripts\activate.bat
 위의 명령어가 뜻하는 것은 새로 생성한 가상환경 "chatbot_env" 안에 폴더 Scripts 안에 activate.bat 파일을 실행한다는 뜻이다.
 
-가상환경이 활성화 되면 아래처럼 터미널 입력창 앞에
-(가상환경이름)이 생성된다.
+가상환경이 활성화 되면 아래처럼 터미널 입력창 맨 왼쪽에 (가상환경이름)이 생성된다.
 (예) (chatbot_env) D:\minjae\testKakaoChatbot\chatbot>
 
-가상환경이 활성화 되면 이제 터미널 창 안에서 설치하는
-모든 라이브러리는 해당 가상 환경 안에 설치가 된다.
+가상환경이 활성화 되면 이제 터미널 창 안에서 설치하는 모든 라이브러리는 해당 가상 환경 안에 설치가 된다.
 
 * 파이썬 스크립트 파일(lambda_function.py)과 새로 설치한 가상환경(chatbot_env) 연결 방법 
 1. VSCode 상단 리본 탭 "View" 클릭 -> 컨텍스트 메뉴 "Command Palette..." 클릭 
