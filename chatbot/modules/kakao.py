@@ -319,6 +319,9 @@ def common_basicCardResFormat(card):
 
     buttons = []
     
+    # 그리디 알고리즘 (Greedy Algorithm)
+    # 참고 URL - https://youtu.be/5OYlS2QQMPA?si=LzCRpZvGmEXI5Ean
+    # 참고 2 URL - https://youtu.be/_TG0hVYJ6D8?si=j85mnzUabJeClsoQ
     for basicButton in card[chatbot_helper._buttons]:   # 공통 - 기본형 카드 버튼 텍스트 및 메세지 추가 
         if basicButton[chatbot_helper._webLinkUrl]:   # basicButton[chatbot_helper._webLinkUrl]에 할당된 값이 null 또는 공백("")이 아닌 경우 (None or Empty String Check)
             buttons.append({
@@ -350,6 +353,9 @@ def common_quickRepliesResFormat(replies):
 
     quickReplies = []
 
+    # 그리디 알고리즘 (Greedy Algorithm)
+    # 참고 URL - https://youtu.be/5OYlS2QQMPA?si=LzCRpZvGmEXI5Ean
+    # 참고 2 URL - https://youtu.be/_TG0hVYJ6D8?si=j85mnzUabJeClsoQ
     for repliesButton in replies[chatbot_helper._buttons]:   # 공통 - 바로가기 그룹 버튼 텍스트 및 메세지 추가 
         if repliesButton[chatbot_helper._webLinkUrl]:   # repliesButton[chatbot_helper._webLinkUrl]에 할당된 값이 null 또는 공백("")이 아닌 경우 (None or Empty String Check)
             quickReplies.append({
@@ -485,8 +491,9 @@ def getResFormat(userRequest_msg, masterEntity):
             elif (chatbot_helper._civil3D in userRequest_msg):   # Civil3D 
                 resFormat, master_data = end_basicCardResFormat(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._civil3DInfos])   
         
-        elif chatbot_helper._survey in userRequest_msg:   # 만족도 조사
-            resFormat, master_data = common_basicCardResFormat(master_datas[chatbot_helper._surveyCard])
+        # TODO: 아래 주석친 코드 필요시 사용 예정 (2025.08.27 minjae)
+        # elif chatbot_helper._survey in userRequest_msg:   # 만족도 조사
+        #     resFormat, master_data = common_basicCardResFormat(master_datas[chatbot_helper._surveyCard])
         
         # 사용자가 카카오 챗봇 버튼이 아닌 일반 메시지를 채팅창에 입력시 아래처럼 오류 메시지가 출력되어 원인 파악 결과 resFormat 변수가 None으로 리턴되어 
         # lambda_function.py 소스파일 -> resChatbot 함수에서 res_queue.put(resFormat) 실행할 때 발생하는 오류로 확인 되어 아래처럼 else 절 코드 추가 (2025.09.12 minjae)
@@ -576,7 +583,10 @@ def subCat_basicCardResFormat(userRequest_msg, subCatCard):
     """
 
     subCatButtons = []
-     
+    
+    # 그리디 알고리즘 (Greedy Algorithm)
+    # 참고 URL - https://youtu.be/5OYlS2QQMPA?si=LzCRpZvGmEXI5Ean
+    # 참고 2 URL - https://youtu.be/_TG0hVYJ6D8?si=j85mnzUabJeClsoQ 
     for subCatButton in subCatCard[chatbot_helper._buttons]:   # 문의 유형 기본형 카드 버튼 텍스트 및 메세지 추가
         messageText = None   
 
@@ -665,6 +675,9 @@ def end_basicCardResFormat(endCard, endInfos):
     endButtons = []
     outputs = []
 
+    # 그리디 알고리즘 (Greedy Algorithm)
+    # 참고 URL - https://youtu.be/5OYlS2QQMPA?si=LzCRpZvGmEXI5Ean
+    # 참고 2 URL - https://youtu.be/_TG0hVYJ6D8?si=j85mnzUabJeClsoQ
     # 오류 메시지 "string indices must be integers, not 'str'" 출력되어 아래처럼 코드 변경 처리함. (2025.08.28 minjae)
     # (기존) endCard -> (변경) endCard[chatbot_helper._buttons]  
     for endButton in endCard[chatbot_helper._buttons]:   # 처음으로, 동영상, 만족도 조사 버튼 텍스트 및 메세지 추가
