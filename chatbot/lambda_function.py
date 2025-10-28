@@ -5,22 +5,26 @@
 참고 URL - https://happy-jjang-a.tistory.com/223
 """
 
+# TODO: lambda_function.py 파이썬 스크립트 파일 소스 코드 리팩토링 하기 (2025.09.30 minjae)
+# 참고 URL - https://claude.ai/chat/786c45b9-f744-4fcf-950a-bcc178417e1c
+
 import json         # json 데이터 처리   
 import threading    # 멀티스레드 패키지 
 import time         # 챗봇 답변 시간 계산 
 import queue as q   # 자료구조 queue(deque 기반) 
-import os           # 답변 결과 임시 로그 텍스트 파일('/tmp/botlog.txt') 저장  
+import os           # 답변 결과 임시 로그 텍스트 파일('/tmp/botlog.txt') 저장
 
-# 1. 공통 모듈 먼저 import 처리
+# 1. 공통 모듈 먼저 import
 from commons import chatbot_helper   # 챗봇 전용 도움말 텍스트  
 
-# 2. singleton 모듈을 log 모듈 보다 먼저 import 처리 
-from modules.singleton import MasterEntity   # 싱글톤(singleton) 패턴 
+# 2. singleton 모듈을 log 모듈 보다 먼저 import 
+from modules import test
+from modules.singleton import MasterEntity   # 싱글톤(singleton) 패턴
 
-# 3. singleton 모듈이 먼저 초기화된 후 log 모듈 import 처리 
+# 3. singleton 모듈이 먼저 초기화된 후 log 모듈 import 
 from modules.log import logger   # 챗봇 전역 로그 객체(logger)
 
-# 4. 나머지 모듈 import 처리
+# 4. 나머지 모듈 import
 from modules import kakao   # 카카오 json 포맷
 
 # 마스터 데이터 유효성 검사 대상 리스트
@@ -64,6 +68,8 @@ def handler(event, context):
     start_time = time.time()    # 챗봇 응답 시간 계산하기 위해 메인 함수(handler) 시작하는 시간을 변수 start_time에 저장 
     
     try: 
+        test._testDebug('handler 함수 로그 테스트')
+
         # event['body']가 존재하지 않는 경우 - ColdStart(콜드 스타트)인 경우 제외 
         # 참고 URL - https://chatgpt.com/c/687a0180-e2bc-8010-9a19-90695a1bf477
         if chatbot_helper._body not in event: 
@@ -107,7 +113,7 @@ def handler(event, context):
     finally:
         if None is res_queue:   # 챗봇 답변 내용 담을 큐(queue) 객체 res_queue 값이 None인 경우 
             logger.info("[테스트] handler - finally 강제 종료 - [사유] 큐(queue) 객체 res_queue 생성 안 함.")
-            return   # finally 문 종료 
+            return
              
         while(time.time() - start_time < chatbot_helper._time_limit):   # 챗봇 응답 시간 3.5초 이내인 경우
             if False == res_queue.empty():
@@ -120,7 +126,7 @@ def handler(event, context):
             time.sleep(chatbot_helper._polling_interval) 
  
         if False == run_flag:   # 챗봇 응답 시간 5초 초과한 경우     
-            resFormat = kakao.timeover_quickRepliesResFormat(chatbot_helper._done_thinking)   
+            resFormat = kakao.timeover_quickReplies(chatbot_helper._done_thinking)   
 
         res_msg = json.dumps(resFormat) 
         # logger.info("[테스트] 챗봇 답변 채팅 정보 - %s" %res_msg)
@@ -168,6 +174,8 @@ def resChatbot(kakao_request, res_queue, file_name):
     userRequest_msg = kakao_request[chatbot_helper._userRequest][chatbot_helper._utterance]   # 사용자 입력 채팅 메세지 가져오기 
     
     try:
+        test._testDebug('resChatbot 함수 로그 테스트')
+
         # 챗봇 응답 시간 5초 초과시 응답 재요청 기능 구현 
         # 참고 URL - https://claude.ai/chat/d550ac84-5c0c-4805-a600-9fdfd1236714
         if chatbot_helper._done_thinking in userRequest_msg:   # 시간 5초 초과시 응답 재요청
@@ -177,7 +185,7 @@ def resChatbot(kakao_request, res_queue, file_name):
 
             botRes = prev_userRequest_msg
             logger.info(f"[테스트] 응답 재요청 채팅 메세지 - {botRes}")
-            res_queue.put(kakao.simple_textResFormat(botRes))
+            res_queue.put(kakao.simple_text(botRes))
             dbReset(file_name)
 
             # TODO: 추후 필요시 아래 주석친 코드 참고 (2025.09.12 minjae)
@@ -188,17 +196,17 @@ def resChatbot(kakao_request, res_queue, file_name):
             #         botRes, prompt = last_update.split()[chatbot_helper._secondWord_Idx], last_update.split()[chatbot_helper._thirdWord_Idx]   # 변수 last_update에 저장된 문자열 중 공백('')단위로 분리한 두 번째와 세 번째 단어 각각 botRes와 prompt에 저장
             #         logger.info(f"[테스트] /img - botRes (last_update.split()[chatbot_helper._secondWord_Idx]) - {botRes}")
             #         logger.info(f"[테스트] /img - prompt (last_update.split()[chatbot_helper._thirdWord_Idx]) - {prompt}")
-            #         res_queue.put(kakao.simple_imageResFormat(botRes,prompt))
+            #         res_queue.put(kakao.simple_image(botRes,prompt))
 
             #     else:    # 변수 kind에 저장된 문자열이 'img' 아닌 경우 
             #         botRes = last_update[chatbot_helper._askPrefix_Len:]   # 변수 last_update에 저장된 문자열 중 다섯 번째 문자(last_update[chatbot_helper._askPrefix_Length:]) 부터 끝까지 변수 botRes에 저장 (숫자 4 의미 - "ask "(공백 '' 포함) 문자열 제거하고 나머지 텍스트 가져옴)
             #         logger.info(f"[테스트] /ask - botRes (last_update[4:]) - {botRes}")
-            #         res_queue.put(kakao.simple_textResFormat(botRes))
+            #         res_queue.put(kakao.simple_text(botRes))
 
             #     dbReset(file_name)
 
-        elif True == masterEntity.get_isValid:   # 마스터 데이터 유효성 검사 결과 성공한 경우   
-            resFormat, master_data = kakao.getResFormat(userRequest_msg, masterEntity)
+        elif True == masterEntity.get_isValid:   # 마스터 데이터 유효성 검사 결과 성공한 경우
+            resFormat, master_data = kakao.get_response(userRequest_msg, masterEntity)
             prev_userRequest_msg = userRequest_msg
 
             if master_data is not None:   # 특정 마스터 데이터 값이 존재하는 경우 (예) 아이템 카드 (basicCard, carousel) or 바로가기 그룹 (quickReplies) 
@@ -216,13 +224,13 @@ def resChatbot(kakao_request, res_queue, file_name):
 
         # TODO: 추후 필요시 아래 주석친 코드 참고 (2025.09.12 minjae)
         # else:
-        #     base_res = kakao.base_ResFormat()
+        #     base_res = kakao.base_response()
         #     res_queue.put(base_res)
 
     except Exception as e:
         error_msg = str(e) 
         logger.error(f"[테스트] 오류 - {error_msg}")
-        res_queue.put(kakao.error_textResFormat(error_msg))
+        res_queue.put(kakao.error_text(error_msg))
         raise    # raise로 함수 resChatbot의 현재 예외를 다시 발생시켜서 함수 resChatbot 호출한 상위 코드 블록으로 넘김
 
 def dbReset(file_name):

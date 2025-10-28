@@ -3,6 +3,11 @@
 
 파이썬 logging 라이브러리 사용해서 전역 로그 객체(logger) 및 로그 기록 기능 구현 (2025.09.18 minjae)
 참고 URL - https://claude.ai/chat/8fc1ceeb-fe95-4d1b-8517-ecec83beb3f2
+
+파이썬 패키지, 모듈 
+참고 URL - https://docs.python.org/ko/3.13/tutorial/modules.html
+참고 2 URL - https://wikidocs.net/1418
+참고 3 URL - https://dojang.io/mod/page/view.php?id=2450
 """
 
 import sys
@@ -27,7 +32,7 @@ for handler in logger.handlers[:]:
 logger.propagate = False
 
 # 4. formatter 생성 (로그 기록/출력/저장에 사용할 날짜 + 로그 메시지)
-# 원하는 출력 형태 예시: [INFO] [2025-09-18 10:49:19] [kakao.py | getResFormat - L282]: [테스트] 카카오 json 포맷 가져오기 - 시작!
+# 원하는 출력 형태 예시: [INFO] [2025-09-18 10:49:19] [kakao.py | get_response - L282]: [테스트] 카카오 json 포맷 가져오기 - 시작!
 # formatter = logging.Formatter('[%(levelname)s] [%(asctime)s] [%(filename)s | %(funcName)s - L%(lineno)d]: %(message)s', datefmt=chatbot_helper._datefmt)
 formatter = KSTFormatter('[%(levelname)s] [%(asctime)s] [%(filename)s | %(funcName)s - L%(lineno)d]: %(message)s', datefmt=chatbot_helper._datefmt)
 

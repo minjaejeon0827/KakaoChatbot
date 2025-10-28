@@ -1,5 +1,10 @@
 """
 * 싱글톤(singleton) 패턴 전용 모듈 
+
+파이썬 패키지, 모듈 
+참고 URL - https://docs.python.org/ko/3.13/tutorial/modules.html
+참고 2 URL - https://wikidocs.net/1418
+참고 3 URL - https://dojang.io/mod/page/view.php?id=2450
 """  
 
 # 1. 공통 모듈 먼저 import 처리
@@ -374,6 +379,10 @@ class MasterEntity(object):
 
             if None is master_datas:    
                 raise Exception("전체 마스터 데이터 로드 실패!")
+            
+            # 그리디 알고리즘 (Greedy Algorithm) - 탐욕법이라고 불리며, 현재 상황에서 지금 당장 좋은 것만 고르는 방법이다.
+            # 참고 URL - https://youtu.be/5OYlS2QQMPA?si=LzCRpZvGmEXI5Ean
+            # 참고 2 URL - https://youtu.be/_TG0hVYJ6D8?si=j85mnzUabJeClsoQ
 
             # dict 객체 master_datas를 for문으로 루핑하기 위해 items() 메서드 호출 (2025.09.02 minjae)
             # 참고 URL - https://docs.python.org/ko/3.13/tutorial/datastructures.html#looping-techniques 

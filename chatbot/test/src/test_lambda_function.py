@@ -144,7 +144,7 @@ def handler(event, context):
             time.sleep(chatbot_helper._polling_interval) 
  
         if False == run_flag:   # 챗봇 응답 시간 5초 초과한 경우     
-            resFormat = kakao.timeover_quickRepliesResFormat(chatbot_helper._done_thinking)   
+            resFormat = kakao.timeover_quickReplies(chatbot_helper._done_thinking)   
 
         res_msg = json.dumps(resFormat) 
         # logger._info("[테스트] 챗봇 답변 채팅 정보 - %s" %res_msg)
@@ -180,18 +180,18 @@ def resChatbot(kakao_request, res_queue, file_name):
                     botRes, prompt = last_update.split()[chatbot_helper._secondWord_Idx],last_update.split()[chatbot_helper._thirdWord_Idx]   # 변수 last_update에 저장된 문자열 중 공백('')단위로 분리한 두 번째와 세 번째 단어 각각 botRes와 prompt에 저장
                     chatbot_logger.log_write(chatbot_logger._info, '[테스트] /img - botRes (last_update.split()[chatbot_helper._secondWord_Idx])', botRes)
                     chatbot_logger.log_write(chatbot_logger._info, '[테스트] /img - prompt (last_update.split()[chatbot_helper._thirdWord_Idx])', prompt)
-                    res_queue.put(kakao.simple_imageResFormat(botRes,prompt))
+                    res_queue.put(kakao.simple_image(botRes,prompt))
                 else:   # 변수 kind에 저장된 문자열이 'img' 아닌 경우 
                     botRes = last_update[chatbot_helper._askPrefix_Len:]   # 변수 last_update에 저장된 문자열 중 다섯 번째 문자(last_update[chatbot_helper._askPrefix_Length:]) 부터 끝까지 변수 botRes에 저장 (숫자 4 의미 - "ask "(공백 '' 포함) 문자열 제거하고 나머지 텍스트 가져옴)
                     chatbot_logger.log_write(chatbot_logger._info, '[테스트] /ask - botRes (last_update[4:])', botRes)
-                    res_queue.put(kakao.simple_textResFormat(botRes))
+                    res_queue.put(kakao.simple_text(botRes))
                 dbReset(file_name)    
 
         elif '/img' in userRequest_msg:   # DALLE2 이미지 응답
             dbReset(file_name)   
             prompt = userRequest_msg.replace("/img", "")
             botRes = openAI.getImageURLFromDALLE(prompt)
-            res_queue.put(kakao.simple_imageResFormat(botRes,prompt))
+            res_queue.put(kakao.simple_image(botRes,prompt))
 
             botlog_msg = f"img {str(botRes)} {str(prompt)}"
             dbSave(file_name, botlog_msg)
@@ -200,14 +200,14 @@ def resChatbot(kakao_request, res_queue, file_name):
             dbReset(file_name)  
             prompt = userRequest_msg.replace("/ask", "")
             botRes = openAI.getMessageFromGPT(prompt)
-            res_queue.put(kakao.simple_textResFormat(botRes))
+            res_queue.put(kakao.simple_text(botRes))
 
             chatbot_logger.openAI_log_write(chatbot_logger._info, "ChatGPT 텍스트 답변", botRes)
             botlog_msg = f"ask {str(botRes)}" 
             dbSave(file_name, botlog_msg)
 
         elif True == masterEntity.get_isValid:   # 마스터 데이터 유효성 검사 결과 성공한 경우   
-            resFormat, master_data = kakao.getResFormat(userRequest_msg, masterEntity.get_master_datas, masterEntity)
+            resFormat, master_data = kakao.get_response(userRequest_msg, masterEntity.get_master_datas, masterEntity)
 
             if master_data is not None:   # 챗봇 특정 아이템 카드(basicCard, carousel) or 바로가기 그룹(quickReplies) 마스터 데이터 값이 존재하는 경우 
                 saveLog(file_name, chatbot_logger._info, f"({master_data[chatbot_helper._levelNo]}: {master_data[chatbot_helper._displayName]} - 사용자 입력 채팅 정보: '{userRequest_msg}')")
@@ -223,13 +223,13 @@ def resChatbot(kakao_request, res_queue, file_name):
 
         # TODO: 추후 필요시 아래 주석친 코드 참고 예정 (2025.09.12 minjae)
         # else:
-        #     base_res = kakao.base_ResFormat()
+        #     base_res = kakao.base_response()
         #     res_queue.put(base_res)
 
     except Exception as e:   # 하위 코드 블록에서 예외가 발생해도 변수 e에다 넣고 아래 코드 실행됨  
         error_msg = str(e) 
         chatbot_logger.log_write(chatbot_logger._error, "[테스트] 오류", error_msg)
-        res_queue.put(kakao.error_textResFormat(error_msg))
+        res_queue.put(kakao.error_text(error_msg))
         raise    # raise로 함수 resChatbot의 현재 예외를 다시 발생시켜서 함수 resChatbot 호출한 상위 코드 블록으로 넘김                             
 
 # 아마존 웹서비스(AWS) 람다 함수(Lambda Function) -> 로그 텍스트 파일("/tmp/botlog.txt") 전용 함수 

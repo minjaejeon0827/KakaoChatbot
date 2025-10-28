@@ -1,8 +1,20 @@
 """
 * [카카오톡 서버 전송 용도] json 포맷 전용 모듈
+참고 URL - https://chatgpt.com/c/69002b43-44c0-8322-8298-e7871b39da2a
 
-챗봇 응답 타입별 json 포맷
+* 파이썬 Type Hints
+참고 URL - https://docs.python.org/ko/3.14/library/typing.html
+참고 2 URL - https://peps.python.org/pep-0484/
+참고 3 URL - https://devpouch.tistory.com/189
+참고 4 URL - https://supermemi.tistory.com/entry/Python-3-%ED%8C%8C%EC%9D%B4%EC%8D%AC%EC%97%90%EC%84%9C-%EC%9D%98%EB%AF%B8%EB%8A%94-%EB%AC%B4%EC%97%87%EC%9D%BC%EA%B9%8C-%EC%A3%BC%EC%84%9D
+
+* 챗봇 응답 타입별 json 포맷
 참고 URL - https://kakaobusiness.gitbook.io/main/tool/chatbot/skill_guide/answer_json_format
+
+* 파이썬 패키지, 모듈 
+참고 URL - https://docs.python.org/ko/3.13/tutorial/modules.html
+참고 2 URL - https://wikidocs.net/1418
+참고 3 URL - https://dojang.io/mod/page/view.php?id=2450
 """
 
 # 1. 공통 모듈 먼저 import 처리
@@ -11,15 +23,13 @@ from commons import chatbot_helper   # 챗봇 전용 도움말 텍스트
 # 2. log 모듈 import 처리 
 from modules.log import logger       # 챗봇 전역 로그 객체(logger)  
 
-def outputs_json(outputs):
+def outputs_json(outputs: list[dict]) -> dict:
     """
     Description: 출력 그룹 json 포맷 가져오기
 
-    Parameters:
-        outputs (list): 출력 그룹 리스트
+    Parameters: outputs - 출력 그룹 리스트
 
-    Returns:
-        dict: 출력 그룹 json 포맷
+    Returns: 출력 그룹 json 포맷
     """
 
     return {
@@ -30,16 +40,14 @@ def outputs_json(outputs):
         }
     }
 
-def quickReplies_json(replies, quickReplies):
+def quickReplies_json(replies: dict, quickReplies: list[dict]) -> dict:
     """
     Description: 바로가기 그룹 json 포맷 가져오기
 
-    Parameters:
-        replies (dict): 특정 마스터 데이터 객체  
-        quickReplies (list): 버튼 리스트 (label + messageText)
+    Parameters: replies - 특정 마스터 데이터 객체
+                quickReplies - 버튼 리스트 (label + messageText)
 
-    Returns:
-        dict: 바로가기 그룹 json 포맷
+    Returns: 바로가기 그룹 json 포맷
     """
 
     return {
@@ -56,16 +64,14 @@ def quickReplies_json(replies, quickReplies):
         }
     }
 
-def textCard_json(card, buttons):
+def textCard_json(card: dict, buttons: list[dict]) -> dict:
     """
     Description: 텍스트 카드 json 포맷 가져오기
 
-    Parameters:
-        card (dict): 특정 마스터 데이터 객체
-        buttons (list): 버튼 리스트 (label + messageText) 
+    Parameters: card - 특정 마스터 데이터 객체
+                buttons - 버튼 리스트 (label + messageText) 
 
-    Returns:
-        dict: 텍스트 카드 json 포맷
+    Returns: 텍스트 카드 json 포맷
     """
 
     return {
@@ -85,16 +91,14 @@ def textCard_json(card, buttons):
     }
 
 # TODO: 추후 필요시 함수 파라미터 quickReplies를 default 파라미터로 구현 예정 (2025.09.03 minjae)
-def basicCard_json(card, buttons):
+def basicCard_json(card: dict, buttons: list[dict]) -> dict:
     """
-    Description: 기본형 카드 json 포맷 가져오기 
+    Description: 기본형 카드 json 포맷 가져오기
 
-    Parameters:
-        card (dict): 특정 마스터 데이터 객체
-        buttons (list): 버튼 리스트 (label + messageText)
+    Parameters: card - 특정 마스터 데이터 객체
+                buttons - 버튼 리스트 (label + messageText)
 
-    Returns:
-        dict: 기본형 카드 json 포맷
+    Returns: 기본형 카드 json 포맷
     """
 
     outputs = []
@@ -128,16 +132,14 @@ def basicCard_json(card, buttons):
 
     return outputs_json(outputs)
 
-def carousel_json(card, items):
+def carousel_json(card: dict, items: list[dict]) -> dict:
     """
     Description: 아이템형 케로셀 json 포맷 가져오기
 
-    Parameters:
-        card (dict): 특정 마스터 데이터 객체
-        items (list): 아이템 리스트 (imageTitle + thumbnail + itemList 등등...) 
+    Parameters: card - 특정 마스터 데이터 객체
+                items - 아이템 리스트 (imageTitle + thumbnail + itemList 등등...) 
 
-    Returns:
-        dict: 아이템형 케로셀 json 포맷 
+    Returns: 아이템형 케로셀 json 포맷 
     """
     
     return {
@@ -159,17 +161,15 @@ def carousel_json(card, items):
         }
     }
 
-# TODO: 아래 함수 base_ResFormat 필요시 로직 수정 예정 (2025.09.03 minjae) 
-def base_ResFormat():
+# TODO: 아래 함수 base_response 필요시 로직 수정 예정 (2025.09.03 minjae) 
+def base_response() -> dict:
     """
-    Description: 
-        기술지원 문의 제외 일반 문의 json 포맷 가져오기
-        카카오톡 채팅방에 응답 메시지를 출력하고 싶지 않은 경우 비어있는 메세지 전송 
+    Description: 기술지원 문의 제외 일반 문의 json 포맷 가져오기
+                 카카오톡 채팅방에 응답 메시지를 출력하고 싶지 않은 경우 비어있는 메세지 전송 
 
     Parameters: 없음.
 
-    Returns: 
-        dict: 기술지원 문의 제외 일반 문의 json 포맷
+    Returns: 기술지원 문의 제외 일반 문의 json 포맷
     """
 
     return {
@@ -180,17 +180,14 @@ def base_ResFormat():
         }
     }    
 
-def simple_textResFormat(botRes):
+def simple_text(botRes: str) -> dict:
     """
-    Description: 
-        텍스트 메세지 json 포맷 가져오기
-        카카오톡 채팅방에 텍스트 메시지(botRes) 전송 
+    Description: 텍스트 메세지 json 포맷 가져오기
+                 카카오톡 채팅방에 텍스트 메시지(botRes) 전송 
 
-    Parameters:
-        botRes (str): 챗봇 답변 내용  
+    Parameters: botRes - 챗봇 답변 내용  
 
-    Returns:
-        dict: 텍스트 메세지 json 포맷
+    Returns: 텍스트 메세지 json 포맷
     """
  
     return {
@@ -205,21 +202,18 @@ def simple_textResFormat(botRes):
             ], 
             'quickReplies': []
         }
-    }    
+    }
 
 # TODO: 아래 주석친 코드 필요시 사용 예정 (2025.09.29 minjae)
-# def simple_imageResFormat(botRes, prompt):
+# def simple_image(botRes: str, prompt: str) -> dict:
 #     """
-#     Description: 
-#         DALLE2 이미지 json 포맷 가져오기
-#         카카오톡 채팅방에 DALLE2 이미지 전송
+#     Description: DALLE2 이미지 json 포맷 가져오기
+#                  카카오톡 채팅방에 DALLE2 이미지 전송
 
-#     Parameters:
-#         botRes (str): DALLE2 이미지 URL 주소 
-#         prompt (str): 사용자가 카카오톡 채팅방에 그려 달라고 요청한 이미지 설명 
+#     Parameters: botRes - DALLE2 이미지 URL 주소 
+#                 prompt - 사용자가 카카오톡 채팅방에 그려 달라고 요청한 이미지 설명 
     
-#     Returns:
-#         dict: DALLE2 이미지 json 포맷
+#     Returns: DALLE2 이미지 json 포맷
 #     """
 
 #     output_text = prompt + "내용에 관한 이미지 입니다"
@@ -239,17 +233,14 @@ def simple_textResFormat(botRes):
 #         }
 #     }   
 
-def error_textResFormat(error_msg):
+def error_text(error_msg: str) -> dict:
     """
-    Description: 
-        오류 메세지 json 포맷 가져오기
-        카카오톡 채팅방에 오류 메세지 전송
+    Description: 오류 메세지 json 포맷 가져오기
+                 카카오톡 채팅방에 오류 메세지 전송
 
-    Parameters:
-        error_msg (str): 오류 메세지
+    Parameters: error_msg - 오류 메세지
 
-    Returns:
-        dict: 오류 메세지 json 포맷
+    Returns: 오류 메세지 json 포맷
     """
  
     return {
@@ -272,17 +263,14 @@ def error_textResFormat(error_msg):
         }
     }       
 
-def timeover_quickRepliesResFormat(requestAgain_msg):
+def timeover_quickReplies(requestAgain_msg: str) -> dict:
     """
-    Description: 
-        응답 재요청 json 포맷 가져오기
-        챗봇 응답 시간 5초 초과시 응답 재요청 메세지 전송
+    Description: 응답 재요청 json 포맷 가져오기
+                 챗봇 응답 시간 5초 초과시 응답 재요청 메세지 전송
 
-    Parameters:
-        requestAgain_msg (str): 응답 재요청 메세지
+    Parameters: requestAgain_msg - 응답 재요청 메세지
 
-    Returns:
-        dict: 응답 재요청 json 포맷
+    Returns: 응답 재요청 json 포맷
     """
 
     return {
@@ -305,24 +293,22 @@ def timeover_quickRepliesResFormat(requestAgain_msg):
         }
     }   
 
-def common_basicCardResFormat(card):
+def common_basicCard(card: dict) -> tuple[dict, dict]:
     """
-    Description: 공통 - 기본형 카드 json 포맷 가져오기 
+    Description: [공통] 기본형 카드 json 포맷 가져오기 
 
-    Parameters:
-        card (dict): 특정 마스터 데이터 객체
+    Parameters: card - 특정 마스터 데이터 객체
 
-    Returns:
-        basicCard_json(card, buttons) (dict): 공통 - 기본형 카드 json 포맷
-        card (dict): 특정 마스터 데이터 객체
+    Returns: basicCard_json(card, buttons) - [공통] 기본형 카드 json 포맷
+             card - 특정 마스터 데이터 객체
     """
 
     buttons = []
     
-    # 그리디 알고리즘 (Greedy Algorithm)
+    # 그리디 알고리즘 (Greedy Algorithm) - 탐욕법이라고 불리며, 현재 상황에서 지금 당장 좋은 것만 고르는 방법이다.
     # 참고 URL - https://youtu.be/5OYlS2QQMPA?si=LzCRpZvGmEXI5Ean
     # 참고 2 URL - https://youtu.be/_TG0hVYJ6D8?si=j85mnzUabJeClsoQ
-    for basicButton in card[chatbot_helper._buttons]:   # 공통 - 기본형 카드 버튼 텍스트 및 메세지 추가 
+    for basicButton in card[chatbot_helper._buttons]:   # [공통] 기본형 카드 버튼 텍스트 및 메세지 추가 
         if basicButton[chatbot_helper._webLinkUrl]:   # basicButton[chatbot_helper._webLinkUrl]에 할당된 값이 null 또는 공백("")이 아닌 경우 (None or Empty String Check)
             buttons.append({
                 "action": chatbot_helper._webLink,
@@ -337,26 +323,24 @@ def common_basicCardResFormat(card):
                 "messageText": basicButton[chatbot_helper._messageText]
             })
 
-    return basicCard_json(card, buttons), card
+    return (basicCard_json(card, buttons), card)
     
-def common_quickRepliesResFormat(replies):
+def common_quickReplies(replies: dict) -> tuple[dict, dict]:
     """
-    Description: 공통 - 바로가기 그룹 json 포맷 가져오기
+    Description: [공통] 바로가기 그룹 json 포맷 가져오기
 
-    Parameters:
-        replies (dict): 특정 마스터 데이터 객체
+    Parameters: replies - 특정 마스터 데이터 객체
 
-    Returns:
-        quickReplies_json(replies, quickReplies) (dict): 공통 - 바로가기 그룹 json 포맷
-        replies (dict): 특정 마스터 데이터 객체
+    Returns: quickReplies_json(replies, quickReplies) - [공통] 바로가기 그룹 json 포맷
+             replies - 특정 마스터 데이터 객체
     """
 
     quickReplies = []
 
-    # 그리디 알고리즘 (Greedy Algorithm)
+    # 그리디 알고리즘 (Greedy Algorithm) - 탐욕법이라고 불리며, 현재 상황에서 지금 당장 좋은 것만 고르는 방법이다.
     # 참고 URL - https://youtu.be/5OYlS2QQMPA?si=LzCRpZvGmEXI5Ean
     # 참고 2 URL - https://youtu.be/_TG0hVYJ6D8?si=j85mnzUabJeClsoQ
-    for repliesButton in replies[chatbot_helper._buttons]:   # 공통 - 바로가기 그룹 버튼 텍스트 및 메세지 추가 
+    for repliesButton in replies[chatbot_helper._buttons]:   # [공통] 바로가기 그룹 버튼 텍스트 및 메세지 추가 
         if repliesButton[chatbot_helper._webLinkUrl]:   # repliesButton[chatbot_helper._webLinkUrl]에 할당된 값이 null 또는 공백("")이 아닌 경우 (None or Empty String Check)
             quickReplies.append({
                 "action": chatbot_helper._webLink,
@@ -371,44 +355,40 @@ def common_quickRepliesResFormat(replies):
                 "messageText": repliesButton[chatbot_helper._messageText]
             }) 
 
-    return quickReplies_json(replies, quickReplies), replies
+    return (quickReplies_json(replies, quickReplies), replies)
 
-def common_ver_quickRepliesResFormat(userRequest_msg, verReplies):
+def common_ver_quickReplies(userRequest_msg: str, verReplies: dict) -> tuple[dict, dict]:
     """
-    Description: 공통 - Autodesk or 상상진화 BOX 제품 버전 바로가기 그룹 json 포맷 가져오기 
+    Description: [공통] Autodesk or 상상진화 BOX 제품 버전 바로가기 그룹 json 포맷 가져오기
 
-    Parameters: 
-        userRequest_msg (str): 사용자 입력 채팅 메세지 
-        verReplies (dict): 특정 마스터 데이터 객체
+    Parameters: userRequest_msg - 사용자 입력 채팅 메세지
+                verReplies - 특정 마스터 데이터 객체
 
-    Returns:
-        quickReplies_json(verReplies, verQuickReplies) (dict): 공통 - Autodesk or 상상진화 BOX 제품 버전 바로가기 그룹 json 포맷
-        verReplies (dict): 특정 마스터 데이터 객체
+    Returns: quickReplies_json(verReplies, verQuickReplies) - [공통] Autodesk or 상상진화 BOX 제품 버전 바로가기 그룹 json 포맷
+             verReplies - 특정 마스터 데이터 객체
     """
 
     verQuickReplies = []
      
-    for verButton in verReplies[chatbot_helper._buttons]:   # 공통 - Autodesk or 상상진화 BOX 제품 버전 바로가기 그룹 버튼 텍스트 및 메세지 추가
+    for verButton in verReplies[chatbot_helper._buttons]:   # [공통] Autodesk or 상상진화 BOX 제품 버전 바로가기 그룹 버튼 텍스트 및 메세지 추가
         verQuickReplies.append({
             "action": chatbot_helper._message,
             "label": verButton[chatbot_helper._label],
             "messageText": f"{chatbot_helper._instType} {userRequest_msg} {verButton[chatbot_helper._messageText]}"
         })
 
-    return quickReplies_json(verReplies, verQuickReplies), verReplies
+    return (quickReplies_json(verReplies, verQuickReplies), verReplies)
 
-# TODO: 아래 함수 getResFormat 필요시 로직 수정 예정 (2025.09.04 minjae) 
-def getResFormat(userRequest_msg, masterEntity):
+# TODO: 아래 함수 get_response 필요시 로직 수정 예정 (2025.09.04 minjae)
+def get_response(userRequest_msg: str, masterEntity: dict) -> tuple[dict, dict]:
     """
     Description: 카카오 json 포맷 가져오기  
 
-    Parameters:
-        userRequest_msg (str): 사용자 입력 채팅 메세지 
-        masterEntity (dict): 마스터 데이터 담는 싱글톤(singleton) 객체   
+    Parameters: userRequest_msg - 사용자 입력 채팅 메세지 
+                masterEntity - 마스터 데이터 담는 싱글톤(singleton) 객체   
 
-    Returns:
-        resFormat (dict): 카카오 json 포맷 기반 챗봇 답변 내용
-        master_data (dict): 특정 마스터 데이터 (예) 아이템 카드 (basicCard, carousel) or 바로가기 그룹 (quickReplies)
+    Returns: resFormat - 카카오 json 포맷 기반 챗봇 답변 내용
+             master_data - 특정 마스터 데이터 (예) 아이템 카드 (basicCard, carousel) or 바로가기 그룹 (quickReplies)
     """
 
     resFormat = None   
@@ -436,101 +416,99 @@ def getResFormat(userRequest_msg, masterEntity):
         #                 chatbot_helper._error_ssflex)   # 예외 발생시킴
 
         if (chatbot_helper._start in userRequest_msg or chatbot_helper._beginning in userRequest_msg):   # start - 시작 화면 or 처음으로
-            resFormat, master_data = common_basicCardResFormat(master_datas[chatbot_helper._startCard])
+            (resFormat, master_data) = common_basicCard(master_datas[chatbot_helper._startCard])
 
         elif chatbot_helper._remote_botRes == userRequest_msg:   # level1 - 원격 지원
-            resFormat = base_ResFormat()
+            resFormat = base_response()
             master_data = master_datas[chatbot_helper._startCard]
 
         elif chatbot_helper._ask_chatbot == userRequest_msg:   # level1 - 챗봇 문의 
-            resFormat, master_data = chatbot_carouselResFormat(master_datas[chatbot_helper._chatbotCard])
+            (resFormat, master_data) = chatbot_carousel(master_datas[chatbot_helper._chatbotCard])
 
         elif userRequest_msg in chatbot_messageTexts:   # level2 - 문의 유형 
-            resFormat, master_data = subCat_basicCardResFormat(userRequest_msg, master_datas[chatbot_helper._subCatCard])
+            (resFormat, master_data) = subCat_basicCard(userRequest_msg, master_datas[chatbot_helper._subCatCard])
 
         elif chatbot_helper._askInst_adskProduct == userRequest_msg:   # level3 - Autodesk 제품 설치 문의
-            resFormat, master_data = common_quickRepliesResFormat(master_datas[chatbot_helper._adskReplies])
+            (resFormat, master_data) = common_quickReplies(master_datas[chatbot_helper._adskReplies])
 
         elif userRequest_msg in adsk_messageTexts:   # level4 - Autodesk 제품 버전
-            resFormat, master_data = common_ver_quickRepliesResFormat(userRequest_msg, master_datas[chatbot_helper._adskVerReplies])
+            (resFormat, master_data) = common_ver_quickReplies(userRequest_msg, master_datas[chatbot_helper._adskVerReplies])
 
         elif chatbot_helper._askInst_boxProduct == userRequest_msg:   # level3 - 상상진화 BOX 제품 설치 문의
-            resFormat, master_data = common_quickRepliesResFormat(master_datas[chatbot_helper._boxReplies])
+            (resFormat, master_data) = common_quickReplies(master_datas[chatbot_helper._boxReplies])
 
         elif userRequest_msg in box_messageTexts:   # level4 - 상상진화 BOX 제품 버전
-            resFormat, master_data = common_ver_quickRepliesResFormat(userRequest_msg, master_datas[chatbot_helper._boxVerReplies])
+            (resFormat, master_data) = common_ver_quickReplies(userRequest_msg, master_datas[chatbot_helper._boxVerReplies])
 
         # TODO: 아래 주석친 코드 필요시 사용 예정 (2025.08.27 minjae)
         # elif chatbot_helper._ask_accountProduct == userRequest_msg:   # level3 - 계정 & 제품배정 문의 
-        #     resFormat, master_data = account_quickRepliesResFormat(master_datas[chatbot_helper._accountReplies])
+        #     (resFormat, master_data) = account_quickReplies(master_datas[chatbot_helper._accountReplies])
 
         elif (chatbot_helper._instType in userRequest_msg):   # end - 텍스트 + basicCard Autodesk or 상상진화 BOX 제품 설치 방법 
             # 상상진화 BOX 제품 2025, 2026 버전 공통 설치 방법
-            if (chatbot_helper._revitBox in userRequest_msg):   # RevitBOX     
-                resFormat, master_data = end_basicCardResFormat(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._revitBoxInfos])  
+            if (chatbot_helper._revitBox in userRequest_msg):   # RevitBOX
+                (resFormat, master_data) = end_basicCard(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._revitBoxInfos])  
 
             elif (chatbot_helper._cadBox in userRequest_msg):   # CADBOX
-                resFormat, master_data = end_basicCardResFormat(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._cadBoxInfos])
+                (resFormat, master_data) = end_basicCard(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._cadBoxInfos])
      
             elif (chatbot_helper._energyBox in userRequest_msg):   # EnergyBOX
-                resFormat, master_data = end_basicCardResFormat(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._energyBoxInfos])
+                (resFormat, master_data) = end_basicCard(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._energyBoxInfos])
 
             # Autodesk 제품 2025, 2026 버전 공통 설치 방법
             elif (chatbot_helper._autoCAD in userRequest_msg):   # AutoCAD  
-                resFormat, master_data = end_basicCardResFormat(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._autoCADInfos])   
+                (resFormat, master_data) = end_basicCard(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._autoCADInfos])   
 
             elif (chatbot_helper._revit in userRequest_msg):   # Revit 
-                resFormat, master_data = end_basicCardResFormat(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._revitInfos])   
+                (resFormat, master_data) = end_basicCard(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._revitInfos])   
 
             elif (chatbot_helper._navisworksManage in userRequest_msg):   # Navisworks Manage
-                resFormat, master_data = end_basicCardResFormat(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._navisworksManageInfos])   
+                (resFormat, master_data) = end_basicCard(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._navisworksManageInfos])   
 
             elif (chatbot_helper._infraWorks in userRequest_msg):   # InfraWorks
-                resFormat, master_data = end_basicCardResFormat(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._infraWorksInfos])   
+                (resFormat, master_data) = end_basicCard(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._infraWorksInfos])   
                 
             elif (chatbot_helper._civil3D in userRequest_msg):   # Civil3D 
-                resFormat, master_data = end_basicCardResFormat(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._civil3DInfos])   
+                (resFormat, master_data) = end_basicCard(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._civil3DInfos])   
         
         # TODO: 아래 주석친 코드 필요시 사용 예정 (2025.08.27 minjae)
         # elif chatbot_helper._survey in userRequest_msg:   # 만족도 조사
-        #     resFormat, master_data = common_basicCardResFormat(master_datas[chatbot_helper._surveyCard])
+        #     (resFormat, master_data) = common_basicCard(master_datas[chatbot_helper._surveyCard])
         
         # 사용자가 카카오 챗봇 버튼이 아닌 일반 메시지를 채팅창에 입력시 아래처럼 오류 메시지가 출력되어 원인 파악 결과 resFormat 변수가 None으로 리턴되어 
         # lambda_function.py 소스파일 -> resChatbot 함수에서 res_queue.put(resFormat) 실행할 때 발생하는 오류로 확인 되어 아래처럼 else 절 코드 추가 (2025.09.12 minjae)
         # 참고 URL - https://claude.ai/chat/2035baf1-0f86-4d08-af37-0091c8358dbb
         # 오류 메시지 - "TypeError: 'NoneType' object is not subscriptable"
         else:   # 기술지원 문의 제외 일반 문의 
-            resFormat = base_ResFormat()
+            resFormat = base_response()
 
         # TODO: 아래 주석친 코드 필요시 사용 예정 (2025.09.05 minjae)
         # elif (chatbot_helper._accountType in userRequest_msg):  # end - 텍스트 + basicCard 계정 & 제품배정 
         #     if chatbot_helper._anyQuestion in userRequest_msg:   # '기타 문의' 
-        #         resFormat, master_data = end_basicCardResFormat(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._accountInfos][chatbot_helper._anyQuestion])
+        #         (resFormat, master_data) = end_basicCard(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._accountInfos][chatbot_helper._anyQuestion])
 
         #     elif chatbot_helper._resetPassword in userRequest_msg:   # '계정 비밀번호 분실'
-        #         resFormat, master_data = end_basicCardResFormat(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._accountInfos][chatbot_helper._resetPassword])
+        #         (resFormat, master_data) = end_basicCard(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._accountInfos][chatbot_helper._resetPassword])
 
         #     else:   # [구현 예정!] '기타 문의', '계정 비밀번호 분실' 제외한 다른 문의 
-        #         resFormat, master_data = end_basicCardResFormat(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._etcInfos][chatbot_helper._etcTest])
+        #         (resFormat, master_data) = end_basicCard(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._etcInfos][chatbot_helper._etcTest])
 
         logger.info("[테스트] 카카오 json 포맷 가져오기 - 완료!")
-        return resFormat, master_data 
+        return (resFormat, master_data) 
         
     except Exception as e:     
-        error_msg = str(e)     
-        logger.error(f"[테스트] 오류 - {error_msg}") 
+        error_msg = str(e)
+        logger.error(f"[테스트] 오류 - {error_msg}")
         raise       
 
-def chatbot_carouselResFormat(chatbotCard):
+def chatbot_carousel(chatbotCard: dict) -> tuple[dict, dict]:
     """  
     Description: 챗봇 문의 아이템형 케로셀 json 포맷 가져오기
 
-    Parameters:
-        chatbotCard (dict): 특정 마스터 데이터 객체
+    Parameters: chatbotCard - 특정 마스터 데이터 객체
 
-    Returns:
-        carousel_json(chatbotCard, chatbot_items) (dict): 챗봇 문의 아이템형 케로셀 json 포맷
-        chatbotCard (dict): 특정 마스터 데이터 객체
+    Returns: carousel_json(chatbotCard, chatbot_items) - 챗봇 문의 아이템형 케로셀 json 포맷
+             chatbotCard - 특정 마스터 데이터 객체
     """
 
     chatbotButtons = []
@@ -567,24 +545,22 @@ def chatbot_carouselResFormat(chatbotCard):
         "buttonLayout": "vertical"
     })
 
-    return carousel_json(chatbotCard, chatbot_items), chatbotCard
+    return (carousel_json(chatbotCard, chatbot_items), chatbotCard)
 
-def subCat_basicCardResFormat(userRequest_msg, subCatCard):
+def subCat_basicCard(userRequest_msg: str, subCatCard: dict) -> tuple[dict, dict]:
     """
     Description: 문의 유형 기본형 카드 json 포맷 가져오기 
 
-    Parameters:
-        userRequest_msg (str): 사용자 입력 채팅 메세지
-        subCatCard (dict): 특정 마스터 데이터 객체
+    Parameters: userRequest_msg - 사용자 입력 채팅 메세지
+                subCatCard - 특정 마스터 데이터 객체
 
-    Returns:
-        basicCard_json(subCatCard, subCatButtons) (dict): 문의 유형 기본형 카드 json 포맷
-        subCatCard (dict): 특정 마스터 데이터 객체
+    Returns: basicCard_json(subCatCard, subCatButtons) - 문의 유형 기본형 카드 json 포맷
+             subCatCard - 특정 마스터 데이터 객체
     """
 
     subCatButtons = []
     
-    # 그리디 알고리즘 (Greedy Algorithm)
+    # 그리디 알고리즘 (Greedy Algorithm) - 탐욕법이라고 불리며, 현재 상황에서 지금 당장 좋은 것만 고르는 방법이다.
     # 참고 URL - https://youtu.be/5OYlS2QQMPA?si=LzCRpZvGmEXI5Ean
     # 참고 2 URL - https://youtu.be/_TG0hVYJ6D8?si=j85mnzUabJeClsoQ 
     for subCatButton in subCatCard[chatbot_helper._buttons]:   # 문의 유형 기본형 카드 버튼 텍스트 및 메세지 추가
@@ -606,20 +582,18 @@ def subCat_basicCardResFormat(userRequest_msg, subCatCard):
             "messageText": messageText
         })
 
-    return basicCard_json(subCatCard, subCatButtons), subCatCard
+    return (basicCard_json(subCatCard, subCatButtons), subCatCard)
 
 # TODO: 아래 주석친 코드 필요시 사용 예정 (2025.09.17 minjae)
-# def adskLang_textCardResFormat(userRequest_msg, adskLangCard):
+# def adskLang_textCard(userRequest_msg: str, adskLangCard: dict) -> tuple[dict, dict]:
 #     """
 #     Description: Autodesk 제품 설치 언어 텍스트 카드 json 포맷 가져오기
 
-#     Parameters:
-#         userRequest_msg (str): 사용자 입력 채팅 메세지
-#         adskLangCard (dict): 특정 마스터 데이터 객체
+#     Parameters: userRequest_msg - 사용자 입력 채팅 메세지
+#                 adskLangCard - 특정 마스터 데이터 객체
 
-#     Returns:
-#         textCard_json(adskLangCard, adskLangButtons) (dict): Autodesk 제품 설치 언어 텍스트 카드 json 포맷
-#         adskLangCard (dict): 특정 마스터 데이터 객체
+#     Returns: textCard_json(adskLangCard, adskLangButtons) - Autodesk 제품 설치 언어 텍스트 카드 json 포맷
+#              adskLangCard - 특정 마스터 데이터 객체
 #     """
 
 #     adskLangButtons = []
@@ -631,19 +605,17 @@ def subCat_basicCardResFormat(userRequest_msg, subCatCard):
 #             "messageText": f"{userRequest_msg} {adskLangButton[chatbot_helper._messageText]}"
 #         })
 
-#     return textCard_json(adskLangCard, adskLangButtons), adskLangCard
+#     return (textCard_json(adskLangCard, adskLangButtons), adskLangCard)
 
 # TODO: 아래 주석친 코드 필요시 사용 예정 (2025.09.17 minjae)
-# def account_quickRepliesResFormat(accountReplies):
+# def account_quickReplies(accountReplies: dict) -> tuple[dict, dict]:
 #     """
 #     Description: 계정 & 제품배정 문의 바로가기 그룹 json 포맷 가져오기
 
-#     Parameters:
-#         accountReplies (dict): 특정 마스터 데이터 객체
+#     Parameters: accountReplies - 특정 마스터 데이터 객체
 
-#     Returns: 
-#         quickReplies_json(accountReplies, accountQuickReplies) (dict): 계정 & 제품배정 문의 바로가기 그룹 json 포맷
-#         accountReplies (dict): 특정 마스터 데이터 객체
+#     Returns: quickReplies_json(accountReplies, accountQuickReplies) - 계정 & 제품배정 문의 바로가기 그룹 json 포맷
+#              accountReplies - 특정 마스터 데이터 객체
 #     """
 
 #     accountQuickReplies = []
@@ -656,26 +628,24 @@ def subCat_basicCardResFormat(userRequest_msg, subCatCard):
 #             "messageText": messageText
 #         })
 
-#     return quickReplies_json(accountReplies, accountQuickReplies), accountReplies
+#     return (quickReplies_json(accountReplies, accountQuickReplies), accountReplies)
 
-# TODO: 아래 함수 end_basicCardResFormat 필요시 로직 수정 예정 (2025.09.05 minjae)
-def end_basicCardResFormat(endCard, endInfos):
+# TODO: 아래 함수 end_basicCard 필요시 로직 수정 예정 (2025.09.05 minjae)
+def end_basicCard(endCard: dict, endInfos: list[dict]) -> tuple[dict, dict]:
     """
     Description: 마지막화면 기본형 카드 json 포맷 가져오기 
 
-    Parameters:
-        endCard (dict): 특정 마스터 데이터 객체
-        endInfos (list): 특정 기술지원 정보 리스트 (예) 설치 (Autodesk or 상상진화 BOX 제품), 계정 & 제품배정 등등...
+    Parameters: endCard - 특정 마스터 데이터 객체
+                endInfos - 특정 기술지원 정보 리스트 (예) 설치 (Autodesk or 상상진화 BOX 제품), 계정 & 제품배정 등등...
 
-    Returns:
-        outputs_json(outputs) (dict): 마지막화면 기본형 카드 json 포맷
-        endCard (dict): 특정 마스터 데이터 객체
+    Returns: outputs_json(outputs) - 마지막화면 기본형 카드 json 포맷
+             endCard - 특정 마스터 데이터 객체
     """
 
     endButtons = []
     outputs = []
 
-    # 그리디 알고리즘 (Greedy Algorithm)
+    # 그리디 알고리즘 (Greedy Algorithm) - 탐욕법이라고 불리며, 현재 상황에서 지금 당장 좋은 것만 고르는 방법이다.
     # 참고 URL - https://youtu.be/5OYlS2QQMPA?si=LzCRpZvGmEXI5Ean
     # 참고 2 URL - https://youtu.be/_TG0hVYJ6D8?si=j85mnzUabJeClsoQ
     # 오류 메시지 "string indices must be integers, not 'str'" 출력되어 아래처럼 코드 변경 처리함. (2025.08.28 minjae)
@@ -716,4 +686,4 @@ def end_basicCardResFormat(endCard, endInfos):
         }
     })
 
-    return outputs_json(outputs), endCard
+    return (outputs_json(outputs), endCard)

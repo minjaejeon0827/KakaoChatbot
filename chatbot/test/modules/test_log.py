@@ -27,7 +27,7 @@ logger.propagate = False
 
 
 # 3. formatter 생성 (로그 작성/출력/저장에 사용할 날짜 + 로그 메시지)
-# 원하는 출력 형태: [INFO] [2025-09-18 10:49:19] [kakao.py | getResFormat - L282]: [테스트] 카카오 json 포맷 가져오기 - Start!
+# 원하는 출력 형태: [INFO] [2025-09-18 10:49:19] [kakao.py | get_response - L282]: [테스트] 카카오 json 포맷 가져오기 - Start!
 # formatter = logging.Formatter('[%(levelname)s] [%(asctime)s] [%(filename)s | %(funcName)s - L%(lineno)d]: %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
 formatter = KSTFormatter('[%(levelname)s] [%(asctime)s] [%(filename)s | %(funcName)s - L%(lineno)d]: %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
 
