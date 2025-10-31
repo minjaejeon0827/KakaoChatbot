@@ -2,24 +2,28 @@
 * [카카오톡 서버 전송 용도] json 포맷 전용 모듈
 참고 URL - https://chatgpt.com/c/69002b43-44c0-8322-8298-e7871b39da2a
 
+* 챗봇 응답 타입별 json 포맷
+참고 URL - https://kakaobusiness.gitbook.io/main/tool/chatbot/skill_guide/answer_json_format
+
+* 메타 데이터 (meta_data)
+참고 URL - https://namu.wiki/w/%EB%A9%94%ED%83%80%EB%8D%B0%EC%9D%B4%ED%84%B0
+참고 2 URL - https://ko.wikipedia.org/wiki/%EB%A9%94%ED%83%80%EB%8D%B0%EC%9D%B4%ED%84%B0#cite_note-NISO-22
+
 * Race Condition
 참고 URL - https://en.wikipedia.org/wiki/Race_condition
 참고 2 URL - https://namu.wiki/w/%EA%B2%BD%EC%9F%81%20%EC%83%81%ED%83%9C
 참고 3 URL - https://lake0989.tistory.com/121
+
+* 파이썬 패키지, 모듈
+참고 URL - https://docs.python.org/ko/3.13/tutorial/modules.html
+참고 2 URL - https://wikidocs.net/1418
+참고 3 URL - https://dojang.io/mod/page/view.php?id=2450
 
 * 파이썬 Type Hints
 참고 URL - https://docs.python.org/ko/3.14/library/typing.html
 참고 2 URL - https://peps.python.org/pep-0484/
 참고 3 URL - https://devpouch.tistory.com/189
 참고 4 URL - https://supermemi.tistory.com/entry/Python-3-%ED%8C%8C%EC%9D%B4%EC%8D%AC%EC%97%90%EC%84%9C-%EC%9D%98%EB%AF%B8%EB%8A%94-%EB%AC%B4%EC%97%87%EC%9D%BC%EA%B9%8C-%EC%A3%BC%EC%84%9D
-
-* 챗봇 응답 타입별 json 포맷
-참고 URL - https://kakaobusiness.gitbook.io/main/tool/chatbot/skill_guide/answer_json_format
-
-* 파이썬 패키지, 모듈 
-참고 URL - https://docs.python.org/ko/3.13/tutorial/modules.html
-참고 2 URL - https://wikidocs.net/1418
-참고 3 URL - https://dojang.io/mod/page/view.php?id=2450
 
 * 파이썬 Type Hints class Any
 참고 URL - https://docs.python.org/ko/3.9/library/typing.html#the-any-type
@@ -34,7 +38,7 @@ from modules.log import logger       # 챗봇 전역 로그 객체(logger)
 # 3. Type Hints class Any import
 from typing import Any
 
-def outputs_json(outputs: list[dict]) -> dict[str, Any]:
+def outputs_format(outputs: list[dict]) -> dict[str, Any]:
     """
     Description: 출력 그룹 json 포맷 가져오기
 
@@ -51,7 +55,7 @@ def outputs_json(outputs: list[dict]) -> dict[str, Any]:
         }
     }
 
-def quickReplies_json(master_data: dict, buttons: list[dict]) -> dict[str, Any]:
+def quickReplies_format(master_data: dict[str, Any], buttons: list[dict]) -> dict[str, Any]:
     """
     Description: 바로가기 그룹 json 포맷 가져오기
 
@@ -75,7 +79,7 @@ def quickReplies_json(master_data: dict, buttons: list[dict]) -> dict[str, Any]:
         }
     }
 
-def textCard_json(master_data: dict, buttons: list[dict]) -> dict[str, Any]:
+def textCard_format(master_data: dict[str, Any], buttons: list[dict]) -> dict[str, Any]:
     """
     Description: 텍스트 카드 json 포맷 가져오기
 
@@ -101,8 +105,7 @@ def textCard_json(master_data: dict, buttons: list[dict]) -> dict[str, Any]:
         }
     }
 
-# TODO: 추후 필요시 함수 파라미터 quickReplies를 default 파라미터로 구현 예정 (2025.09.03 minjae)
-def basicCard_json(master_data: dict, buttons: list[dict]) -> dict[str, Any]:
+def basicCard_format(master_data: dict[str, Any], buttons: list[dict]) -> dict[str, Any]:
     """
     Description: 기본형 카드 json 포맷 가져오기
 
@@ -141,9 +144,9 @@ def basicCard_json(master_data: dict, buttons: list[dict]) -> dict[str, Any]:
         }
     })
 
-    return outputs_json(outputs)
+    return outputs_format(outputs)
 
-def carousel_json(master_data: dict, items: list[dict]) -> dict[str, Any]:
+def carousel_format(master_data: dict[str, Any], items: list[dict]) -> dict[str, Any]:
     """
     Description: 아이템형 케로셀 json 포맷 가져오기
 
@@ -172,26 +175,28 @@ def carousel_json(master_data: dict, items: list[dict]) -> dict[str, Any]:
         }
     }
 
-# TODO: 아래 함수 base_response 필요시 로직 수정 예정 (2025.09.03 minjae)
-def base_response(master_data: dict = None) -> tuple[dict, dict]:
+def empty_response(master_data: dict[str, Any] = None) -> dict[str, Any]:
     """
     Description: 기술지원 문의 제외 일반 문의 json 포맷 가져오기
                  카카오톡 채팅방에 응답 메시지를 출력하고 싶지 않은 경우 비어있는 메세지 전송 
 
-    Parameters: 없음.
+    Parameters: master_data - 특정 마스터 데이터 (default parameter)
+                참고 URL - https://docs.python.org/ko/3/glossary.html#term-parameter
 
     Returns: 기술지원 문의 제외 일반 문의 json 포맷
     """
 
-    logger.info(f"[테스트] master_data - {master_data}")
+    # logger.info(f"[테스트] master_data - {master_data}")
 
-    return ({
-        'version': '2.0', 
+    empty_format = {
+        'version': '2.0',
         'template': {
             'outputs': [], 
             'quickReplies': []
         }
-    }, master_data)
+    }
+
+    return { "format": empty_format, "meta_data": master_data }
 
 def simple_text(botRes: str) -> dict[str, Any]:
     """
@@ -306,7 +311,7 @@ def timeover_quickReplies(requestAgain_msg: str) -> dict[str, Any]:
         }
     }
 
-def _create_buttons(master_data: dict, message_prefix: str = None) -> list[dict]:
+def _create_buttons(master_data: dict[str, Any], message_prefix: str = None) -> list[dict]:
     """
     Description: [공통] 버튼 리스트 생성
 
@@ -319,7 +324,7 @@ def _create_buttons(master_data: dict, message_prefix: str = None) -> list[dict]
 
     buttons = []
 
-    # 브루트 포스 알고리즘 (Brute Force Algorithm) - 무차별 대입법이라고 불리며, 문제를 해결하기 위해 가능한 경우의 수를 모두 검사(완전 탐색)해보는 방법이다.
+    # 브루트 포스 완전 탐색 알고리즘 (Brute Force Algorithm) - 무차별 대입법이라고 불리며, 문제를 해결하기 위해 가능한 경우의 수를 모두 검사(완전 탐색)해보는 방법이다.
     # 참고 URL - https://ko.wikipedia.org/wiki/%EB%AC%B4%EC%B0%A8%EB%B3%84_%EB%8C%80%EC%9E%85_%EA%B2%80%EC%83%89
     # 참고 2 URL - https://wikidocs.net/233719
     # 참고 3 URL - https://youtu.be/QhMY4t2xwG0?si=uYsaL7CLHmx-RHV8
@@ -341,51 +346,51 @@ def _create_buttons(master_data: dict, message_prefix: str = None) -> list[dict]
 
     return buttons
 
-def common_basicCard(master_data: dict) -> tuple[dict, dict]:
+def common_basicCard(master_data: dict[str, Any]) -> dict[str, Any]:
     """
     Description: [공통] 기본형 카드 json 포맷 가져오기 
 
     Parameters: master_data - 특정 마스터 데이터
 
-    Returns: basicCard_json(master_data, buttons) - [공통] 기본형 카드 json 포맷
+    Returns: basicCard_format(master_data, buttons) - [공통] 기본형 카드 json 포맷
              master_data - 특정 마스터 데이터
     """
 
     buttons = _create_buttons(master_data)   # [공통] 버튼 리스트 생성
-    
-    return (basicCard_json(master_data, buttons), master_data)
 
-def common_quickReplies(master_data: dict) -> tuple[dict, dict]:
+    return { "format": basicCard_format(master_data, buttons), "meta_data": master_data }
+
+def common_quickReplies(master_data: dict[str, Any]) -> dict[str, Any]:
     """
     Description: [공통] 바로가기 그룹 json 포맷 가져오기
 
     Parameters: master_data - 특정 마스터 데이터
 
-    Returns: quickReplies_json(master_data, buttons) - [공통] 바로가기 그룹 json 포맷
+    Returns: quickReplies_format(master_data, buttons) - [공통] 바로가기 그룹 json 포맷
              master_data - 특정 마스터 데이터
     """
 
     buttons = _create_buttons(master_data)
 
-    return (quickReplies_json(master_data, buttons), master_data)
+    return { "format": quickReplies_format(master_data, buttons), "meta_data": master_data }
 
-def common_ver_quickReplies(userRequest_msg: str, master_data: dict) -> tuple[dict, dict]:
+def common_ver_quickReplies(userRequest_msg: str, master_data: dict[str, Any]) -> dict[str, Any]:
     """
     Description: [공통] Autodesk or 상상진화 BOX 제품 버전 바로가기 그룹 json 포맷 가져오기
 
     Parameters: userRequest_msg - 사용자 입력 채팅 메세지
                 master_data - 특정 마스터 데이터
 
-    Returns: quickReplies_json(master_data, buttons) - [공통] Autodesk or 상상진화 BOX 제품 버전 바로가기 그룹 json 포맷
+    Returns: quickReplies_format(master_data, buttons) - [공통] Autodesk or 상상진화 BOX 제품 버전 바로가기 그룹 json 포맷
              master_data - 특정 마스터 데이터
     """
 
     message_prefix = f"{chatbot_helper._instType} {userRequest_msg}"
     buttons = _create_buttons(master_data, message_prefix)
 
-    return (quickReplies_json(master_data, buttons), master_data)
+    return { "format": quickReplies_format(master_data, buttons), "meta_data": master_data }
 
-def get_response(userRequest_msg: str, masterEntity: dict) -> tuple[dict, dict]:
+def get_response(userRequest_msg: str, masterEntity: dict[str, Any]) -> dict[str, Any]:
     """
     Description: 카카오 json 포맷 가져오기  
 
@@ -426,7 +431,7 @@ def get_response(userRequest_msg: str, masterEntity: dict) -> tuple[dict, dict]:
     in_operator_mappings = {   # if 조건절 in 연산자 매핑 Dictionary 객체
         chatbot_helper._start: lambda: common_basicCard(master_datas[chatbot_helper._startCard]),   # start - 시작 화면
         chatbot_helper._beginning: lambda: common_basicCard(master_datas[chatbot_helper._startCard]),   # start - 처음으로
-        chatbot_helper._remote_botRes: lambda: base_response(master_datas[chatbot_helper._startCard]),   # level1 - 원격 지원
+        chatbot_helper._remote_botRes: lambda: empty_response(master_datas[chatbot_helper._startCard]),   # level1 - 원격 지원
         chatbot_helper._ask_chatbot: lambda: chatbot_carousel(master_datas[chatbot_helper._chatbotCard]),   # level1 - 챗봇 문의
         chatbot_helper._adskProduct: lambda: subCat_basicCard(userRequest_msg, master_datas[chatbot_helper._subCatCard]),   # level2 - 문의 유형 (Autodesk 제품)
         chatbot_helper._boxProduct: lambda: subCat_basicCard(userRequest_msg, master_datas[chatbot_helper._subCatCard]),   # level2 - 문의 유형 (상상진화 BOX 제품)
@@ -456,7 +461,7 @@ def get_response(userRequest_msg: str, masterEntity: dict) -> tuple[dict, dict]:
         #                 '사유: 카카오 json 포맷 가져오기 오류 발생!!!\n'+
         #                 chatbot_helper._error_ssflex)   # 예외 발생시킴
 
-        # 브루트 포스 알고리즘 (Brute Force Algorithm) - 무차별 대입법이라고 불리며, 문제를 해결하기 위해 가능한 경우의 수를 모두 검사(완전 탐색)해보는 방법이다.
+        # 브루트 포스 완전 탐색 알고리즘 (Brute Force Algorithm) - 무차별 대입법이라고 불리며, 문제를 해결하기 위해 가능한 경우의 수를 모두 검사(완전 탐색)해보는 방법이다.
         # 참고 URL - https://ko.wikipedia.org/wiki/%EB%AC%B4%EC%B0%A8%EB%B3%84_%EB%8C%80%EC%9E%85_%EA%B2%80%EC%83%89
         # 참고 2 URL - https://wikidocs.net/233719
         # 참고 3 URL - https://youtu.be/QhMY4t2xwG0?si=uYsaL7CLHmx-RHV8
@@ -466,33 +471,37 @@ def get_response(userRequest_msg: str, masterEntity: dict) -> tuple[dict, dict]:
         # 조기 종료(return) 통해 불필요한 후속 탐색을 줄이는 최적화된 브루트 포스 완전 탐색 알고리즘 (Brute Force Algorithm) - "브루트 포스(Brute Force) 완전 탐색 알고리즘 기반 탐색 구조 + 그리디(Greedy) 알고리즘 방식 조기 종료" 혼합형
         for key, handler in eq_operator_mappings.items():   # 사용자 입력(userRequest_msg)에 맞는 핸들러 함수(handler) 찾아 실행
             if key == userRequest_msg:
-                logger.info(f"[테스트] [eq_operator_mappings] key - {key}, userRequest_msg - {userRequest_msg}")
+                logger.info(f"[테스트] [eq_operator_mappings] key: '{key}', userRequest_msg: '{userRequest_msg}'")
                 return handler()
             
         for key, handler in in_operator_mappings.items():   # 사용자 입력(userRequest_msg)에 맞는 핸들러 함수(handler) 찾아 실행
             if key in userRequest_msg:
-                logger.info(f"[테스트] [in_operator_mappings] key - {key}, userRequest_msg - {userRequest_msg}")
+                logger.info(f"[테스트] [in_operator_mappings] key: '{key}', userRequest_msg: '{userRequest_msg}'")
                 return handler()
+            
+        # TODO: 오류 메시지 "TypeError: cannot unpack non-iterable NoneType object" 출력 원인 파악 (2025.10.30 minjae)
+        # 오류 원인 - 함수나 메서드가 None 값을 반환했을 때, 해당 None 값을 언패킹(unpacking) 하려고 시도할 경우 발생. 즉, Python에서 None 객체는 반복(iteration)이 불가능하므로, 언패킹(unpacking) 불가.
+        # 참고 URL - https://python.realjourney.co.kr/entry/Pytorch-TypeError-cannot-unpack-non-iterable-NoneType-object
 
         # 사용자가 카카오 챗봇 버튼이 아닌 일반 메시지를 채팅창에 입력시 아래처럼 오류 메시지가 출력되어 원인 파악하니 함수 실행 결과 None으로 반환되고
         # lambda_function.py 소스파일 -> resChatbot 함수에서 res_queue.put(response) 실행할 때 발생하는 오류로 확인 되어 아래처럼 else 절 코드 추가 (2025.10.30 minjae)
         # 참고 URL - https://claude.ai/chat/2035baf1-0f86-4d08-af37-0091c8358dbb
         # 오류 메시지 - "TypeError: 'NoneType' object is not subscriptable"
         logger.info("[테스트] [기술지원 문의 제외 일반 문의] 카카오 json 포맷 가져오기 - 완료!")
-        return base_response()   # 기술지원 문의 제외 일반 문의
+        return empty_response()   # 기술지원 문의 제외 일반 문의
         
     except Exception as e:     
         error_msg = str(e)
         logger.error(f"[테스트] 오류 - {error_msg}")
         raise
 
-def chatbot_carousel(master_data: dict) -> tuple[dict, dict]:
+def chatbot_carousel(master_data: dict[str, Any]) -> dict[str, Any]:
     """  
     Description: 챗봇 문의 아이템형 케로셀 json 포맷 가져오기
 
     Parameters: master_data - 특정 마스터 데이터
 
-    Returns: carousel_json(master_data, chatbot_items) - 챗봇 문의 아이템형 케로셀 json 포맷
+    Returns: carousel_format(master_data, chatbot_items) - 챗봇 문의 아이템형 케로셀 json 포맷
              master_data - 특정 마스터 데이터
     """
 
@@ -530,22 +539,23 @@ def chatbot_carousel(master_data: dict) -> tuple[dict, dict]:
         "buttonLayout": "vertical"
     })
 
-    return (carousel_json(master_data, chatbot_items), master_data)
+    return { "format": carousel_format(master_data, chatbot_items), "meta_data": master_data }
 
-def subCat_basicCard(userRequest_msg: str, master_data: dict) -> tuple[dict, dict]:
+# TODO: 아래 함수 subCat_basicCard 필요시 로직 수정 예정 (2025.10.31 minjae)
+def subCat_basicCard(userRequest_msg: str, master_data: dict[str, Any]) -> dict[str, Any]:
     """
     Description: 문의 유형 기본형 카드 json 포맷 가져오기 
 
     Parameters: userRequest_msg - 사용자 입력 채팅 메세지
                 master_data - 특정 마스터 데이터
 
-    Returns: basicCard_json(master_data, buttons) - 문의 유형 기본형 카드 json 포맷
+    Returns: basicCard_format(master_data, buttons) - 문의 유형 기본형 카드 json 포맷
              master_data - 특정 마스터 데이터
     """
 
     buttons = []
     
-    # 브루트 포스 알고리즘 (Brute Force Algorithm) - 무차별 대입법이라고 불리며, 문제를 해결하기 위해 가능한 경우의 수를 모두 검사(완전 탐색)해보는 방법이다.
+    # 브루트 포스 완전 탐색 알고리즘 (Brute Force Algorithm) - 무차별 대입법이라고 불리며, 문제를 해결하기 위해 가능한 경우의 수를 모두 검사(완전 탐색)해보는 방법이다.
     # 참고 URL - https://ko.wikipedia.org/wiki/%EB%AC%B4%EC%B0%A8%EB%B3%84_%EB%8C%80%EC%9E%85_%EA%B2%80%EC%83%89
     # 참고 2 URL - https://wikidocs.net/233719
     # 참고 3 URL - https://youtu.be/QhMY4t2xwG0?si=uYsaL7CLHmx-RHV8
@@ -568,57 +578,57 @@ def subCat_basicCard(userRequest_msg: str, master_data: dict) -> tuple[dict, dic
             "messageText": messageText
         })
 
-    return (basicCard_json(master_data, buttons), master_data)
+    return { "format": basicCard_format(master_data, buttons), "meta_data": master_data }
 
 # TODO: 아래 주석친 코드 필요시 사용 예정 (2025.09.17 minjae)
-# def adskLang_textCard(userRequest_msg: str, master_data: dict) -> tuple[dict, dict]:
+# def adskLang_textCard(userRequest_msg: str, master_data: dict[str, Any]) -> dict[str, Any]:
 #     """
 #     Description: Autodesk 제품 설치 언어 텍스트 카드 json 포맷 가져오기
 
 #     Parameters: userRequest_msg - 사용자 입력 채팅 메세지
 #                 master_data - 특정 마스터 데이터
 
-#     Returns: textCard_json(master_data, buttons) - Autodesk 제품 설치 언어 텍스트 카드 json 포맷
+#     Returns: textCard_format(master_data, buttons) - Autodesk 제품 설치 언어 텍스트 카드 json 포맷
 #              master_data - 특정 마스터 데이터
 #     """
 
 #     message_prefix = userRequest_msg
 #     buttons = _create_buttons(master_data, message_prefix)
 
-#     return (textCard_json(master_data, buttons), master_data)
+#     return { "format": textCard_format(master_data, buttons), "meta_data": master_data }
 
 # TODO: 아래 주석친 코드 필요시 사용 예정 (2025.09.17 minjae)
-# def account_quickReplies(master_data: dict) -> tuple[dict, dict]:
+# def account_quickReplies(master_data: dict[str, Any]) -> dict[str, Any]:
 #     """
 #     Description: 계정 & 제품배정 문의 바로가기 그룹 json 포맷 가져오기
 
 #     Parameters: master_data - 특정 마스터 데이터
 
-#     Returns: quickReplies_json(master_data, buttons) - 계정 & 제품배정 문의 바로가기 그룹 json 포맷
+#     Returns: quickReplies_format(master_data, buttons) - 계정 & 제품배정 문의 바로가기 그룹 json 포맷
 #              master_data - 특정 마스터 데이터
 #     """
 
 #     message_prefix = chatbot_helper._accountType
 #     buttons = _create_buttons(master_data, message_prefix)
 
-#     return (quickReplies_json(master_data, buttons), master_data)
+#     return { "format": quickReplies_format(master_data, buttons), "meta_data": master_data }
 
 # TODO: 아래 함수 end_basicCard 필요시 로직 수정 예정 (2025.09.05 minjae)
-def end_basicCard(master_data: dict, endInfos: list[dict]) -> tuple[dict, dict]:
+def end_basicCard(master_data: dict[str, Any], endInfos: list[dict]) -> dict[str, Any]:
     """
     Description: 마지막화면 기본형 카드 json 포맷 가져오기 
 
     Parameters: master_data - 특정 마스터 데이터
                 endInfos - 특정 기술지원 정보 리스트 (예) 설치 (Autodesk or 상상진화 BOX 제품), 계정 & 제품배정 등등...
 
-    Returns: outputs_json(outputs) - 마지막화면 기본형 카드 json 포맷
+    Returns: outputs_format(outputs) - 마지막화면 기본형 카드 json 포맷
              master_data - 특정 마스터 데이터
     """
 
     buttons = []
     outputs = []
 
-    # 브루트 포스 알고리즘 (Brute Force Algorithm) - 무차별 대입법이라고 불리며, 문제를 해결하기 위해 가능한 경우의 수를 모두 검사(완전 탐색)해보는 방법이다.
+    # 브루트 포스 완전 탐색 알고리즘 (Brute Force Algorithm) - 무차별 대입법이라고 불리며, 문제를 해결하기 위해 가능한 경우의 수를 모두 검사(완전 탐색)해보는 방법이다.
     # 참고 URL - https://ko.wikipedia.org/wiki/%EB%AC%B4%EC%B0%A8%EB%B3%84_%EB%8C%80%EC%9E%85_%EA%B2%80%EC%83%89
     # 참고 2 URL - https://wikidocs.net/233719
     # 참고 3 URL - https://youtu.be/QhMY4t2xwG0?si=uYsaL7CLHmx-RHV8
@@ -660,4 +670,4 @@ def end_basicCard(master_data: dict, endInfos: list[dict]) -> tuple[dict, dict]:
         }
     })
 
-    return (outputs_json(outputs), master_data)
+    return { "format": outputs_format(outputs), "meta_data": master_data }
