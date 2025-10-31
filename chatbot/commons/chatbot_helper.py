@@ -49,10 +49,14 @@ _masterEntity_json_file_path = './resources/json/masterEntity.json'   # 전체 �
 
 # endregion lambda_function.py  
 
-# region kakao.py  
+# region kakao.py
+
+# 카카오 응답 데이터 
+_format = 'format'         # json format
+_meta_data = 'meta_data'   # 다른 데이터 설명해 주는 데이터 (예) master_data - 특정 마스터 데이터
 
 # 필드명 "action" - 버튼 클릭시 수행될 작업
-_webLink = 'webLink'   # 웹 브라우저 열고 webLinkUrl 주소로 이동
+_webLink = 'webLink'   # 웹 브라우저 열고 webLinkUrl 주소 이동
 _message = 'message'   # 사용자의 발화로 messageText 실행. (바로가기 응답의 메세지 연결 기능과 동일)
 
 # 기술지원 업무 프로세스
@@ -121,8 +125,8 @@ _revit = 'Revit'
 _navisworksManage = 'Navisworks Manage'
 # Navisworks Simulate 제품 판매 불가(제품 재고 X)인 관계로 설치지원 제품 'InfraWorks' 대체 (2025.08.21 minjae)
 # _navisworks_Simulate = 'Navisworks Simulate'
-_civil3D = 'Civil3D'
 _infraWorks = 'InfraWorks'
+_civil3D = 'Civil3D'
 
 # CASE 2: 상상진화 BOX 제품
 # _boxType = 'BOX -' 
