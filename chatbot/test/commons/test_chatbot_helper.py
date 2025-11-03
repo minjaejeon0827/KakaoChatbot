@@ -45,7 +45,7 @@ _checkingRequest = '요청사항 확인 중이에요.\n잠시후 아래 말풍�
 _start = '/start'   # 시작 화면
 
 # level1 
-_remote_botRes = '아래 링크를 클릭하시면 원격 지원이 시작됩니다.\nhttps://113366.com/client/download?relayUri=imbu'   # 원격 지원
+_remote_text = '아래 링크를 클릭하시면 원격 지원이 시작됩니다.\nhttps://113366.com/client/download?relayUri=imbu'   # 원격 지원
 _chatbot = f'챗봇 {_ask}'   # 챗봇 문의
 _chatbotItem_Idx = 0   # [챗봇 문의] itemList 'title', 'description'
 
@@ -77,7 +77,7 @@ _survey = '만족도 조사'
 # 버튼 인덱스 번호
 _videoButton_Idx = 1   # [마지막 화면] 버튼 "동영상" (masterEntity.json -> "endCard" Dictionary -> "buttons" list 객체 인덱스 번호)  
 _webLinkUrl_Idx = 0   # [마지막 화면] 버튼 "동영상"과 연동할 webLinkUrl 인덱스 번호 (masterEntity.json -> "endCard" Dictionary -> "autoCADInfos", "revitInfos", "navisworksManageInfos", "infraWorksInfos", "civil3DInfos", "revitBoxInfos", "cadBoxInfos", "energyBoxInfos", "accountInfos" list 객체 인덱스 번호
-_botRes_Idx = 0   # [마지막 화면] Autodesk, Box 제품별 카카오 챗봇 답변 내용 인덱스 번호
+_text_Idx = 0   # [마지막 화면] Autodesk, Box 제품별 카카오 챗봇 답변 내용 인덱스 번호
 
 # 기술지원 유형 
 _instType = 'Inst -'   # 설치 
@@ -111,7 +111,7 @@ _energyBox = 'EnergyBOX'
 # 공통 - 카드 or 바로가기 그룹 객체 안에 속한 키(key)
 _levelNo = 'levelNo'
 _displayName = 'displayName'
-_botRes = 'botRes'
+_text = 'text'
 _title = 'title'
 _description = 'description'
 _thumbnail = 'thumbnail'

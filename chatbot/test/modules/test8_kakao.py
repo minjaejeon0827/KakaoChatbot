@@ -5,9 +5,6 @@
 * 챗봇 응답 타입별 json 포맷
 참고 URL - https://kakaobusiness.gitbook.io/main/tool/chatbot/skill_guide/answer_json_format
 
-* 카카오 응답 json 포맷 "buttons" VS "quickReplies" 차이점
-"quickReplies"의 경우 "action": "webLink" 기능 실행 불가.
-
 * 메타 데이터 (meta_data)
 참고 URL - https://namu.wiki/w/%EB%A9%94%ED%83%80%EB%8D%B0%EC%9D%B4%ED%84%B0
 참고 2 URL - https://ko.wikipedia.org/wiki/%EB%A9%94%ED%83%80%EB%8D%B0%EC%9D%B4%ED%84%B0#cite_note-NISO-22
@@ -53,8 +50,6 @@ def skillTemplate_format(outputs: list[dict] = [], quickReplies: list[dict] = []
     Returns: 스킬 응답 템플릿 json 포맷
     """
 
-    logger.info(f"[테스트] 스킬 응답 템플릿 outputs: '{outputs}', quickReplies: '{quickReplies}'")
-
     return {
         "version": "2.0",
         "template": {
@@ -75,21 +70,19 @@ def quickReplies_format(master_data: dict[str, Any], quickReplies: list[dict]) -
 
     outputs = []
 
-    # 아래 주석친 코드 처럼 master_data[chatbot_helper._text]에 할당된 값이 null 또는 공백("")일 경우 바로가기 그룹이 카카오톡 채팅방에 출력 안되는 오류 발생함.
-    # master_data[chatbot_helper._text] = None
-    # 하여 null 또는 공백("")이 아닌 문자열로 할당 해야함. (2025.11.03 minjae)
-    # 참고 URL - https://stackoverflow.com/questions/9573244/how-to-check-if-the-string-is-empty-in-python
-    # 참고 2 URL - https://hello-bryan.tistory.com/131
-    # 참고 3 URL - https://jino-dev-diary.tistory.com/42
-    # 참고 4 URL - https://claude.ai/chat/eaf7856e-1b5e-4c26-992e-de1683005638
-    if master_data[chatbot_helper._text]:   # master_data[chatbot_helper._text]에 할당된 값이 null 또는 공백("")이 아닌 경우 (None or Empty String Check)
-        outputs.append({
-            "simpleText": {
-                "text": master_data[chatbot_helper._text]
-            }
-        })
-
-    return skillTemplate_format(outputs, quickReplies)
+    return {
+        'version': '2.0', 
+        'template': {
+            'outputs': [
+                {
+                    "simpleText": {
+                        "text": master_data[chatbot_helper._description]
+                    }
+                }
+            ], 
+            'quickReplies': quickReplies
+        }
+    }
 
 def textCard_format(master_data: dict[str, Any], buttons: list[dict]) -> dict[str, Any]:
     """
@@ -103,15 +96,21 @@ def textCard_format(master_data: dict[str, Any], buttons: list[dict]) -> dict[st
 
     outputs = []
 
-    outputs.append({   # textCard 항상 추가
-        "textCard": {
-            "title": master_data[chatbot_helper._title],
-            "description": master_data[chatbot_helper._description],
-            "buttons": buttons
+    return {
+        "version": "2.0",
+        "template": {
+            "outputs": [
+                {
+                    "textCard": {
+                        "title": master_data[chatbot_helper._title],
+                        "description": master_data[chatbot_helper._description],
+                        "buttons": buttons
+                    }
+                }
+            ],
+            "quickReplies": []
         }
-    })
-
-    return skillTemplate_format(outputs)
+    }
 
 def basicCard_format(master_data: dict[str, Any], buttons: list[dict]) -> dict[str, Any]:
     """
@@ -165,22 +164,50 @@ def carousel_format(master_data: dict[str, Any], items: list[dict]) -> dict[str,
     """
 
     outputs = []
-
-    if master_data[chatbot_helper._text]:   # master_data[chatbot_helper._text]에 할당된 값이 null 또는 공백("")이 아닌 경우 (None or Empty String Check)
-        outputs.append({
-            "simpleText": {
-                "text": master_data[chatbot_helper._text]
-            }
-        })
-
-    outputs.append({   # carousel 항상 추가
-        "carousel": {
-            "type": "itemCard",
-            "items": items
+    
+    return {
+        "version": "2.0",
+        "template": {
+            "outputs": [
+                {
+                    "simpleText": {
+                        "text": master_data[chatbot_helper._text]
+                    }
+                },
+                {
+                    "carousel": {
+                        "type": "itemCard",
+                        "items": items
+                    }
+                }
+            ],
+            "quickReplies": []
         }
-    })
+    }
 
-    return skillTemplate_format(outputs)
+def empty_response(master_data: dict[str, Any]) -> dict[str, Any]:
+    """
+    Description: 기술지원 문의 제외 일반 문의 json 포맷 가져오기
+                 카카오톡 채팅방에 응답 메시지를 출력하고 싶지 않은 경우 비어있는 메세지 전송 
+
+    Parameters: master_data - 특정 마스터 데이터
+
+    Returns: 기술지원 문의 제외 일반 문의 json 포맷
+    """
+
+    outputs = []
+
+    # logger.info(f"[테스트] master_data - {master_data}")
+
+    empty_format = {
+        'version': '2.0',
+        'template': {
+            'outputs': [], 
+            'quickReplies': []
+        }
+    }
+
+    return { "format": empty_format, "meta_data": master_data }
 
 def simple_text(text: str) -> dict[str, Any]:
     """
@@ -193,40 +220,51 @@ def simple_text(text: str) -> dict[str, Any]:
     """
 
     outputs = []
-
-    if text:   # text에 할당된 값이 null 또는 공백("")이 아닌 경우 (None or Empty String Check)
-        outputs.append({
-            "simpleText": {
-                "text": text
-            }
-        })
-        
-    return skillTemplate_format(outputs)
+ 
+    return {
+        'version': '2.0', 
+        'template': {
+            'outputs': [
+                {
+                    "simpleText": {
+                        "text": text
+                    }
+                }
+            ], 
+            'quickReplies': []
+        }
+    }
 
 # TODO: 아래 주석친 코드 필요시 사용 예정 (2025.09.29 minjae)
-# def simple_image(imageUrl: str, prompt: str) -> dict[str, Any]:
+# def simple_image(text: str, prompt: str) -> dict[str, Any]:
 #     """
 #     Description: DALLE2 이미지 json 포맷 가져오기
 #                  카카오톡 채팅방에 DALLE2 이미지 전송
 
-#     Parameters: imageUrl - DALLE2 이미지 URL 주소 
+#     Parameters: text - DALLE2 이미지 URL 주소 
 #                 prompt - 사용자가 카카오톡 채팅방에 그려 달라고 요청한 이미지 설명 
     
 #     Returns: DALLE2 이미지 json 포맷
 #     """
 
 #     outputs = []
+
 #     output_text = prompt + "내용에 관한 이미지 입니다"
 
-#     if imageUrl:   # imageUrl에 할당된 값이 null 또는 공백("")이 아닌 경우 (None or Empty String Check)
-#         outputs.append({
-#             "simpleImage": {
-#                 "imageUrl": imageUrl,
-#                 "altText": output_text
-#             }
-#         })
-
-#     return skillTemplate_format(outputs)
+#     return {
+#         'version': '2.0', 
+#         'template': {
+#             'outputs': [
+#                 {
+#                     "simpleImage": {
+#                         "imageUrl": text,
+#                         "altText": output_text
+#                     }
+#                 }
+#             ], 
+#             'quickReplies': []
+#         }
+#     }   
 
 # TODO: 아래 구현한 error_text 함수 Parameters "master_data"에 값이 None 들어와서 None 으로 리턴될 경우 
 #       lambda_function.py 소스파일 -> resChatbot 함수 몸체 -> 해당 NoneType 객체(response_data[chatbot_helper._meta_data]) 인덱싱 또는 슬라이싱 시도할 때 (response_data[chatbot_helper._meta_data][chatbot_helper._displayName]) 아래와 같은 오류 발생
@@ -234,6 +272,7 @@ def simple_text(text: str) -> dict[str, Any]:
 # 참고 URL - https://python.realjourney.co.kr/entry/OpenCV-TypeError-NoneType-object-is-not-subscriptable
 # 오류 메시지 - TypeError: 'NoneType' object is not subscriptable
 # def error_text(error_msg: str, master_data: dict[str, Any] = None) -> dict[str, Any]:
+# def error_text(error_msg: str, master_data: dict[str, Any]) -> dict[str, Any]:
 def error_text(error_msg: str) -> dict[str, Any]:
     """
     Description: 오류 메세지 json 포맷 가져오기
@@ -246,26 +285,31 @@ def error_text(error_msg: str) -> dict[str, Any]:
     """
 
     outputs = []
-    quickReplies = []
 
-    if error_msg:   # error_msg에 할당된 값이 null 또는 공백("")이 아닌 경우 (None or Empty String Check)
-        outputs.append({
-            "simpleText": {
-                "text": error_msg
-            }
-        })
+    # error_format = {
+    return {
+        'version': '2.0', 
+        'template': {
+            'outputs': [
+                {
+                    "simpleText": {
+                        "text": error_msg
+                    }
+                }
+            ], 
+            "quickReplies": [
+                {
+                    "action": chatbot_helper._message,
+                    "label": chatbot_helper._beginning,
+                    "messageText": chatbot_helper._beginning
+                    # "webLinkUrl": "https://e.kakao.com/t/hello-ryan"   # "quickReplies"의 경우 "webLinkUrl" 실행되지 않음.
+                }
+            ]
+        }
+    }
 
-    quickReplies.append({
-        "action": chatbot_helper._message,
-        # "action": chatbot_helper._webLink,     # "quickReplies"의 경우 "action" -> "webLink" 기능 실행 불가.
-        "label": chatbot_helper._beginning,
-        "messageText": chatbot_helper._beginning
-        # "webLinkUrl": "https://e.kakao.com/t/hello-ryan"   # "quickReplies"의 경우 "webLinkUrl" 기능 실행 불가.
-    })
+    # return { "format": error_format, "meta_data": master_data }
 
-    return skillTemplate_format(outputs, quickReplies)
-
-# TODO: 아래 함수 timeover_quickReplies 필요시 로직 수정 예정 (2025.11.03 minjae)
 def timeover_quickReplies(requestAgain_msg: str) -> dict[str, Any]:
     """
     Description: 응답 재요청 json 포맷 가져오기
@@ -277,35 +321,26 @@ def timeover_quickReplies(requestAgain_msg: str) -> dict[str, Any]:
     """
 
     outputs = []
-    quickReplies = []
 
-    outputs.append({
-        "simpleText": {
-            "text": chatbot_helper._checkRequest
+    return {
+        "version": "2.0",
+        "template": {
+            "outputs": [
+                {
+                    "simpleText": {
+                        "text": chatbot_helper._checkRequest
+                    }
+                }
+            ],
+            "quickReplies": [
+                {
+                    "action": chatbot_helper._message,
+                    "label": requestAgain_msg,
+                    "messageText": requestAgain_msg
+                }
+            ]
         }
-    })
-
-    quickReplies.append({
-        "action": chatbot_helper._message,
-        "label": requestAgain_msg,
-        "messageText": requestAgain_msg
-    })
-
-    return skillTemplate_format(outputs, quickReplies)
-
-def empty_response(master_data: dict[str, Any]) -> dict[str, Any]:
-    """
-    Description: 기술지원 문의 제외 일반 문의 json 포맷 가져오기
-                 또는 카카오톡 채팅방에 응답 메시지를 출력하고 싶지 않은 경우 비어있는 메세지 전송 
-
-    Parameters: master_data - 특정 마스터 데이터
-
-    Returns: 기술지원 문의 제외 일반 문의 json 포맷
-    """
-
-    empty_format = skillTemplate_format()
-
-    return { "format": empty_format, "meta_data": master_data }
+    }
 
 def _create_buttons(master_data: dict[str, Any], message_prefix: str = None) -> list[dict]:
     """
@@ -527,7 +562,7 @@ def get_response(userRequest_msg: str, masterEntity: dict[str, Any]) -> dict[str
         # 참고 URL - https://claude.ai/chat/2035baf1-0f86-4d08-af37-0091c8358dbb
         # 오류 메시지 - "TypeError: 'NoneType' object is not subscriptable"
         logger.info("[테스트] [기술지원 문의 제외 일반 문의] 카카오 json 포맷 가져오기 - 완료!")
-        return empty_response(master_datas[chatbot_helper._emptyResponse])   # 기술지원 문의 제외 일반 문의
+        return empty_response()   # 기술지원 문의 제외 일반 문의
         
     except Exception as e:     
         error_msg = str(e)

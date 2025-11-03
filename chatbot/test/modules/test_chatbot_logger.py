@@ -75,19 +75,19 @@ def _get_formatted_time():
 
 # 공통 로그 작성 함수 (챗봇, OpenAI)
 # 참고 URL - https://chatgpt.com/c/6847d34f-9700-8010-92fb-2d063eff183a
-def _test_log_write(log_type, log_level, msg, botRes):
+def _test_log_write(log_type, log_level, msg, text):
     time_stamp = _get_formatted_time()
     file_name, function_name, lineno = _get_caller_info()
-    print("[%s] [%s] [%s] [%s | %s - L%s]: %s - %s" %(log_type, log_level, time_stamp, file_name, function_name, lineno, msg, botRes))
+    print("[%s] [%s] [%s] [%s | %s - L%s]: %s - %s" %(log_type, log_level, time_stamp, file_name, function_name, lineno, msg, text))
 
 
 # 아마존 웹서비스(AWS) 람다 함수(Lambda Funtion) 챗봇 로그 작성 
-# def log_write(log_level, msg, botRes):
-#     _test_log_write("Chatbot", log_level, msg, botRes)   # 챗봇 로그 기록
+# def log_write(log_level, msg, text):
+#     _test_log_write("Chatbot", log_level, msg, text)   # 챗봇 로그 기록
 
 # 아마존 웹서비스(AWS) 람다 함수(Lambda Funtion) OpenAI 로그 작성 
-def openAI_log_write(log_level, msg, botRes):
-    _test_log_write("OpenAI", log_level, msg, botRes)   # OpenAI 로그 기록
+def openAI_log_write(log_level, msg, text):
+    _test_log_write("OpenAI", log_level, msg, text)   # OpenAI 로그 기록
 
 
 def _log_write(log_level, msg):

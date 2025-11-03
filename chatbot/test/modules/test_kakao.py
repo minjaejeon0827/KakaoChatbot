@@ -58,16 +58,16 @@ def textCard_json(card, buttons):
 def basicCard_json(card, buttons):
     outputs = []
 
-    # TODO: card[chatbot_helper._botRes]에 할당된 값이 null 또는 공백("")일 경우 basicCard 가 카카오톡 채팅방에 출력 안되는 오류 발생함. 
+    # TODO: card[chatbot_helper._text]에 할당된 값이 null 또는 공백("")일 경우 basicCard 가 카카오톡 채팅방에 출력 안되는 오류 발생함. 
     #       하여 null 또는 공백("")이 아닌 문자열로 할당 해야함. (2025.09.03 minjae)
     # 참고 URL - https://stackoverflow.com/questions/9573244/how-to-check-if-the-string-is-empty-in-python
     # 참고 2 URL - https://hello-bryan.tistory.com/131
     # 참고 3 URL - https://jino-dev-diary.tistory.com/42
     # 참고 4 URL - https://claude.ai/chat/eaf7856e-1b5e-4c26-992e-de1683005638
-    if card[chatbot_helper._botRes]:   # card[chatbot_helper._botRes]에 할당된 값이 null 또는 공백("")이 아닌 경우 (None or Empty String Check)
+    if card[chatbot_helper._text]:   # card[chatbot_helper._text]에 할당된 값이 null 또는 공백("")이 아닌 경우 (None or Empty String Check)
         outputs.append({
             "simpleText": {
-                "text": card[chatbot_helper._botRes]
+                "text": card[chatbot_helper._text]
             }
         })
 
@@ -95,7 +95,7 @@ def carousel_json(card, items):
             "outputs": [
                 {
                     "simpleText": {
-                        "text": card[chatbot_helper._botRes]
+                        "text": card[chatbot_helper._text]
                     }
                 },
                 {
@@ -108,10 +108,10 @@ def carousel_json(card, items):
         }
     }
 
-# TODO: 아래 함수 base_response 필요시 로직 수정 예정 (2025.09.03 minjae)
+# TODO: 아래 함수 empty_response 필요시 로직 수정 예정 (2025.09.03 minjae)
 # 비어있는 메세지 전송 (카카오톡 서버로 비어있는 메시지 전송)
 # 카카오톡 채팅방에 메시지를 출력하고 싶지 않은 경우 사용 
-def base_response():
+def empty_response():
     return {
         'version': '2.0', 
         'template': {
@@ -121,10 +121,10 @@ def base_response():
     } 
 
 # 텍스트 메세지 전송 (카카오톡 서버로 텍스트 전송)
-# 카카오톡 채팅방에 보낼 메시지를 매개변수 botRes에 input으로 받기(인자로 전달)
-def simple_text(botRes):
-    # 카카오톡 채팅방에 보낼 메시지가 저장된 매개변수 botRes를
-    # 아래 json 형태(Format)에서 항목 'outputs' -> 항목 "simpleText" -> "text"안에 매개변수 botRes를 넣어서
+# 카카오톡 채팅방에 보낼 메시지를 매개변수 text에 input으로 받기(인자로 전달)
+def simple_text(text):
+    # 카카오톡 채팅방에 보낼 메시지가 저장된 매개변수 text를
+    # 아래 json 형태(Format)에서 항목 'outputs' -> 항목 "simpleText" -> "text"안에 매개변수 text를 넣어서
     # 변수 res에 저장하기 
     return {
         'version': '2.0', 
@@ -132,7 +132,7 @@ def simple_text(botRes):
             'outputs': [
                 {
                     "simpleText": {
-                        "text": botRes
+                        "text": text
                     }
                 }
             ], 
@@ -141,7 +141,7 @@ def simple_text(botRes):
     } 
 
 # 그림 전송 (카카오톡 서버로 그림 전송)
-def simple_image(botRes, prompt):
+def simple_image(text, prompt):
     output_text = prompt + "내용에 관한 이미지 입니다"
     return {
         'version': '2.0', 
@@ -149,7 +149,7 @@ def simple_image(botRes, prompt):
             'outputs': [
                 {
                     "simpleImage": {
-                        "imageUrl": botRes,
+                        "imageUrl": text,
                         "altText": output_text
                     }
                 }
@@ -265,13 +265,13 @@ def common_ver_quickReplies(userRequest_msg, verReplies):
 # TODO: 아래 함수 get 필요시 로직 수정 예정 (2025.09.04 minjae)
 # 카카오 json 포맷 가져오기 
 def get(userRequest_msg, masterEntity):
-    resFormat = None   # 카카오 json format 형식 기반 챗봇 답변 내용  
+    response = None   # 카카오 json format 형식 기반 챗봇 답변 내용  
 
     # TODO: 아래와 같은 오류 메시지 출력되어 (기존) masterEntity.get_master_datas() -> (변경) masterEntity.get_master_datas 처리함. (2025.09.16 minjae)
     # 오류 메시지 - 'dict' object is not callable
     # master_datas = masterEntity.get_master_datas()
-    master_datas = masterEntity.get_master_datas   # 전체 마스터 데이터 객체 (Dictionary) 
-    master_data = None   # 챗봇 특정 아이템 카드(basicCard, carousel) or 바로가기 그룹(quickReplies) 마스터 데이터 객체  
+    master_datas = masterEntity.get_master_datas   # 전체 마스터 데이터 (Dictionary) 
+    master_data = None   # 챗봇 특정 아이템 카드(basicCard, carousel) or 바로가기 그룹(quickReplies) 마스터 데이터  
 
     chatbot_messageTexts = masterEntity.get_chatbot_messageTexts   # [챗봇 문의] 버튼 메시지 텍스트 리스트    
     adsk_messageTexts = masterEntity.get_adsk_messageTexts   # [Autodesk 제품 설치 문의] 버튼 메시지 텍스트 리스트
@@ -295,85 +295,85 @@ def get(userRequest_msg, masterEntity):
         #                 chatbot_helper._error_ssflex)   # 예외 발생시킴
 
         if (chatbot_helper._start in userRequest_msg or chatbot_helper._beginning in userRequest_msg):   # start - 시작 화면 or 처음으로
-            resFormat, master_data = common_basicCard(master_datas[chatbot_helper._startCard])
+            response, master_data = common_basicCard(master_datas[chatbot_helper._startCard])
 
-        elif chatbot_helper._remote_botRes == userRequest_msg:   # level1 - 원격 지원
-            resFormat = base_response()
+        elif chatbot_helper._remote_text == userRequest_msg:   # level1 - 원격 지원
+            response = empty_response()
             master_data = master_datas[chatbot_helper._startCard]
 
         elif chatbot_helper._chatbot == userRequest_msg:   # level1 - 챗봇 문의 
-            resFormat, master_data = chatbot_carousel(master_datas[chatbot_helper._chatbotCard])
+            response, master_data = chatbot_carousel(master_datas[chatbot_helper._chatbotCard])
 
         elif userRequest_msg in chatbot_messageTexts:   # level2 - 문의 유형 
-            resFormat, master_data = subCat_basicCard(userRequest_msg, master_datas[chatbot_helper._subCatCard])
+            response, master_data = subCat_basicCard(userRequest_msg, master_datas[chatbot_helper._subCatCard])
 
         elif chatbot_helper._askInst_adskProduct == userRequest_msg:   # level3 - Autodesk 제품 설치 문의
-            resFormat, master_data = common_quickReplies(master_datas[chatbot_helper._adskReplies])
+            response, master_data = common_quickReplies(master_datas[chatbot_helper._adskReplies])
 
         elif userRequest_msg in adsk_messageTexts:   # level4 - Autodesk 제품 버전
-            resFormat, master_data = common_ver_quickReplies(userRequest_msg, master_datas[chatbot_helper._adskVerReplies])
+            response, master_data = common_ver_quickReplies(userRequest_msg, master_datas[chatbot_helper._adskVerReplies])
 
         elif chatbot_helper._askInst_boxProduct == userRequest_msg:   # level3 - 상상진화 BOX 제품 설치 문의
-            resFormat, master_data = common_quickReplies(master_datas[chatbot_helper._boxReplies])
+            response, master_data = common_quickReplies(master_datas[chatbot_helper._boxReplies])
 
         elif userRequest_msg in box_messageTexts:   # level4 - 상상진화 BOX 제품 버전
-            resFormat, master_data = common_ver_quickReplies(userRequest_msg, master_datas[chatbot_helper._boxVerReplies])
+            response, master_data = common_ver_quickReplies(userRequest_msg, master_datas[chatbot_helper._boxVerReplies])
 
         # TODO: 아래 주석친 코드 필요시 사용 예정 (2025.08.27 minjae)
         # elif chatbot_helper._ask_accountProduct == userRequest_msg:   # level3 - 계정 & 제품배정 문의 
-        #     resFormat, master_data = account_quickReplies(master_datas[chatbot_helper._accountReplies])  
+        #     response, master_data = account_quickReplies(master_datas[chatbot_helper._accountReplies])  
 
         # TODO: 추후 필요시 동영상 시청 가능할 경우("videoYn": "Y")만 master_datas[chatbot_helper._endCard][chatbot_helper._buttons][chatbot_helper._videoButton_Idx][chatbot_helper._webLinkUrl] 속성에 값 할당 기능 구현하기 (2025.08.27 minjae)
         elif (chatbot_helper._instType in userRequest_msg):   # end - 텍스트 + basicCard Autodesk or 상상진화 BOX 제품 설치 방법 
             # 상상진화 BOX 제품 2025, 2026 버전 공통 설치 방법 텍스트 가져오기
             if (chatbot_helper._revitBox in userRequest_msg):   # RevitBOX     
-                resFormat, master_data = end_basicCard(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._revitBoxInfos])  
+                response, master_data = end_basicCard(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._revitBoxInfos])  
 
             elif (chatbot_helper._cadBox in userRequest_msg):   # CADBOX
-                resFormat, master_data = end_basicCard(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._cadBoxInfos])
+                response, master_data = end_basicCard(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._cadBoxInfos])
      
             elif (chatbot_helper._energyBox in userRequest_msg):   # EnergyBOX
-                resFormat, master_data = end_basicCard(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._energyBoxInfos])
+                response, master_data = end_basicCard(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._energyBoxInfos])
 
             # Autodesk 제품 2025, 2026 버전 공통 설치 방법 텍스트 가져오기
             elif (chatbot_helper._autoCAD in userRequest_msg):     # AutoCAD  
-                resFormat, master_data = end_basicCard(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._autoCADInfos])   
+                response, master_data = end_basicCard(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._autoCADInfos])   
 
             elif (chatbot_helper._revit in userRequest_msg):   # Revit 
-                resFormat, master_data = end_basicCard(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._revitInfos])   
+                response, master_data = end_basicCard(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._revitInfos])   
 
             elif (chatbot_helper._navisworksManage in userRequest_msg):   # Navisworks Manage
-                resFormat, master_data = end_basicCard(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._navisworksManageInfos])   
+                response, master_data = end_basicCard(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._navisworksManageInfos])   
 
             elif (chatbot_helper._infraWorks in userRequest_msg):   # InfraWorks
-                resFormat, master_data = end_basicCard(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._infraWorksInfos])   
+                response, master_data = end_basicCard(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._infraWorksInfos])   
                 
             elif (chatbot_helper._civil3D in userRequest_msg):   # Civil3D 
-                resFormat, master_data = end_basicCard(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._civil3DInfos])   
+                response, master_data = end_basicCard(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._civil3DInfos])   
         
         elif chatbot_helper._survey in userRequest_msg:   # 만족도 조사
-            resFormat, master_data = common_basicCard(master_datas[chatbot_helper._surveyCard])
+            response, master_data = common_basicCard(master_datas[chatbot_helper._surveyCard])
         
-        # TODO: 사용자가 카카오 챗봇 버튼이 아닌 일반 메시지를 채팅창에 입력시 아래처럼 오류 메시지가 출력되어 원인 파악 결과 resFormat 변수가 None으로 리턴되어 
-        #       lambda_function.py 소스파일 -> resChatbot 함수에서 res_queue.put(resFormat) 실행할 때 발생하는 오류로 확인 되어 아래처럼 else 절 코드 추가 (2025.09.12 minjae)
+        # TODO: 사용자가 카카오 챗봇 버튼이 아닌 일반 메시지를 채팅창에 입력시 아래처럼 오류 메시지가 출력되어 원인 파악 결과 response 변수가 None으로 리턴되어 
+        #       lambda_function.py 소스파일 -> resChatbot 함수에서 res_queue.put(response) 실행할 때 발생하는 오류로 확인 되어 아래처럼 else 절 코드 추가 (2025.09.12 minjae)
         # 참고 URL - https://claude.ai/chat/2035baf1-0f86-4d08-af37-0091c8358dbb
         # 오류 메시지 - "TypeError: 'NoneType' object is not subscriptable"
         else:   # 기술지원 문의 제외 일반 문의
-            resFormat = base_response()
+            response = empty_response()
 
         # TODO: 아래 주석친 코드 필요시 사용 예정 (2025.09.05 minjae)
         # elif (chatbot_helper._accountType in userRequest_msg):  # end - 텍스트 + basicCard 계정 & 제품배정 
         #     if chatbot_helper._anyQuestion in userRequest_msg:   # '기타 문의' 
-        #         resFormat, master_data = end_basicCard(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._accountInfos][chatbot_helper._anyQuestion])
+        #         response, master_data = end_basicCard(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._accountInfos][chatbot_helper._anyQuestion])
 
         #     elif chatbot_helper._resetPassword in userRequest_msg:   # '계정 비밀번호 분실'
-        #         resFormat, master_data = end_basicCard(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._accountInfos][chatbot_helper._resetPassword])
+        #         response, master_data = end_basicCard(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._accountInfos][chatbot_helper._resetPassword])
 
         #     else:   # [구현 예정!] '기타 문의', '계정 비밀번호 분실' 제외한 다른 문의 
-        #         resFormat, master_data = end_basicCard(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._etcInfos][chatbot_helper._etcTest])
+        #         response, master_data = end_basicCard(master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._etcInfos][chatbot_helper._etcTest])
 
         chatbot_logger.log_write(chatbot_logger._info, '[테스트] 카카오 json 포맷 가져오기', 'OK!')   
-        return resFormat, master_data 
+        return response, master_data 
         
     except Exception as e:     
         error_msg = str(e)     
@@ -502,10 +502,10 @@ def end_basicCard(endCard, endInfos):
                 "messageText": endButton[chatbot_helper._messageText]
             })
 
-    if endInfos[chatbot_helper._botRes_Idx][chatbot_helper._botRes]:   # endInfos[chatbot_helper._botRes_Idx][chatbot_helper._botRes]에 할당된 값이 null 또는 공백("")이 아닌 경우 (None or Empty String Check)
+    if endInfos[chatbot_helper._text_Idx][chatbot_helper._text]:   # endInfos[chatbot_helper._text_Idx][chatbot_helper._text]에 할당된 값이 null 또는 공백("")이 아닌 경우 (None or Empty String Check)
         outputs.append({
             "simpleText": {
-                "text": endInfos[chatbot_helper._botRes_Idx][chatbot_helper._botRes]
+                "text": endInfos[chatbot_helper._text_Idx][chatbot_helper._text]
             }
         })
 

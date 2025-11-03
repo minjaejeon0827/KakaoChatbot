@@ -133,15 +133,15 @@ class MasterEntity(object):
     # 웹서버로 부터 받아온 마스터 데이터 유효성 검사
     # 참고 URL - https://chatgpt.com/c/68017acc-672c-8010-8649-7fa39f17d834
     def isValidator(self):
-        # master_datas = None   # 전체 마스터 데이터 객체 (Dictionary) 
-        master_datas = self.get_master_datas     # 전체 마스터 데이터 객체 (Dictionary) 
+        # master_datas = None   # 전체 마스터 데이터 (Dictionary) 
+        master_datas = self.get_master_datas     # 전체 마스터 데이터 (Dictionary) 
         valid_targets = self.get_valid_targets   # 마스터 데이터 유효성 검사 대상 리스트
 
         try:
             chatbot_logger.log_write(chatbot_logger._info, '[테스트] 마스터 데이터 유효성 검사 대상 리스트', valid_targets)
             chatbot_logger.log_write(chatbot_logger._info, '[테스트] 마스터 데이터 유효성 검사', 'Start!')
 
-            if None is master_datas:   # 전체 마스터 데이터 객체 (Dictionary)가 None일 경우 
+            if None is master_datas:   # 전체 마스터 데이터 (Dictionary)가 None일 경우 
                 raise Exception("마스터 데이터 로드 실패!")
 
             # TODO: Dictionary 객체 master_datas를 for문으로 루핑하기 위해 items() 메서드 사용 구현 (2025.09.02 minjae)
@@ -313,25 +313,25 @@ class KSTFormatter(logging.Formatter):
 #         """
 #         return datetime.now(self.kst).strftime("%Y-%m-%d %H:%M:%S")
     
-#     ----- def _log_write(self, log_type, log_level, content, botRes):
+#     ----- def _log_write(self, log_type, log_level, content, text):
 #         """
 #         공통 로그 작성 함수
 #         """
 #         timestamp = self._get_formatted_time()
 #         file_name, function_name, lineno = self._get_caller_info()
-#         print(f"[{log_type}] [{log_level}] [{timestamp}] [{file_name} | {function_name} - L{lineno}]: {content} - {botRes}")
+#         print(f"[{log_type}] [{log_level}] [{timestamp}] [{file_name} | {function_name} - L{lineno}]: {content} - {text}")
 
-#     ----- def log_write(self, log_level, content, botRes):
+#     ----- def log_write(self, log_level, content, text):
 #         """
 #         챗봇 로그 작성
 #         """
-#         self._log_write("Chatbot", log_level, content, botRes)
+#         self._log_write("Chatbot", log_level, content, text)
 
-#     ----- def openAI_log_write(self, log_level, content, botRes):
+#     ----- def openAI_log_write(self, log_level, content, text):
 #         """
 #         OpenAI 로그 작성
 #         """
-#         self._log_write("OpenAI", log_level, content, botRes)
+#         self._log_write("OpenAI", log_level, content, text)
 
 #     # 싱글톤 인스턴스를 반환하는 팩토리 함수
 #     ----- def get_logger():
@@ -342,20 +342,20 @@ class KSTFormatter(logging.Formatter):
 
 #     # 기존 함수 호환성을 위한 래퍼 함수들
 #     @staticmethod
-#     ----- def log_write(log_level, content, botRes):
+#     ----- def log_write(log_level, content, text):
 #         """
 #         기존 코드 호환성을 위한 래퍼 함수
 #         """
 #         logger = Logger()
-#         logger.log_write(log_level, content, botRes)
+#         logger.log_write(log_level, content, text)
 
 #     @staticmethod
-#     ----- def openAI_log_write(log_level, content, botRes):
+#     ----- def openAI_log_write(log_level, content, text):
 #         """
 #         기존 코드 호환성을 위한 래퍼 함수
 #         """
 #         logger = Logger()
-#         logger.openAI_log_write(log_level, content, botRes)
+#         logger.openAI_log_write(log_level, content, text)
 
 
 # 참고 

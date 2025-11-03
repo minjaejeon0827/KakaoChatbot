@@ -8,7 +8,7 @@ from modules import chatbot_logger   # 챗봇 커스텀 로그 작성 모듈 -> 
 # TODO: 추후 테스트 웹서버 구축 후 마스터 데이터 다운로드 Rest API 함수 getMasterDownLoadAsync 로직 수정 예정 (2025.09.11 minjae)
 # 마스터 데이터 다운로드 
 async def getMasterDownLoadAsync(masterEntity_json_filepath):
-    master_datas = None   # 전체 마스터 데이터 객체 (Dictionary) 
+    master_datas = None   # 전체 마스터 데이터 (Dictionary) 
 
     try:
         chatbot_logger.log_write(chatbot_logger._info, '[테스트] 웹서버 마스터 데이터 다운로드', 'Start!')

@@ -135,18 +135,18 @@ def handler(event, context):
              
         while(time.time() - start_time < chatbot_helper._time_limit):   # 챗봇 응답 시간 3.5초 이내인 경우
             if False == res_queue.empty():
-                resFormat = res_queue.get()  # 큐(res_queue)에서 데이터 가져오기 
+                response = res_queue.get()  # 큐(res_queue)에서 데이터 가져오기 
                 res_queue.task_done()   # 큐(res_queue)에서 가져온 데이터에 대한 작업 완료
-                chatbot_logger.log_write(chatbot_logger._info, "[테스트] resFormat 정보", resFormat)
+                chatbot_logger.log_write(chatbot_logger._info, "[테스트] response 정보", response)
 
                 run_flag= True   
                 break    
             time.sleep(chatbot_helper._polling_interval) 
  
         if False == run_flag:   # 챗봇 응답 시간 5초 초과한 경우     
-            resFormat = kakao.timeover_quickReplies(chatbot_helper._done_thinking)   
+            response = kakao.timeover_quickReplies(chatbot_helper._done_thinking)   
 
-        res_msg = json.dumps(resFormat) 
+        res_msg = json.dumps(response) 
         # logger._info("[테스트] 챗봇 답변 채팅 정보 - %s" %res_msg)
         chatbot_logger.log_write(chatbot_logger._info, "[테스트] 챗봇 답변 채팅 정보", res_msg)
 
@@ -162,9 +162,9 @@ def handler(event, context):
 def resChatbot(kakao_request, res_queue, file_name):
     global masterEntity    # 챗봇 마스터 데이터 싱글톤 객체 
  
-    botRes = None          # 챗봇 답변 내용  
-    resFormat = None       # 카카오 json format 형식 기반 챗봇 답변 내용
-    master_data = None     # 챗봇 마스터 데이터 객체 
+    text = None          # 챗봇 답변 내용  
+    response = None       # 카카오 json format 형식 기반 챗봇 답변 내용
+    master_data = None     # 챗봇 마스터 데이터 
     userRequest_msg = kakao_request[chatbot_helper._userRequest][chatbot_helper._utterance]   # 사용자 입력 채팅 정보 가져오기 
     
     try:
@@ -177,44 +177,44 @@ def resChatbot(kakao_request, res_queue, file_name):
             if len(last_update.split()) >= chatbot_helper._multiWord:   # 변수 last_update에 저장된 문자열을 공백('')단위로 분리한 단어들의 개수가 1개보다 많은 경우 (여러 단어로 구성)
                 kind = last_update.split()[chatbot_helper._firstWord_Idx]    # 변수 last_update에 저장된 문자열을 공백('')단위로 분리한 첫 번째 단어 변수 kind에 저장 (예) ask, img 등등... 
                 if kind == "img":   # 변수 kind에 저장된 문자열이 'img'인 경우 
-                    botRes, prompt = last_update.split()[chatbot_helper._secondWord_Idx],last_update.split()[chatbot_helper._thirdWord_Idx]   # 변수 last_update에 저장된 문자열 중 공백('')단위로 분리한 두 번째와 세 번째 단어 각각 botRes와 prompt에 저장
-                    chatbot_logger.log_write(chatbot_logger._info, '[테스트] /img - botRes (last_update.split()[chatbot_helper._secondWord_Idx])', botRes)
+                    text, prompt = last_update.split()[chatbot_helper._secondWord_Idx],last_update.split()[chatbot_helper._thirdWord_Idx]   # 변수 last_update에 저장된 문자열 중 공백('')단위로 분리한 두 번째와 세 번째 단어 각각 text와 prompt에 저장
+                    chatbot_logger.log_write(chatbot_logger._info, '[테스트] /img - text (last_update.split()[chatbot_helper._secondWord_Idx])', text)
                     chatbot_logger.log_write(chatbot_logger._info, '[테스트] /img - prompt (last_update.split()[chatbot_helper._thirdWord_Idx])', prompt)
-                    res_queue.put(kakao.simple_image(botRes,prompt))
+                    res_queue.put(kakao.simple_image(text,prompt))
                 else:   # 변수 kind에 저장된 문자열이 'img' 아닌 경우 
-                    botRes = last_update[chatbot_helper._askPrefix_Len:]   # 변수 last_update에 저장된 문자열 중 다섯 번째 문자(last_update[chatbot_helper._askPrefix_Length:]) 부터 끝까지 변수 botRes에 저장 (숫자 4 의미 - "ask "(공백 '' 포함) 문자열 제거하고 나머지 텍스트 가져옴)
-                    chatbot_logger.log_write(chatbot_logger._info, '[테스트] /ask - botRes (last_update[4:])', botRes)
-                    res_queue.put(kakao.simple_text(botRes))
+                    text = last_update[chatbot_helper._askPrefix_Len:]   # 변수 last_update에 저장된 문자열 중 다섯 번째 문자(last_update[chatbot_helper._askPrefix_Length:]) 부터 끝까지 변수 text에 저장 (숫자 4 의미 - "ask "(공백 '' 포함) 문자열 제거하고 나머지 텍스트 가져옴)
+                    chatbot_logger.log_write(chatbot_logger._info, '[테스트] /ask - text (last_update[4:])', text)
+                    res_queue.put(kakao.simple_text(text))
                 dbReset(file_name)    
 
         elif '/img' in userRequest_msg:   # DALLE2 이미지 응답
             dbReset(file_name)   
             prompt = userRequest_msg.replace("/img", "")
-            botRes = openAI.getImageURLFromDALLE(prompt)
-            res_queue.put(kakao.simple_image(botRes,prompt))
+            text = openAI.getImageURLFromDALLE(prompt)
+            res_queue.put(kakao.simple_image(text,prompt))
 
-            botlog_msg = f"img {str(botRes)} {str(prompt)}"
+            botlog_msg = f"img {str(text)} {str(prompt)}"
             dbSave(file_name, botlog_msg)
 
         elif '/ask' in userRequest_msg:   # ChatGPT 텍스트 응답 메시지 
             dbReset(file_name)  
             prompt = userRequest_msg.replace("/ask", "")
-            botRes = openAI.getMessageFromGPT(prompt)
-            res_queue.put(kakao.simple_text(botRes))
+            text = openAI.getMessageFromGPT(prompt)
+            res_queue.put(kakao.simple_text(text))
 
-            chatbot_logger.openAI_log_write(chatbot_logger._info, "ChatGPT 텍스트 답변", botRes)
-            botlog_msg = f"ask {str(botRes)}" 
+            chatbot_logger.openAI_log_write(chatbot_logger._info, "ChatGPT 텍스트 답변", text)
+            botlog_msg = f"ask {str(text)}" 
             dbSave(file_name, botlog_msg)
 
         elif True == masterEntity.get_isValid:   # 마스터 데이터 유효성 검사 결과 성공한 경우   
-            resFormat, master_data = kakao.get_response(userRequest_msg, masterEntity.get_master_datas, masterEntity)
+            response, master_data = kakao.get_response(userRequest_msg, masterEntity.get_master_datas, masterEntity)
 
             if master_data is not None:   # 챗봇 특정 아이템 카드(basicCard, carousel) or 바로가기 그룹(quickReplies) 마스터 데이터 값이 존재하는 경우 
                 saveLog(file_name, chatbot_logger._info, f"({master_data[chatbot_helper._levelNo]}: {master_data[chatbot_helper._displayName]} - 사용자 입력 채팅 정보: '{userRequest_msg}')")
             else:   # 챗봇 특정 아이템 카드(basicCard, carousel) or 바로가기 그룹(quickReplies) 마스터 데이터 값이 존재하지 않는 경우   
                 saveLog(file_name, chatbot_logger._info, f"(etc: [기술지원 문의 제외 일반 문의] - 사용자 입력 채팅 정보: '{userRequest_msg}')")
 
-            res_queue.put(resFormat)
+            res_queue.put(response)
 
         else:   # 마스터 데이터 유효성 검사 결과 실패인 경우
             raise Exception(chatbot_helper._error_title + 
@@ -223,8 +223,8 @@ def resChatbot(kakao_request, res_queue, file_name):
 
         # TODO: 추후 필요시 아래 주석친 코드 참고 예정 (2025.09.12 minjae)
         # else:
-        #     base_res = kakao.base_response()
-        #     res_queue.put(base_res)
+        #     empty_res = kakao.empty_response()
+        #     res_queue.put(empty_res)
 
     except Exception as e:   # 하위 코드 블록에서 예외가 발생해도 변수 e에다 넣고 아래 코드 실행됨  
         error_msg = str(e) 
