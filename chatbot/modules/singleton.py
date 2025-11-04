@@ -1,10 +1,36 @@
 """
 * 싱글톤(singleton) 패턴 전용 모듈 
 
-파이썬 패키지, 모듈 
+*** 파이썬 문서 ***
+* 1. 클래스
+참고 URL - https://docs.python.org/ko/3/tutorial/classes.html
+참고 2 URL - https://wikidocs.net/28
+참고 3 URL - https://wikidocs.net/215474
+
+* 2. 클래스 인스턴스 변수 접근제한자 private 대신 언더바(__) 2개 사용
+참고 URL - https://docs.python.org/ko/3/reference/expressions.html#private-name-mangling
+참고 2 URL - https://wikidocs.net/297028
+참고 3 URL - https://wikidocs.net/297029
+참고 4 URL - https://oniondev.tistory.com/20
+
+* 3. functools @cached_property
+참고 URL - https://docs.python.org/ko/dev/library/functools.html
+참고 2 URL - https://sosodev.tistory.com/entry/Python-cachedproperty-%EA%B0%92%EC%9D%84-%EC%9E%AC%EC%82%AC%EC%9A%A9-%ED%95%98%EA%B8%B0
+
+* 4. 패키지, 모듈
 참고 URL - https://docs.python.org/ko/3.13/tutorial/modules.html
 참고 2 URL - https://wikidocs.net/1418
 참고 3 URL - https://dojang.io/mod/page/view.php?id=2450
+
+* 5. Type Hints
+참고 URL - https://docs.python.org/ko/3.14/library/typing.html
+참고 2 URL - https://peps.python.org/pep-0484/
+참고 3 URL - https://devpouch.tistory.com/189
+참고 4 URL - https://supermemi.tistory.com/entry/Python-3-%ED%8C%8C%EC%9D%B4%EC%8D%AC%EC%97%90%EC%84%9C-%EC%9D%98%EB%AF%B8%EB%8A%94-%EB%AC%B4%EC%97%87%EC%9D%BC%EA%B9%8C-%EC%A3%BC%EC%84%9D
+
+* 6. Type Hints class Any
+참고 URL - https://docs.python.org/ko/3.9/library/typing.html#the-any-type
+
 """  
 
 # 1. 공통 모듈 먼저 import 처리
@@ -17,7 +43,8 @@ from modules import chatbot_logger   # log.py -> 챗봇 전역 로그 객체(log
 import logging   # 로그 기록 
 import asyncio   # 비동기 프로그래밍(async - await) 
 
-from datetime import datetime 
+from functools import cached_property
+from datetime import datetime
 from zoneinfo import ZoneInfo    # 대한민국 표준시 설정
 
 # TODO: 순환 임포트(circular import) 문제(modules.singleton.py → modules.log import 처리 <-> modules.log.py → modules.singleton.KSTFormatter import 처리)로 인해 아래와 같은 오류 발생하여 챗봇 전역 로그 객체(logger) import 처리문 주석 처리 진행 (2025.09.19 minjae)
@@ -29,7 +56,7 @@ from zoneinfo import ZoneInfo    # 대한민국 표준시 설정
 from restAPI import chatbot_restServer   # 챗봇 웹서버 Rest API 메서드 
 from enum import Enum    # Enum 열거형 구조체 
 
-class EnumValidator(Enum):
+class EnumValidator(Enum):   # 명시적으로 Enum 클래스 상속
     """
     Description: 
         데이터 유효성 검사 Enum 열거형 구조체 클래스 
@@ -44,7 +71,8 @@ class EnumValidator(Enum):
     NOT_EXISTENCE = 0
     EXISTENCE = 1   
 
-class MasterEntity(object):
+# class MasterEntity(object):   # 명시적으로 object 클래스 상속
+class MasterEntity:   # 암시적으로 object 클래스 상속
     """
     Description: 
         마스터 데이터 싱글톤(singleton) 클래스
@@ -123,13 +151,13 @@ class MasterEntity(object):
 
         return _class._instance                         
 
-    def __init__(self, valid_targets):  
+    def __init__(self, valid_targets):
         """
         Description: 
             생성된 객체 초기화
 
             *** 주요 특징 ***
-            1. 객체 생성 시 전달된 모든 인자(valid_targets는 제외)를 __new__ 메서드가 먼저 받고, 그 다음 __init__ 메서드로 전달
+            1. 객체 생성 시 전달된 모든 인자(valid_targets 제외)를 __new__ 메서드가 먼저 받고, 그 다음 __init__ 메서드로 전달
             2. 생성된 객체에 속성(property) 추가 및 값 할당 
 
             참고 URL - https://docs.python.org/ko/3.6/reference/datamodel.html#object.__init__
@@ -147,7 +175,7 @@ class MasterEntity(object):
             chatbot_logger.info("[테스트] MasterEntity __init__ 메서드 - 호출 완료!")           
             _class._init = True   # 초기화 완료  
 
-    @property
+    @cached_property
     def get_master_datas(self):   
         """
         Description: 전체 마스터 데이터 가져오기 
@@ -167,7 +195,7 @@ class MasterEntity(object):
     #     """
     #     Description: 전체 마스터 데이터 설정  
 
-    #     Parameters: 
+    #     Parameters:
     #         self (object): 마스터 데이터 싱글톤(singleton) 클래스 객체 자신 (MasterEntity class)
     #         master_datas (dict): 전체 마스터 데이터 
 
@@ -176,7 +204,7 @@ class MasterEntity(object):
         
     #     self.__master_datas = master_datas
 
-    @property
+    @cached_property
     def get_chatbot_messageTexts(self):
         """
         Description: [챗봇 문의] 버튼 메시지 리스트 가져오기   
@@ -205,7 +233,7 @@ class MasterEntity(object):
         
     #     self.__chatbot_messageTexts = chatbot_messageTexts
 
-    @property
+    @cached_property
     def get_adsk_messageTexts(self):
         """
         Description: [Autodesk 제품 설치 문의] 버튼 메시지 리스트 가져오기 
@@ -234,7 +262,7 @@ class MasterEntity(object):
 
     #     self.__adsk_messageTexts = adsk_messageTexts
 
-    @property
+    @cached_property
     def get_box_messageTexts(self):
         """
         Description: [상상진화 BOX 제품 설치 문의] 버튼 메시지 리스트 가져오기
@@ -263,7 +291,7 @@ class MasterEntity(object):
 
     #     self.__box_messageTexts = box_messageTexts
 
-    @property
+    @cached_property
     def get_valid_targets(self):   
         """
         Description: 마스터 데이터 유효성 검사 대상 리스트 가져오기
@@ -292,7 +320,7 @@ class MasterEntity(object):
         
     #     self.__valid_targets = valid_targets
 
-    @property
+    @cached_property
     def get_isValid(self):   
         """
         Description: 마스터 데이터 유효성 검사 결과 가져오기  
@@ -347,7 +375,7 @@ class MasterEntity(object):
             self.__adsk_messageTexts = [ adskButton[chatbot_helper._messageText] for adskButton in self.__master_datas[chatbot_helper._adskReplies][chatbot_helper._buttons] ]   # [Autodesk 제품 설치 문의] 버튼 메시지 리스트 
             self.__box_messageTexts = [ boxButton[chatbot_helper._messageText] for boxButton in self.__master_datas[chatbot_helper._boxReplies][chatbot_helper._buttons] ]   # [상상진화 BOX 제품 설치 문의] 버튼 메시지 리스트
             self.__valid_targets = valid_targets      
-            self.__isValid = self.isValidator()     
+            self.__isValid = self.isValidator()
  
             chatbot_logger.info("[테스트] 마스터 데이터 초기 설정 결과 - 완료!")
         
@@ -406,7 +434,7 @@ class MasterEntity(object):
             chatbot_logger.error(f"[테스트] 오류 - {error_msg}")
             return False    
                 
-class KSTFormatter(logging.Formatter):
+class KSTFormatter(logging.Formatter):   # 명시적으로 logging.Formatter 클래스 상속
     """
     Description: 
         대한민국 표준시 설정 싱글톤(singleton) 클래스 (pytz 라이브러리 사용 안 함.)
@@ -501,7 +529,7 @@ class KSTFormatter(logging.Formatter):
             chatbot_logger.info("[테스트] KSTFormatter __init__ 메서드 - 호출 완료!")
             _class._init = True   # 초기화 완료
 
-    @property
+    @cached_property
     def get_kst(self):   
         """
         Description: 설정된 대한민국 표준시(Asia/Seoul) ZoneInfo 클래스 객체 가져오기 (ZoneInfo class) 
