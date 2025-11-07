@@ -117,7 +117,7 @@ def handler(event, context):
 
         res_queue = q.Queue()   
 
-        request_respond = threading.Thread(target=resChatbot,
+        request_respond = threading.Thread(target=chatbot_response,
                                            args=(kakao_request, res_queue, file_name))
         
         request_respond.start()
@@ -159,7 +159,7 @@ def handler(event, context):
         }
     
 # 챗봇 답변 요청 및 응답 확인
-def resChatbot(kakao_request, res_queue, file_name):
+def chatbot_response(kakao_request, res_queue, file_name):
     global masterEntity    # 챗봇 마스터 데이터 싱글톤 객체 
  
     text = None          # 챗봇 답변 내용  
@@ -230,7 +230,7 @@ def resChatbot(kakao_request, res_queue, file_name):
         error_msg = str(e) 
         chatbot_logger.log_write(chatbot_logger._error, "[테스트] 오류", error_msg)
         res_queue.put(kakao.error_text(error_msg))
-        raise    # raise로 함수 resChatbot의 현재 예외를 다시 발생시켜서 함수 resChatbot 호출한 상위 코드 블록으로 넘김                             
+        raise    # raise로 함수 resChatbot의 현재 예외를 다시 발생시켜서 함수 chatbot_response 호출한 상위 코드 블록으로 넘김                             
 
 # 아마존 웹서비스(AWS) 람다 함수(Lambda Function) -> 로그 텍스트 파일("/tmp/botlog.txt") 전용 함수 
 # 로그(텍스트) 초기화 및 작성 

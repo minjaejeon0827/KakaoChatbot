@@ -625,7 +625,7 @@ def get_response(userRequest_msg: str, masterEntity: dict) -> tuple[dict, dict]:
         #     (response, master_data) = common_basicCard(master_datas[chatbot_helper._surveyCard])
         
         # 사용자가 카카오 챗봇 버튼이 아닌 일반 메시지를 채팅창에 입력시 아래처럼 오류 메시지가 출력되어 원인 파악 결과 response 변수가 None으로 리턴되어 
-        # lambda_function.py 소스파일 -> resChatbot 함수에서 res_queue.put(response) 실행할 때 발생하는 오류로 확인 되어 아래처럼 else 절 코드 추가 (2025.09.12 minjae)
+        # lambda_function.py 소스파일 -> chatbot_response 함수에서 res_queue.put(response) 실행할 때 발생하는 오류로 확인 되어 아래처럼 else 절 코드 추가 (2025.09.12 minjae)
         # 참고 URL - https://claude.ai/chat/2035baf1-0f86-4d08-af37-0091c8358dbb
         # 오류 메시지 - "TypeError: 'NoneType' object is not subscriptable"
         else:   # 기술지원 문의 제외 일반 문의

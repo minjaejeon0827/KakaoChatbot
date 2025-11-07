@@ -267,7 +267,7 @@ def simple_text(text: str) -> dict[str, Any]:
 #     }   
 
 # TODO: 아래 구현한 error_text 함수 Parameters "master_data"에 값이 None 들어와서 None 으로 리턴될 경우 
-#       lambda_function.py 소스파일 -> resChatbot 함수 몸체 -> 해당 NoneType 객체(response_data[chatbot_helper._meta_data]) 인덱싱 또는 슬라이싱 시도할 때 (response_data[chatbot_helper._meta_data][chatbot_helper._displayName]) 아래와 같은 오류 발생
+#       lambda_function.py 소스파일 -> chatbot_response 함수 몸체 -> 해당 NoneType 객체(response_data[chatbot_helper._meta_data]) 인덱싱 또는 슬라이싱 시도할 때 (response_data[chatbot_helper._meta_data][chatbot_helper._displayName]) 아래와 같은 오류 발생
 #       하여 해당 오류 해결하기 위해 None으로 리턴 되지 않도록 로직 보완 (2025.11.03 minjae)
 # 참고 URL - https://python.realjourney.co.kr/entry/OpenCV-TypeError-NoneType-object-is-not-subscriptable
 # 오류 메시지 - TypeError: 'NoneType' object is not subscriptable
@@ -558,7 +558,7 @@ def get_response(userRequest_msg: str, masterEntity: dict[str, Any]) -> dict[str
         # 참고 URL - https://python.realjourney.co.kr/entry/Pytorch-TypeError-cannot-unpack-non-iterable-NoneType-object
 
         # 사용자가 카카오 챗봇 버튼이 아닌 일반 메시지를 채팅창에 입력시 아래처럼 오류 메시지가 출력되어 원인 파악하니 함수 실행 결과 None으로 반환되고
-        # lambda_function.py 소스파일 -> resChatbot 함수에서 res_queue.put(response) 실행할 때 발생하는 오류로 확인 되어 아래처럼 else 절 코드 추가 (2025.10.30 minjae)
+        # lambda_function.py 소스파일 -> chatbot_response 함수에서 res_queue.put(response) 실행할 때 발생하는 오류로 확인 되어 아래처럼 else 절 코드 추가 (2025.10.30 minjae)
         # 참고 URL - https://claude.ai/chat/2035baf1-0f86-4d08-af37-0091c8358dbb
         # 오류 메시지 - "TypeError: 'NoneType' object is not subscriptable"
         logger.info("[테스트] [기술지원 문의 제외 일반 문의] 카카오 json 포맷 가져오기 - 완료!")

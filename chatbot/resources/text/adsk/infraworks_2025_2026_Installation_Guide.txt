@@ -23,12 +23,9 @@ Infraworks 2025, 2026 버전 공통
 9. 설치 구성요소가 준비될때까지 대기하십시오.
 
 
-
 *만약 정상적으로 수행하기 힘드시다면 수동 설치파일 다운로드 링크를 안내드립니다.*
-
 파일 버전별로 해당 링크에 게시된 모든 설치파일을 다운로드 하고, 1번 파일을 실행합니다.
 
------------------------------------------------
 
 Infraworks 2026 설치파일
 
@@ -81,10 +78,7 @@ https://efulfillment.autodesk.com/NetSWDLD/2023/IW360P/E1E3DF14-97BD-3EBF-BE0D-0
 13. "Start" 버튼을 눌러 Infraworks를 실행합니다.
 
 
-
 * 라이센스 활성화 *
-
-
 
 - 라이센스 활성화를 시작합니다. "Sign In with your Autodesk ID"를 클릭합니다.
 
@@ -93,7 +87,6 @@ https://efulfillment.autodesk.com/NetSWDLD/2023/IW360P/E1E3DF14-97BD-3EBF-BE0D-0
 - "Autodesk Identity Manager 열기"를 클릭합니다.
 
 - 라이센스 정보가 리디렉션 되면서 인증이 완료됩니다. Infraworks의 라이선스 인증이 이루어집니다.  
-
 
 
 * 상상플렉스 커뮤니티(기술지원 문의)

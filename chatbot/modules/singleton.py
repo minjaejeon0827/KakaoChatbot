@@ -93,7 +93,7 @@ class MasterEntity:   # 암시적으로 object 클래스 상속
         _instance (MasterEntity): 마스터 데이터 싱글톤(singleton) 클래스 인스턴스
         _init (bool): 인스턴스 초기화 완료 여부 (True: 완료, False: 실패)
 
-        __master_datas (dict): 전체 마스터 데이터 
+        __master_datas (dict): 전체 마스터 데이터
         __chatbot_messageTexts (list): [챗봇 문의] 버튼 메시지 리스트
         __adsk_messageTexts (list): [Autodesk 제품 설치 문의] 버튼 메시지 리스트
         __box_messageTexts (list): [상상진화 BOX 제품 설치 문의] 버튼 메시지 리스트

@@ -24,12 +24,9 @@ Navisworks Manage 2025, 2026 버전 공통
 9. 설치 구성요소가 준비될때까지 대기하십시오.
 
 
-
 *만약 정상적으로 수행하기 힘드시다면 수동 설치파일 다운로드 링크를 안내드립니다.*
-
 파일 버전별로 해당 링크에 게시된 모든 설치파일을 다운로드 하고, 1번 파일을 실행합니다.
 
------------------------------------------------
 
 Navisworks Manage 2026 설치파일
 
@@ -65,9 +62,6 @@ https://efulfillment.autodesk.com/NetSWDLD/2023/NAVMAN/54026284-5924-352E-895D-2
 
 2번 파일
 https://efulfillment.autodesk.com/NetSWDLD/2023/NAVMAN/54026284-5924-352E-895D-2DAE5162F3DE/SFX/Autodesk_Navisworks_Manage_2023_Win_64bit_dlm_002_002.sfx.exe?authparam=1748822224_f79f4be80dca8f03b7b916c18e5279d9
-
-
------------------------------------------------
 
 
 Navisworks Simulate 2026 설치파일
@@ -106,7 +100,6 @@ https://efulfillment.autodesk.com/NetSWDLD/2023/NAVSIM/AA4F8D65-4DB7-364A-A2AD-A
 https://efulfillment.autodesk.com/NetSWDLD/2023/NAVSIM/AA4F8D65-4DB7-364A-A2AD-ADED13570B23/SFX/Autodesk_Navisworks_Simulate_2023_Win_64bit_dlm_002_002.sfx.exe?authparam=1748854853_f3318b3496c193cb0ba3db65fca791ba
 
 
-
 10. 설치 UI가 활성화되면 "다음"을 클릭합니다.
 
 11. *유의사항* 설치위치는 C드라이브 그대로 둡니다. 변경하지 마십시오
@@ -118,10 +111,7 @@ https://efulfillment.autodesk.com/NetSWDLD/2023/NAVSIM/AA4F8D65-4DB7-364A-A2AD-A
 14. "마침" 버튼을 클릭하고, Navisworks를 실행합니다.
 
 
-
 * 라이센스 활성화 *
-
-
 
 - Autodesk ID로 로그인을 클릭합니다.
 
@@ -130,8 +120,6 @@ https://efulfillment.autodesk.com/NetSWDLD/2023/NAVSIM/AA4F8D65-4DB7-364A-A2AD-A
 - "Autodesk Identity Manager 열기"를 클릭합니다.
 
 - 라이센스 정보가 리디렉션 되면서 인증이 완료됩니다. Navisworks의 라이선스 인증이 이루어집니다.  
-
-
 
 * 상상플렉스 커뮤니티(기술지원 문의)
 https://www.ssflex.co.kr/community/open

@@ -169,8 +169,9 @@ def chatbot_response(kakao_request, res_queue, file_name):
     global prev_userRequest_msg   # 이전 사용자 입력 채팅 메세지 (챗봇 응답 시간 5초 초과시 응답 재요청 할 때 사용)
  
     text = None         # 챗봇 답변 내용
-    response = None      # 카카오 json format 형식 기반 챗봇 답변 내용
-    master_data = None    # 특정 마스터 데이터
+    response_data = None  # 카카오 json format 형식 기반 챗봇 답변 내용 + 특정 마스터 데이터
+    # response = None       # 카카오 json format 형식 기반 챗봇 답변 내용
+    # master_data = None    # 특정 마스터 데이터
     userRequest_msg = kakao_request[chatbot_helper._userRequest][chatbot_helper._utterance]   # 사용자 입력 채팅 메세지 가져오기 
     
     try:
@@ -205,18 +206,34 @@ def chatbot_response(kakao_request, res_queue, file_name):
 
             #     dbReset(file_name)
 
+        elif '/error'== userRequest_msg:   # 오류 테스트
+            raise Exception(chatbot_helper._error_title + 
+                            "사유: 오류 테스트!\n" + 
+                            chatbot_helper._error_ssflex)
+
         elif True == masterEntity.get_isValid:   # 마스터 데이터 유효성 검사 결과 성공한 경우
-            # response, master_data = kakao.test_get_response(userRequest_msg, masterEntity)
             # response, master_data = kakao.get_response(userRequest_msg, masterEntity)
+            response_data = kakao.get_response(userRequest_msg, masterEntity)
             prev_userRequest_msg = userRequest_msg
 
-            if master_data is not None:   # 특정 마스터 데이터 값이 존재하는 경우 (예) 아이템 카드 (basicCard, carousel) or 바로가기 그룹 (quickReplies) 
-                saveLog(file_name, f"({master_data[chatbot_helper._levelNo]}: {master_data[chatbot_helper._displayName]} - 사용자 입력 채팅 정보: '{userRequest_msg}')")
-            else:   # 특정 마스터 데이터 값이 존재하지 않는 경우 (예) 아이템 카드 (basicCard, carousel) or 바로가기 그룹 (quickReplies) 
-                saveLog(file_name, f"(etc: [기술지원 문의 제외 일반 문의] - 사용자 입력 채팅 정보: '{userRequest_msg}')")
+            saveLog(file_name, f"({response_data[chatbot_helper._meta_data][chatbot_helper._levelNo]}: {response_data[chatbot_helper._meta_data][chatbot_helper._displayName]} - 사용자 입력 채팅 정보: '{userRequest_msg}')")
+
+            # TODO: 추후 필요시 아래 주석친 코드 참고 (2025.09.12 minjae)
+            # if response_data[chatbot_helper._meta_data] is not None:   # 특정 마스터 데이터 값이 존재하는 경우 (예) 아이템 카드 (basicCard, carousel) or 바로가기 그룹 (quickReplies) 
+            #     saveLog(file_name, f"({response_data[chatbot_helper._meta_data][chatbot_helper._levelNo]}: {response_data[chatbot_helper._meta_data][chatbot_helper._displayName]} - 사용자 입력 채팅 정보: '{userRequest_msg}')")
+            # else:   # 특정 마스터 데이터 값이 존재하지 않는 경우 (예) 아이템 카드 (basicCard, carousel) or 바로가기 그룹 (quickReplies) 
+            #     saveLog(file_name, f"(etc: [기술지원 문의 제외 일반 문의] - 사용자 입력 채팅 정보: '{userRequest_msg}')")
 
             # time.sleep(5)   # 테스트 - 5초 대기
-            res_queue.put(response)
+            res_queue.put(response_data[chatbot_helper._format])
+
+            # if master_data is not None:   # 특정 마스터 데이터 값이 존재하는 경우 (예) 아이템 카드 (basicCard, carousel) or 바로가기 그룹 (quickReplies) 
+            #     saveLog(file_name, f"({master_data[chatbot_helper._levelNo]}: {master_data[chatbot_helper._displayName]} - 사용자 입력 채팅 정보: '{userRequest_msg}')")
+            # else:   # 특정 마스터 데이터 값이 존재하지 않는 경우 (예) 아이템 카드 (basicCard, carousel) or 바로가기 그룹 (quickReplies) 
+            #     saveLog(file_name, f"(etc: [기술지원 문의 제외 일반 문의] - 사용자 입력 채팅 정보: '{userRequest_msg}')")
+
+            # # time.sleep(5)   # 테스트 - 5초 대기
+            # res_queue.put(response)
 
         else:
             raise Exception(chatbot_helper._error_title + 

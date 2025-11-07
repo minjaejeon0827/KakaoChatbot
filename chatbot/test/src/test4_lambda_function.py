@@ -25,7 +25,7 @@ from modules.singleton import MasterEntity   # 싱글톤(singleton) 패턴
 from modules.log import logger   # 챗봇 전역 로그 객체(logger)
 
 # 4. 나머지 모듈 import
-from modules import kakao   # 카카오 json 포맷
+from modules.kakao import KakaoResponseFormat   # 카카오 스킬 응답 템플릿 json 포맷
 
 # 마스터 데이터 유효성 검사 대상 리스트
 valid_targets = [ chatbot_helper._buttons, 
@@ -42,6 +42,7 @@ valid_targets = [ chatbot_helper._buttons,
                   chatbot_helper._etcInfos ]
 
 masterEntity = MasterEntity(valid_targets)   # 마스터 데이터 싱글톤(singleton) 클래스 객체
+kakaoResponseFormat = KakaoResponseFormat(masterEntity.get_master_datas)   # 스킬 응답 템플릿 json 포맷 클래스 객체
 
 prev_userRequest_msg = None   # 이전 사용자 입력 채팅 메세지 (챗봇 응답 시간 5초 초과시 응답 재요청 할 때 사용)
 
@@ -126,7 +127,8 @@ def handler(event, context):
             time.sleep(chatbot_helper._polling_interval) 
  
         if False == run_flag:   # 챗봇 응답 시간 5초 초과한 경우     
-            response = kakao.timeover_quickReplies(chatbot_helper._done_thinking)   
+            # response = kakao.timeover_quickReplies(chatbot_helper._done_thinking)
+            response = kakaoResponseFormat.timeover_quickReplies(chatbot_helper._done_thinking)
 
         res_msg = json.dumps(response) 
         # logger.info("[테스트] 챗봇 답변 채팅 정보 - %s" %res_msg)
@@ -169,8 +171,9 @@ def chatbot_response(kakao_request, res_queue, file_name):
     global prev_userRequest_msg   # 이전 사용자 입력 채팅 메세지 (챗봇 응답 시간 5초 초과시 응답 재요청 할 때 사용)
  
     text = None         # 챗봇 답변 내용
-    response = None      # 카카오 json format 형식 기반 챗봇 답변 내용
-    master_data = None    # 특정 마스터 데이터
+    response_data = None  # 카카오 json format 형식 기반 챗봇 답변 내용 + 특정 마스터 데이터
+    # response = None       # 카카오 json format 형식 기반 챗봇 답변 내용
+    # master_data = None    # 특정 마스터 데이터
     userRequest_msg = kakao_request[chatbot_helper._userRequest][chatbot_helper._utterance]   # 사용자 입력 채팅 메세지 가져오기 
     
     try:
@@ -185,7 +188,8 @@ def chatbot_response(kakao_request, res_queue, file_name):
 
             text = prev_userRequest_msg
             logger.info(f"[테스트] 응답 재요청 채팅 메세지 - {text}")
-            res_queue.put(kakao.simple_text(text))
+            # res_queue.put(kakao.simple_text(text))
+            res_queue.put(kakaoResponseFormat.simple_text(text))
             dbReset(file_name)
 
             # TODO: 추후 필요시 아래 주석친 코드 참고 (2025.09.12 minjae)
@@ -197,26 +201,45 @@ def chatbot_response(kakao_request, res_queue, file_name):
             #         logger.info(f"[테스트] /img - text (last_update.split()[chatbot_helper._secondWord_Idx]) - {text}")
             #         logger.info(f"[테스트] /img - prompt (last_update.split()[chatbot_helper._thirdWord_Idx]) - {prompt}")
             #         res_queue.put(kakao.simple_image(text,prompt))
+            #         res_queue.put(kakaoResponseFormat.simple_image(text,prompt))
 
             #     else:    # 변수 kind에 저장된 문자열이 'img' 아닌 경우 
             #         text = last_update[chatbot_helper._askPrefix_Len:]   # 변수 last_update에 저장된 문자열 중 다섯 번째 문자(last_update[chatbot_helper._askPrefix_Length:]) 부터 끝까지 변수 text에 저장 (숫자 4 의미 - "ask "(공백 '' 포함) 문자열 제거하고 나머지 텍스트 가져옴)
             #         logger.info(f"[테스트] /ask - text (last_update[4:]) - {text}")
             #         res_queue.put(kakao.simple_text(text))
+            #         res_queue.put(kakaoResponseFormat.simple_text(text))
 
             #     dbReset(file_name)
 
+        elif '/error'== userRequest_msg:   # 오류 테스트
+            raise Exception(chatbot_helper._error_title + 
+                            "사유: 오류 테스트!\n" + 
+                            chatbot_helper._error_ssflex)
+
         elif True == masterEntity.get_isValid:   # 마스터 데이터 유효성 검사 결과 성공한 경우
-            # response, master_data = kakao.test_get_response(userRequest_msg, masterEntity)
             # response, master_data = kakao.get_response(userRequest_msg, masterEntity)
+            # response_data = kakao.get_response(userRequest_msg, masterEntity)
+            response_data = kakaoResponseFormat.get_response(userRequest_msg, masterEntity)
             prev_userRequest_msg = userRequest_msg
 
-            if master_data is not None:   # 특정 마스터 데이터 값이 존재하는 경우 (예) 아이템 카드 (basicCard, carousel) or 바로가기 그룹 (quickReplies) 
-                saveLog(file_name, f"({master_data[chatbot_helper._levelNo]}: {master_data[chatbot_helper._displayName]} - 사용자 입력 채팅 정보: '{userRequest_msg}')")
-            else:   # 특정 마스터 데이터 값이 존재하지 않는 경우 (예) 아이템 카드 (basicCard, carousel) or 바로가기 그룹 (quickReplies) 
-                saveLog(file_name, f"(etc: [기술지원 문의 제외 일반 문의] - 사용자 입력 채팅 정보: '{userRequest_msg}')")
+            saveLog(file_name, f"({response_data[chatbot_helper._meta_data][chatbot_helper._levelNo]}: {response_data[chatbot_helper._meta_data][chatbot_helper._displayName]} - 사용자 입력 채팅 정보: '{userRequest_msg}')")
+
+            # TODO: 추후 필요시 아래 주석친 코드 참고 (2025.09.12 minjae)
+            # if response_data[chatbot_helper._meta_data] is not None:   # 특정 마스터 데이터 값이 존재하는 경우 (예) 아이템 카드 (basicCard, carousel) or 바로가기 그룹 (quickReplies) 
+            #     saveLog(file_name, f"({response_data[chatbot_helper._meta_data][chatbot_helper._levelNo]}: {response_data[chatbot_helper._meta_data][chatbot_helper._displayName]} - 사용자 입력 채팅 정보: '{userRequest_msg}')")
+            # else:   # 특정 마스터 데이터 값이 존재하지 않는 경우 (예) 아이템 카드 (basicCard, carousel) or 바로가기 그룹 (quickReplies) 
+            #     saveLog(file_name, f"(etc: [기술지원 문의 제외 일반 문의] - 사용자 입력 채팅 정보: '{userRequest_msg}')")
 
             # time.sleep(5)   # 테스트 - 5초 대기
-            res_queue.put(response)
+            res_queue.put(response_data[chatbot_helper._format])
+
+            # if master_data is not None:   # 특정 마스터 데이터 값이 존재하는 경우 (예) 아이템 카드 (basicCard, carousel) or 바로가기 그룹 (quickReplies) 
+            #     saveLog(file_name, f"({master_data[chatbot_helper._levelNo]}: {master_data[chatbot_helper._displayName]} - 사용자 입력 채팅 정보: '{userRequest_msg}')")
+            # else:   # 특정 마스터 데이터 값이 존재하지 않는 경우 (예) 아이템 카드 (basicCard, carousel) or 바로가기 그룹 (quickReplies) 
+            #     saveLog(file_name, f"(etc: [기술지원 문의 제외 일반 문의] - 사용자 입력 채팅 정보: '{userRequest_msg}')")
+
+            # # time.sleep(5)   # 테스트 - 5초 대기
+            # res_queue.put(response)
 
         else:
             raise Exception(chatbot_helper._error_title + 
@@ -226,12 +249,15 @@ def chatbot_response(kakao_request, res_queue, file_name):
         # TODO: 추후 필요시 아래 주석친 코드 참고 (2025.09.12 minjae)
         # else:
         #     empty_res = kakao.empty_response()
+        #     empty_res = kakaoResponseFormat.__empty_response()
         #     res_queue.put(empty_res)
 
     except Exception as e:
         error_msg = str(e) 
         logger.error(f"[테스트] 오류 - {error_msg}")
-        res_queue.put(kakao.error_text(error_msg))
+        # res_queue.put(kakao.error_text(error_msg))
+        res_queue.put(kakaoResponseFormat.error_text(error_msg))
+        
         raise    # raise로 함수 resChatbot의 현재 예외를 다시 발생시켜서 함수 chatbot_response 호출한 상위 코드 블록으로 넘김
 
 def dbReset(file_name):

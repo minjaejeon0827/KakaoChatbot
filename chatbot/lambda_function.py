@@ -102,7 +102,7 @@ def handler(event, context):
 
         res_queue = q.Queue()
 
-        request_respond = threading.Thread(target=resChatbot,
+        request_respond = threading.Thread(target=chatbot_response,
                                            args=(kakao_request, res_queue, file_name))
         
         request_respond.start()
@@ -142,7 +142,7 @@ def handler(event, context):
             }
         }
     
-def resChatbot(kakao_request, res_queue, file_name):
+def chatbot_response(kakao_request, res_queue, file_name):
     """
     Description: 챗봇 답변 요청 및 큐(queue) 객체 res_queue 답변 내용 추가
 
@@ -163,7 +163,7 @@ def resChatbot(kakao_request, res_queue, file_name):
     # global masterEntity   # 챗봇 마스터 데이터 싱글톤 객체
     masterEntity   # 챗봇 마스터 데이터 싱글톤 객체 - 변수(masterEntity)에 저장된 값을 변경하거나 새로운 값을 대입하지 않고 단순히 값을 가져다가 쓰기(참조)만 하는 경우 global 키워드 사용할 필요 없음.
 
-    # 함수 resChatbot 안에서 전역 변수(prev_userRequest_msg)에 저장된 값을 변경하거나 새로운 값을 대입 하기 위해 파이썬 전역변수 키워드 global 사용. (global prev_userRequest_msg) (2025.09.30 minjae)
+    # 함수 chatbot_response 안에서 전역 변수(prev_userRequest_msg)에 저장된 값을 변경하거나 새로운 값을 대입 하기 위해 파이썬 전역변수 키워드 global 사용. (global prev_userRequest_msg) (2025.09.30 minjae)
     # 참고 URL - https://docs.python.org/ko/3/reference/simple_stmts.html#the-global-statement
     # 참고 2 URL - https://dojang.io/mod/page/view.php?id=2364
     # 참고 3 URL - https://wikidocs.net/62
@@ -177,7 +177,7 @@ def resChatbot(kakao_request, res_queue, file_name):
     userRequest_msg = kakao_request[chatbot_helper._userRequest][chatbot_helper._utterance]   # 사용자 입력 채팅 메세지 가져오기 
     
     try:
-        test._testDebug('resChatbot 함수 로그 테스트')
+        test._testDebug('chatbot_response 함수 로그 테스트')
 
         # 챗봇 응답 시간 5초 초과시 응답 재요청 기능 구현 
         # 참고 URL - https://claude.ai/chat/d550ac84-5c0c-4805-a600-9fdfd1236714
@@ -219,7 +219,10 @@ def resChatbot(kakao_request, res_queue, file_name):
         elif True == masterEntity.get_isValid:   # 마스터 데이터 유효성 검사 결과 성공한 경우
             # response, master_data = kakao.get_response(userRequest_msg, masterEntity)
             # response_data = kakao.get_response(userRequest_msg, masterEntity)
-            response_data = kakaoResponseFormat.get_response(userRequest_msg, masterEntity)
+            # TODO: 아래 코드 실행시 오류 메시지 "KakaoResponseFormat.get_response() takes 2 positional arguments but 3 were given" 출력되어 코드 변경 처리 (2025.11.07 minjae)
+            # (기존) response_data = kakaoResponseFormat.get_response(userRequest_msg, masterEntity) -> (변경) response_data = kakaoResponseFormat.get_response(userRequest_msg)
+            # response_data = kakaoResponseFormat.get_response(userRequest_msg, masterEntity)
+            response_data = kakaoResponseFormat.get_response(userRequest_msg)
             prev_userRequest_msg = userRequest_msg
 
             saveLog(file_name, f"({response_data[chatbot_helper._meta_data][chatbot_helper._levelNo]}: {response_data[chatbot_helper._meta_data][chatbot_helper._displayName]} - 사용자 입력 채팅 정보: '{userRequest_msg}')")
@@ -258,7 +261,7 @@ def resChatbot(kakao_request, res_queue, file_name):
         # res_queue.put(kakao.error_text(error_msg))
         res_queue.put(kakaoResponseFormat.error_text(error_msg))
         
-        raise    # raise로 함수 resChatbot의 현재 예외를 다시 발생시켜서 함수 resChatbot 호출한 상위 코드 블록으로 넘김
+        raise    # raise로 함수 resChatbot의 현재 예외를 다시 발생시켜서 함수 chatbot_response 호출한 상위 코드 블록으로 넘김
 
 def dbReset(file_name):
     """
