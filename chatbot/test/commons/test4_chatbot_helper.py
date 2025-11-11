@@ -24,7 +24,8 @@ _action = 'action'   # 키 'action'
 # {
 #   "body": "{ \"action\": \"aws-lambda_function-container-WarmUp\" }"
 # }
-_cold_start = 'aws-lambda_function-container-WarmUp'
+_cold_start = 'aws-lambda_function-container-WarmUp' 
+_chatbot_logger = 'chatbot_logger'   # 카카오 챗봇 로그 전역 변수(객체) 이름
 _botlog_file_path = '/tmp/botlog.txt'   # 아마존 웹서비스 람다 함수 (AWS Lambda function) -> 임시 로그 텍스트 파일('/tmp/botlog.txt') 상대 경로
 _time_limit = 3.5   # 챗봇 응답 가능 제한 시간
 
@@ -78,7 +79,6 @@ _start = '/start'   # 시작 화면
 # level1 
 _remote_text = '아래 링크를 클릭하시면 원격 지원 프로그램 다운로드 시작됩니다.\nhttps://113366.com/client/download?relayUri=imbu'   # 원격 지원
 _ask_chatbot = f'챗봇 {_ask}'   # 챗봇 문의
-# _chatbotItem_Idx = 0   # [챗봇 문의] itemList "title", "description"
 
 # TODO: level2 필요시 구현 예정 (2025.09.05 minjae)
 # level2 - 문의 유형 
@@ -103,12 +103,7 @@ _askInst_boxProduct = f'{_boxProduct} {_askInst}'   # 상상진화 BOX 제품 �
 # 버튼 Label + messageText 
 _beginning = '처음으로'
 _video = '동영상'   
-_survey = '만족도 조사'  
-
-# 버튼 인덱스 번호
-# _videoButton_Idx = 1   # 버튼 "동영상" (masterEntity.json -> "endCard" dict -> "buttons" list 객체 인덱스 번호)  
-# _webLinkUrl_Idx = 0   # 버튼 "동영상"과 연동할 webLinkUrl 인덱스 번호 (masterEntity.json -> "endCard" dict -> "autoCADInfos", "revitInfos", "navisworksManageInfos", "infraWorksInfos", "civil3DInfos", "revitBoxInfos", "cadBoxInfos", "energyBoxInfos", "accountInfos" list 객체 인덱스 번호)
-# _text_Idx = 0   # Autodesk, 상상진화 Box 제품별 챗봇 응답 내용 인덱스 번호
+_survey = '만족도 조사'
 
 # 동영상 시청 
 _yes = 'Y'   # 가능 

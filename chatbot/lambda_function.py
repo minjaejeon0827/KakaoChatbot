@@ -25,24 +25,24 @@ from modules.singleton import MasterEntity   # 싱글톤(singleton) 패턴
 from modules.log import logger   # 챗봇 전역 로그 객체(logger)
 
 # 4. 나머지 모듈 import
-from modules.kakao import KakaoResponseFormat   # 카카오 스킬 응답 템플릿 json 포맷
+from modules.kakao import KakaoResponseFormatter   # 카카오 스킬 응답 템플릿 json 포맷
 
 # 마스터 데이터 유효성 검사 대상 리스트
-valid_targets = [ chatbot_helper._buttons, 
-                  chatbot_helper._items, 
-                  chatbot_helper._autoCADInfos, 
-                  chatbot_helper._revitInfos, 
-                  chatbot_helper._navisworksManageInfos, 
-                  chatbot_helper._infraWorksInfos, 
-                  chatbot_helper._civil3DInfos, 
-                  chatbot_helper._revitBoxInfos, 
-                  chatbot_helper._cadBoxInfos, 
-                  chatbot_helper._energyBoxInfos, 
-                  chatbot_helper._accountInfos, 
+valid_targets = [ chatbot_helper._buttons,
+                  chatbot_helper._itemList,
+                  chatbot_helper._autoCADInfos,
+                  chatbot_helper._revitInfos,
+                  chatbot_helper._navisworksManageInfos,
+                  chatbot_helper._infraWorksInfos,
+                  chatbot_helper._civil3DInfos,
+                  chatbot_helper._revitBoxInfos,
+                  chatbot_helper._cadBoxInfos,
+                  chatbot_helper._energyBoxInfos,
+                  chatbot_helper._accountInfos,
                   chatbot_helper._etcInfos ]
 
 masterEntity = MasterEntity(valid_targets)   # 마스터 데이터 싱글톤(singleton) 클래스 객체
-kakaoResponseFormat = KakaoResponseFormat(masterEntity.get_master_datas)   # 스킬 응답 템플릿 json 포맷 클래스 객체
+kakaoResponseFormatter = KakaoResponseFormatter(masterEntity.get_master_datas)   # 스킬 응답 템플릿 json 포맷 클래스 객체
 
 prev_userRequest_msg = None   # 이전 사용자 입력 채팅 메세지 (챗봇 응답 시간 5초 초과시 응답 재요청 할 때 사용)
 
@@ -128,7 +128,7 @@ def handler(event, context):
  
         if False == run_flag:   # 챗봇 응답 시간 5초 초과한 경우     
             # response = kakao.timeover_quickReplies(chatbot_helper._done_thinking)
-            response = kakaoResponseFormat.timeover_quickReplies(chatbot_helper._done_thinking)
+            response = kakaoResponseFormatter.timeover_quickReplies(chatbot_helper._done_thinking)
 
         res_msg = json.dumps(response) 
         # logger.info("[테스트] 챗봇 답변 채팅 정보 - %s" %res_msg)
@@ -189,7 +189,7 @@ def chatbot_response(kakao_request, res_queue, file_name):
             text = prev_userRequest_msg
             logger.info(f"[테스트] 응답 재요청 채팅 메세지 - {text}")
             # res_queue.put(kakao.simple_text(text))
-            res_queue.put(kakaoResponseFormat.simple_text(text))
+            res_queue.put(kakaoResponseFormatter.simple_text(text))
             dbReset(file_name)
 
             # TODO: 추후 필요시 아래 주석친 코드 참고 (2025.09.12 minjae)
@@ -201,13 +201,13 @@ def chatbot_response(kakao_request, res_queue, file_name):
             #         logger.info(f"[테스트] /img - text (last_update.split()[chatbot_helper._secondWord_Idx]) - {text}")
             #         logger.info(f"[테스트] /img - prompt (last_update.split()[chatbot_helper._thirdWord_Idx]) - {prompt}")
             #         res_queue.put(kakao.simple_image(text,prompt))
-            #         res_queue.put(kakaoResponseFormat.simple_image(text,prompt))
+            #         res_queue.put(kakaoResponseFormatter.simple_image(text,prompt))
 
             #     else:    # 변수 kind에 저장된 문자열이 'img' 아닌 경우 
             #         text = last_update[chatbot_helper._askPrefix_Len:]   # 변수 last_update에 저장된 문자열 중 다섯 번째 문자(last_update[chatbot_helper._askPrefix_Length:]) 부터 끝까지 변수 text에 저장 (숫자 4 의미 - "ask "(공백 '' 포함) 문자열 제거하고 나머지 텍스트 가져옴)
             #         logger.info(f"[테스트] /ask - text (last_update[4:]) - {text}")
             #         res_queue.put(kakao.simple_text(text))
-            #         res_queue.put(kakaoResponseFormat.simple_text(text))
+            #         res_queue.put(kakaoResponseFormatter.simple_text(text))
 
             #     dbReset(file_name)
 
@@ -219,10 +219,10 @@ def chatbot_response(kakao_request, res_queue, file_name):
         elif True == masterEntity.get_isValid:   # 마스터 데이터 유효성 검사 결과 성공한 경우
             # response, master_data = kakao.get_response(userRequest_msg, masterEntity)
             # response_data = kakao.get_response(userRequest_msg, masterEntity)
-            # TODO: 아래 코드 실행시 오류 메시지 "KakaoResponseFormat.get_response() takes 2 positional arguments but 3 were given" 출력되어 코드 변경 처리 (2025.11.07 minjae)
-            # (기존) response_data = kakaoResponseFormat.get_response(userRequest_msg, masterEntity) -> (변경) response_data = kakaoResponseFormat.get_response(userRequest_msg)
-            # response_data = kakaoResponseFormat.get_response(userRequest_msg, masterEntity)
-            response_data = kakaoResponseFormat.get_response(userRequest_msg)
+            # TODO: 아래 코드 실행시 오류 메시지 "KakaoResponseFormatter.get_response() takes 2 positional arguments but 3 were given" 출력되어 코드 변경 처리 (2025.11.07 minjae)
+            # (기존) response_data = kakaoResponseFormatter.get_response(userRequest_msg, masterEntity) -> (변경) response_data = kakaoResponseFormatter.get_response(userRequest_msg)
+            # response_data = kakaoResponseFormatter.get_response(userRequest_msg, masterEntity)
+            response_data = kakaoResponseFormatter.get_response(userRequest_msg)
             prev_userRequest_msg = userRequest_msg
 
             saveLog(file_name, f"({response_data[chatbot_helper._meta_data][chatbot_helper._levelNo]}: {response_data[chatbot_helper._meta_data][chatbot_helper._displayName]} - 사용자 입력 채팅 정보: '{userRequest_msg}')")
@@ -252,14 +252,14 @@ def chatbot_response(kakao_request, res_queue, file_name):
         # TODO: 추후 필요시 아래 주석친 코드 참고 (2025.09.12 minjae)
         # else:
         #     empty_res = kakao.empty_response()
-        #     empty_res = kakaoResponseFormat.__empty_response()
+        #     empty_res = kakaoResponseFormatter.__empty_response()
         #     res_queue.put(empty_res)
 
     except Exception as e:
         error_msg = str(e) 
         logger.error(f"[테스트] 오류 - {error_msg}")
         # res_queue.put(kakao.error_text(error_msg))
-        res_queue.put(kakaoResponseFormat.error_text(error_msg))
+        res_queue.put(kakaoResponseFormatter.error_text(error_msg))
         
         raise    # raise로 함수 resChatbot의 현재 예외를 다시 발생시켜서 함수 chatbot_response 호출한 상위 코드 블록으로 넘김
 

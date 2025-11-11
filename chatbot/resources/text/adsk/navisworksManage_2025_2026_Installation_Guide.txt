@@ -4,7 +4,6 @@ Navisworks Manage 2025, 2026 버전 공통
 제품 설치방법을 안내 드립니다.
 *Navisworks Manage & Navisworks Simulate 모두 이 방법으로 설치가 가능합니다.
 
-
 1. 먼저 manage.autodesk.com 홈페이지로 접속합니다.
 
 2. 홈페이지에서 흰색 로그인 버튼을 클릭합니다.
@@ -23,10 +22,8 @@ Navisworks Manage 2025, 2026 버전 공통
 
 9. 설치 구성요소가 준비될때까지 대기하십시오.
 
-
 *만약 정상적으로 수행하기 힘드시다면 수동 설치파일 다운로드 링크를 안내드립니다.*
 파일 버전별로 해당 링크에 게시된 모든 설치파일을 다운로드 하고, 1번 파일을 실행합니다.
-
 
 Navisworks Manage 2026 설치파일
 
@@ -36,7 +33,6 @@ https://efulfillment.autodesk.com/NetSWDLD/ODIS/prd/2026/NAVMAN/71168559-1BF3-32
 2번 파일
 https://efulfillment.autodesk.com/NetSWDLD/ODIS/prd/2026/NAVMAN/71168559-1BF3-326F-B57F-B5E00F4E697F/SFX/Autodesk_Navisworks_Manage_2026_Win_64bit_db_002_002.7z?authparam=1748821580_018db22ba7f4cac78e9974a59c9e7af8
 
-
 Navisworks Manage 2025 설치파일
 
 1번 파일
@@ -44,7 +40,6 @@ https://efulfillment.autodesk.com/NetSWDLD/ODIS/prd/2025/NAVMAN/D87B131B-2A64-3A
 
 2번 파일
 https://efulfillment.autodesk.com/NetSWDLD/ODIS/prd/2025/NAVMAN/D87B131B-2A64-3A01-822F-3FB63EBEDD3B/SFX/Autodesk_Navisworks_Manage_2025_Win_64bit_db_002_002.7z?authparam=1748821726_268c4025a4b12b300e9233fb5bf209e6
-
 
 Navisworks Manage 2024 설치파일
 
@@ -54,7 +49,6 @@ https://efulfillment.autodesk.com/NetSWDLD/2024/NAVMAN/1BB907BC-4F14-3ED2-950C-3
 2번 파일
 https://efulfillment.autodesk.com/NetSWDLD/2024/NAVMAN/1BB907BC-4F14-3ED2-950C-39A3D99D2EFE/SFX/Autodesk_Navisworks_Manage_2024_Win_64bit_dlm_002_002.sfx.exe?authparam=1748822135_b27a45f268e81dc2c8c52d3bba4ae35a
 
-
 Navisworks Manage 2023 설치파일
 
 1번 파일
@@ -62,7 +56,6 @@ https://efulfillment.autodesk.com/NetSWDLD/2023/NAVMAN/54026284-5924-352E-895D-2
 
 2번 파일
 https://efulfillment.autodesk.com/NetSWDLD/2023/NAVMAN/54026284-5924-352E-895D-2DAE5162F3DE/SFX/Autodesk_Navisworks_Manage_2023_Win_64bit_dlm_002_002.sfx.exe?authparam=1748822224_f79f4be80dca8f03b7b916c18e5279d9
-
 
 Navisworks Simulate 2026 설치파일
 
@@ -72,7 +65,6 @@ https://efulfillment.autodesk.com/NetSWDLD/ODIS/prd/2026/NAVSIM/AFC44CB9-1170-3C
 2번 파일
 https://efulfillment.autodesk.com/NetSWDLD/ODIS/prd/2026/NAVSIM/AFC44CB9-1170-3C9F-BDF0-BB98BBD7A2F1/SFX/Autodesk_Navisworks_Simulate_2026_Win_64bit_db_002_002.7z?authparam=1748854635_18c82b1be813f6c23f34cc03f8836037
 
-
 Navisworks Simulate 2025 설치파일
 
 1번 파일
@@ -80,7 +72,6 @@ https://efulfillment.autodesk.com/NetSWDLD/ODIS/prd/2025/NAVSIM/F74BDA04-F362-3D
 
 2번 파일
 https://efulfillment.autodesk.com/NetSWDLD/ODIS/prd/2025/NAVSIM/F74BDA04-F362-3D2C-BE40-309FBB5222B5/SFX/Autodesk_Navisworks_Simulate_2025_Win_64bit_db_002_002.7z?authparam=1748854737_df938528f4d7219cacfbe020651c92b7
-
 
 Navisworks Simulate 2024 설치파일
 
@@ -90,7 +81,6 @@ https://efulfillment.autodesk.com/NetSWDLD/2024/NAVSIM/E65CCB8B-D2C0-3012-AD33-F
 2번 파일
 https://efulfillment.autodesk.com/NetSWDLD/2024/NAVSIM/E65CCB8B-D2C0-3012-AD33-F36606FA7794/SFX/Autodesk_Navisworks_Simulate_2024_Win_64bit_dlm_002_002.sfx.exe?authparam=1748854799_c5d506f965b643582b531d0c041081d1
 
-
 Navisworks Simulate 2023 설치파일
 
 1번 파일
@@ -98,7 +88,6 @@ https://efulfillment.autodesk.com/NetSWDLD/2023/NAVSIM/AA4F8D65-4DB7-364A-A2AD-A
 
 2번 파일
 https://efulfillment.autodesk.com/NetSWDLD/2023/NAVSIM/AA4F8D65-4DB7-364A-A2AD-ADED13570B23/SFX/Autodesk_Navisworks_Simulate_2023_Win_64bit_dlm_002_002.sfx.exe?authparam=1748854853_f3318b3496c193cb0ba3db65fca791ba
-
 
 10. 설치 UI가 활성화되면 "다음"을 클릭합니다.
 
@@ -109,7 +98,6 @@ https://efulfillment.autodesk.com/NetSWDLD/2023/NAVSIM/AA4F8D65-4DB7-364A-A2AD-A
 13. 설치가 100% 전부 다 진행될 때까지 기다립니다.
 
 14. "마침" 버튼을 클릭하고, Navisworks를 실행합니다.
-
 
 * 라이센스 활성화 *
 

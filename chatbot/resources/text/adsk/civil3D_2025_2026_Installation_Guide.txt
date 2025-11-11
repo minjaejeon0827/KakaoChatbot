@@ -1,8 +1,6 @@
 안녕하세요 상상진화 입니다.
-
 Civil3D 2025, 2026 버전 공통 
 제품 설치방법을 안내 드립니다.
-
 
 1. 먼저 manage.autodesk.com 홈페이지로 접속합니다.
 
@@ -22,10 +20,8 @@ Civil3D 2025, 2026 버전 공통
 
 9. 설치 구성요소가 준비될때까지 대기하십시오.
 
-
 *만약 정상적으로 수행하기 힘드시다면 수동 설치파일 다운로드 링크를 안내드립니다.*
 파일 버전별로 해당 링크에 게시된 모든 설치파일을 다운로드 하고, 1번 파일을 실행합니다.
-
 
 Civil3D 2026 설치파일
 
@@ -35,7 +31,6 @@ https://efulfillment.autodesk.com/NetSWDLD/ODIS/prd/2026/CIV3D/DDBC6B25-8B71-351
 2번 파일
 https://efulfillment.autodesk.com/NetSWDLD/ODIS/prd/2026/CIV3D/DDBC6B25-8B71-351A-92F6-B1271FAD8F1B/SFX/CIV3D_2026_Korean_Win_64bit_db_002_002.7z?authparam=1748855783_e4904f5872a0c9b7a0578f72f80f490f
 
-
 Civil3D 2025 설치파일
 
 1번 파일
@@ -43,7 +38,6 @@ https://efulfillment.autodesk.com/NetSWDLD/ODIS/prd/2025/CIV3D/C734B677-9AB4-372
 
 2번 파일
 https://efulfillment.autodesk.com/NetSWDLD/ODIS/prd/2025/CIV3D/C734B677-9AB4-372A-B137-D16F0156B2BB/SFX/CIV3D_2025_Korean_Win_64bit_db_002_002.7z?authparam=1748855844_9681c9a244f7abf97c248ddc1aa442fd
-
 
 Civil3D 2024 설치파일
 
@@ -56,7 +50,6 @@ https://efulfillment.autodesk.com/NetSWDLD/2024/CIV3D/4761072D-7AB2-3554-A823-4E
 3번 파일
 https://efulfillment.autodesk.com/NetSWDLD/2024/CIV3D/4761072D-7AB2-3554-A823-4EACCDF5A593/SFX/Autodesk_Civil_3D_2024_Korean_Win_64bit_dlm_003_003.sfx.exe?authparam=1748855950_bf88e0f4975675f20c1f55e47071ae7e
 
-
 Civil3D 2023 설치파일
 
 1번 파일
@@ -65,17 +58,15 @@ https://efulfillment.autodesk.com/NetSWDLD/2023/CIV3D/8729B0FE-A5BA-38CC-8ED0-9D
 2번 파일
 https://efulfillment.autodesk.com/NetSWDLD/2023/CIV3D/8729B0FE-A5BA-38CC-8ED0-9DC0B91D11EE/SFX/Autodesk_Civil_3D_2023_Korean_Win_64bit_dlm_002_002.sfx.exe?authparam=1748856073_68dc0b283e18b376f42569c61361fa01
 
-
 10. 설치 UI가 활성화되면 "다음"을 클릭합니다.
 
-11. *유의사항* 설치위치는 C드라이브 그대로 둡니다. 변경하지 마십시오
+11. *유의사항* 설치위치는 C드라이브 그대로 둡니다. 변경하지 마십시오.
 
 12. 추가 구성요소를 선택하고, "설치"를 클릭합니다.
 
 13. 설치가 100% 전부 다 진행될 때까지 기다립니다.
 
 14. "마침" 버튼을 클릭하고, Civil3D를 실행합니다.
-
 
 * 라이센스 활성화 *
 
@@ -86,7 +77,6 @@ https://efulfillment.autodesk.com/NetSWDLD/2023/CIV3D/8729B0FE-A5BA-38CC-8ED0-9D
 - "Autodesk Identity Manager 열기"를 클릭합니다.
 
 - 라이센스 정보가 리디렉션 되면서 인증이 완료됩니다. Civil3D의 라이선스 인증이 이루어집니다.  
-
 
 * 상상플렉스 커뮤니티(기술지원 문의)
 https://www.ssflex.co.kr/community/open

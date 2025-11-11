@@ -620,8 +620,8 @@ def __chatbot_carousel(master_data: dict[str, Any]) -> dict[str, Any]:
         },
         "itemList": [
             {
-                "title": master_data[chatbot_helper._items][chatbot_helper._chatbotItem_Idx][chatbot_helper._title],
-                "description": master_data[chatbot_helper._items][chatbot_helper._chatbotItem_Idx][chatbot_helper._description]
+                "title": master_data[chatbot_helper._itemList][chatbot_helper._chatbotItem_Idx][chatbot_helper._title],
+                "description": master_data[chatbot_helper._itemList][chatbot_helper._chatbotItem_Idx][chatbot_helper._description]
             }
         ],
         "itemListAlignment": "left",

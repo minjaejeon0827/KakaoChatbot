@@ -136,7 +136,7 @@ class MasterEntity:   # 암시적으로 object 클래스 상속
 
             참고 URL - https://docs.python.org/ko/3.6/reference/datamodel.html#object.__new__
 
-        Parameters: 
+        Parameters:
             _class (class): MasterEntity 클래스
             *args (tuple): 위치 가변 인자
             **kwargs (dict): 키워드 가변 인자
@@ -149,7 +149,7 @@ class MasterEntity:   # 암시적으로 object 클래스 상속
             _class._instance = super().__new__(_class)  
             chatbot_logger.info("[테스트] MasterEntity __new__ 메서드 - 호출 완료!")
 
-        return _class._instance                         
+        return _class._instance              
 
     def __init__(self, valid_targets):
         """
@@ -162,8 +162,8 @@ class MasterEntity:   # 암시적으로 object 클래스 상속
 
             참고 URL - https://docs.python.org/ko/3.6/reference/datamodel.html#object.__init__
 
-        Parameters: 
-            self (object): 마스터 데이터 싱글톤(singleton) 클래스(MasterEntity) 객체 자신
+        Parameters:
+            self - 마스터 데이터 싱글톤(singleton) 클래스(MasterEntity) 객체 자신
             valid_targets (list): 마스터 데이터 유효성 검사 대상 리스트
 
         Returns: 없음. 
@@ -181,7 +181,7 @@ class MasterEntity:   # 암시적으로 object 클래스 상속
         Description: 전체 마스터 데이터 가져오기 
 
         Parameters: 
-            self (object): 마스터 데이터 싱글톤(singleton) 클래스 객체 자신 (MasterEntity class)
+            self - 마스터 데이터 싱글톤(singleton) 클래스 객체 자신 (MasterEntity class)
 
         Returns: 
             self.__master_datas (dict): 전체 마스터 데이터 
@@ -196,7 +196,7 @@ class MasterEntity:   # 암시적으로 object 클래스 상속
     #     Description: 전체 마스터 데이터 설정  
 
     #     Parameters:
-    #         self (object): 마스터 데이터 싱글톤(singleton) 클래스 객체 자신 (MasterEntity class)
+    #         self - 마스터 데이터 싱글톤(singleton) 클래스 객체 자신 (MasterEntity class)
     #         master_datas (dict): 전체 마스터 데이터 
 
     #     Returns: 없음.
@@ -210,7 +210,7 @@ class MasterEntity:   # 암시적으로 object 클래스 상속
         Description: [챗봇 문의] 버튼 메시지 리스트 가져오기   
 
         Parameters: 
-            self (object): 마스터 데이터 싱글톤(singleton) 클래스 객체 자신 (MasterEntity class)
+            self - 마스터 데이터 싱글톤(singleton) 클래스 객체 자신 (MasterEntity class)
 
         Returns: 
             self.__chatbot_messageTexts (list): [챗봇 문의] 버튼 메시지 리스트
@@ -225,7 +225,7 @@ class MasterEntity:   # 암시적으로 object 클래스 상속
     #     Description: [챗봇 문의] 버튼 메시지 리스트 설정
 
     #     Parameters: 
-    #         self (object): 마스터 데이터 싱글톤(singleton) 클래스 객체 자신 (MasterEntity class)
+    #         self - 마스터 데이터 싱글톤(singleton) 클래스 객체 자신 (MasterEntity class)
     #         chatbot_messageTexts (list): [챗봇 문의] 버튼 메시지 리스트
 
     #     Returns: 없음. 
@@ -239,7 +239,7 @@ class MasterEntity:   # 암시적으로 object 클래스 상속
         Description: [Autodesk 제품 설치 문의] 버튼 메시지 리스트 가져오기 
 
         Parameters: 
-            self (object): 마스터 데이터 싱글톤(singleton) 클래스 객체 자신 (MasterEntity class)
+            self - 마스터 데이터 싱글톤(singleton) 클래스 객체 자신 (MasterEntity class)
 
         Returns: 
             self.__adsk_messageTexts (list): [Autodesk 제품 설치 문의] 버튼 메시지 리스트
@@ -254,7 +254,7 @@ class MasterEntity:   # 암시적으로 object 클래스 상속
     #     Description: [Autodesk 제품 설치 문의] 버튼 메시지 리스트 설정
 
     #     Parameters: 
-    #         self (object): 마스터 데이터 싱글톤(singleton) 클래스 객체 자신 (MasterEntity class)
+    #         self - 마스터 데이터 싱글톤(singleton) 클래스 객체 자신 (MasterEntity class)
     #         adsk_messageTexts (list): [Autodesk 제품 설치 문의] 버튼 메시지 리스트
 
     #     Returns: 없음.  
@@ -268,7 +268,7 @@ class MasterEntity:   # 암시적으로 object 클래스 상속
         Description: [상상진화 BOX 제품 설치 문의] 버튼 메시지 리스트 가져오기
 
         Parameters: 
-            self (object): 마스터 데이터 싱글톤(singleton) 클래스 객체 자신 (MasterEntity class)
+            self - 마스터 데이터 싱글톤(singleton) 클래스 객체 자신 (MasterEntity class)
 
         Returns: 
             self.__box_messageTexts (list): [상상진화 BOX 제품 설치 문의] 버튼 메시지 리스트
@@ -283,7 +283,7 @@ class MasterEntity:   # 암시적으로 object 클래스 상속
     #     Description: [상상진화 BOX 제품 설치 문의] 버튼 메시지 리스트 설정
 
     #     Parameters: 
-    #         self (object): 마스터 데이터 싱글톤(singleton) 클래스 객체 자신 (MasterEntity class)
+    #         self - 마스터 데이터 싱글톤(singleton) 클래스 객체 자신 (MasterEntity class)
     #         box_messageTexts (list): [상상진화 BOX 제품 설치 문의] 버튼 메시지 리스트
 
     #     Returns: 없음. 
@@ -297,7 +297,7 @@ class MasterEntity:   # 암시적으로 object 클래스 상속
         Description: 마스터 데이터 유효성 검사 대상 리스트 가져오기
 
         Parameters: 
-            self (object): 마스터 데이터 싱글톤(singleton) 클래스 객체 자신 (MasterEntity class)
+            self - 마스터 데이터 싱글톤(singleton) 클래스 객체 자신 (MasterEntity class)
 
         Returns: 
             self.__valid_targets (list): 마스터 데이터 유효성 검사 대상 리스트
@@ -312,7 +312,7 @@ class MasterEntity:   # 암시적으로 object 클래스 상속
     #     Description: 마스터 데이터 유효성 검사 대상 리스트 설정 
 
     #     Parameters: 
-    #         self (object): 마스터 데이터 싱글톤(singleton) 클래스 객체 자신 (MasterEntity class)
+    #         self - 마스터 데이터 싱글톤(singleton) 클래스 객체 자신 (MasterEntity class)
     #         valid_targets (list): 마스터 데이터 유효성 검사 대상 리스트
 
     #     Returns: 없음. 
@@ -326,7 +326,7 @@ class MasterEntity:   # 암시적으로 object 클래스 상속
         Description: 마스터 데이터 유효성 검사 결과 가져오기  
 
         Parameters: 
-            self (object): 마스터 데이터 싱글톤(singleton) 클래스 객체 자신 (MasterEntity class)
+            self - 마스터 데이터 싱글톤(singleton) 클래스 객체 자신 (MasterEntity class)
 
         Returns: 
             self.__isValid (bool): 마스터 데이터 유효성 검사 결과
@@ -341,7 +341,7 @@ class MasterEntity:   # 암시적으로 object 클래스 상속
     #     Description: 마스터 데이터 유효성 검사 결과 설정 
 
     #     Parameters: 
-    #         self (object): 마스터 데이터 싱글톤(singleton) 클래스 객체 자신 (MasterEntity class)
+    #         self - 마스터 데이터 싱글톤(singleton) 클래스 객체 자신 (MasterEntity class)
     #         isValid (bool): 마스터 데이터 유효성 검사 결과
 
     #     Returns: 없음. 
@@ -354,7 +354,7 @@ class MasterEntity:   # 암시적으로 object 클래스 상속
         Description: 마스터 데이터 초기 설정  
 
         Parameters: 
-            self (object): 마스터 데이터 싱글톤(singleton) 클래스 객체 자신 (MasterEntity class)  
+            self - 마스터 데이터 싱글톤(singleton) 클래스 객체 자신 (MasterEntity class)  
             valid_targets (list): 마스터 데이터 유효성 검사 대상 리스트
 
         Returns: 없음.
@@ -391,7 +391,7 @@ class MasterEntity:   # 암시적으로 object 클래스 상속
             참고 URL - https://chatgpt.com/c/68017acc-672c-8010-8649-7fa39f17d834 
 
         Parameters: 
-            self (object): 마스터 데이터 싱글톤(singleton) 클래스 객체 자신 (MasterEntity class)
+            self - 마스터 데이터 싱글톤(singleton) 클래스 객체 자신 (MasterEntity class)
 
         Returns: 
             bool: 마스터 데이터 유효성 검사 결과 
@@ -511,7 +511,7 @@ class KSTFormatter(logging.Formatter):   # 명시적으로 logging.Formatter 클
             참고 URL - https://docs.python.org/ko/3.6/reference/datamodel.html#object.__init__
 
         Parameters: 
-            self (object): 대한민국 표준시 설정 싱글톤(singleton) 클래스(KSTFormatter) 객체 자신
+            self - 대한민국 표준시 설정 싱글톤(singleton) 클래스(KSTFormatter) 객체 자신
             *args (tuple): 위치 가변 인자
             **kwargs (dict): 키워드 가변 인자
 
@@ -535,7 +535,7 @@ class KSTFormatter(logging.Formatter):   # 명시적으로 logging.Formatter 클
         Description: 설정된 대한민국 표준시(Asia/Seoul) ZoneInfo 클래스 객체 가져오기 (ZoneInfo class) 
 
         Parameters: 
-            self (object): 대한민국 표준시 설정 Formatter 싱글톤(singleton) 클래스 객체 자신 (KSTFormatter class)
+            self - 대한민국 표준시 설정 Formatter 싱글톤(singleton) 클래스 객체 자신 (KSTFormatter class)
 
         Returns: 
             self.__kst (object): 설정된 대한민국 표준시(Asia/Seoul) ZoneInfo 클래스 객체 (ZoneInfo class) 
@@ -550,7 +550,7 @@ class KSTFormatter(logging.Formatter):   # 명시적으로 logging.Formatter 클
     #     Description: 설정된 대한민국 표준시(Asia/Seoul) ZoneInfo 클래스 객체 설정 (ZoneInfo class)  
 
     #     Parameters: 
-    #         self (object): 대한민국 표준시 설정 Formatter 싱글톤(singleton) 클래스 객체 자신 (KSTFormatter class)
+    #         self - 대한민국 표준시 설정 Formatter 싱글톤(singleton) 클래스 객체 자신 (KSTFormatter class)
     #         kst (object): 설정된 대한민국 표준시(Asia/Seoul) ZoneInfo 클래스 객체 (ZoneInfo class) 
 
     #     Returns: 없음.
@@ -576,7 +576,7 @@ class KSTFormatter(logging.Formatter):   # 명시적으로 logging.Formatter 클
             참고 3 URL - https://docs.python.org/ko/3/library/logging.html#logrecord-attributes  
 
         Parameters:  
-            self (object): 대한민국 표준시 설정 Formatter 싱글톤(singleton) 클래스 객체 자신 (KSTFormatter class)
+            self - 대한민국 표준시 설정 Formatter 싱글톤(singleton) 클래스 객체 자신 (KSTFormatter class)
             record (object): 지정된 LogRecord(record) 객체 (logging.LogRecord class)
             datefmt (str): 날짜 출력 형식 문자열. datefmt 값이 None일 경우 기본 값 사용 (예) self.default_time_format = '%Y-%m-%d %H:%M:%S'.
 
@@ -596,7 +596,7 @@ class KSTFormatter(logging.Formatter):   # 명시적으로 logging.Formatter 클
         else: return time_stamp.strftime(chatbot_helper._datefmt)
 
 """
-* 참고
+*** 참고 ***
 싱글턴(singleton) 패턴 - 개발자가 여러 번 객체 생성을 하더라도 클래스로부터 오직 하나의 객체(유일한 객체)만 생성되도록 하는 디자인 패턴 의미.
 참고 URL - https://wikidocs.net/69361
 참고 2 URL - https://wikidocs.net/3693  

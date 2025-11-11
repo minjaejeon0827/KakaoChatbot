@@ -3,7 +3,6 @@
 Revit 2025, 2026 버전 공통
 제품 설치방법을 안내 드립니다.
 
-
 1. 먼저 manage.autodesk.com 홈페이지로 접속합니다.
 
 2. 홈페이지에서 흰색 로그인 버튼을 클릭합니다.
@@ -22,7 +21,6 @@ Revit 2025, 2026 버전 공통
 
 9. 설치 구성요소가 준비될때까지 대기하십시오.
 
-
 *만약 정상적으로 수행하기 힘드시다면 수동 설치파일 다운로드 링크를 안내드립니다.*
 파일 버전별로 해당 링크에 게시된 모든 설치파일을 다운로드 하고, 1번 파일을 실행합니다.
 
@@ -34,7 +32,6 @@ https://efulfillment.autodesk.com/NetSWDLD/ODIS/prd/2026/RVT/8986CA21-EA9C-32F3-
 2번 파일
 https://efulfillment.autodesk.com/NetSWDLD/ODIS/prd/2026/RVT/8986CA21-EA9C-32F3-A1DB-C34BD2BDA7A5/SFX/RVT_2026_NA_win_db_002_002.7z?authparam=1748765147_e5847824aba1a232420c28607bad9f16
 
-
 Revit 2025 설치파일
 
 1번 파일
@@ -42,7 +39,6 @@ https://efulfillment.autodesk.com/NetSWDLD/ODIS/prd/2025/RVT/686CE2A3-7C33-3AD5-
 
 2번 파일
 https://efulfillment.autodesk.com/NetSWDLD/ODIS/prd/2025/RVT/686CE2A3-7C33-3AD5-806A-75A6E648117F/SFX/Revit_2025_English_Win_64bit_dlm_002_002.7z?authparam=1748765240_16df5d299d23fb834eaaf66e24b38584
-
 
 Revit 2024 설치파일
 
@@ -61,7 +57,6 @@ https://efulfillment.autodesk.com/NetSWDLD/2024/RVT/E7F68AA6-4954-3ACE-8543-D2FC
 5번 파일
 https://efulfillment.autodesk.com/NetSWDLD/2024/RVT/E7F68AA6-4954-3ACE-8543-D2FCC9B0A356/SFX/Revit_2024_G1_Win_64bit_dlm_005_005.sfx.exe?authparam=1748765345_a6fef386fbf7e59602273648985311e6
 
-
 Revit 2023 설치파일
 
 1번 파일
@@ -79,7 +74,6 @@ https://efulfillment.autodesk.com/NetSWDLD/2023/RVT/B4E35F04-D559-35E9-AB70-E013
 5번 파일
 https://efulfillment.autodesk.com/NetSWDLD/2023/RVT/B4E35F04-D559-35E9-AB70-E0131AF7AB5B/SFX/Revit_2023_r1_G1_Win_64bit_dlm_005_005.sfx.exe?authparam=1748765534_4c0a3d5f305a6868c4b496831c871b11
 
-
 10. 설치 UI가 활성화되면 "다음"을 클릭합니다.
 
 11. *유의사항* 설치위치는 C드라이브 그대로 둡니다. 변경하지 마십시오
@@ -90,7 +84,6 @@ https://efulfillment.autodesk.com/NetSWDLD/2023/RVT/B4E35F04-D559-35E9-AB70-E013
 
 14. "시작" 버튼을 눌러 Revit을 실행합니다.
 
-
 * 라이센스 활성화 *
 
 - Autodesk ID로 로그인을 클릭합니다.
@@ -100,7 +93,6 @@ https://efulfillment.autodesk.com/NetSWDLD/2023/RVT/B4E35F04-D559-35E9-AB70-E013
 - "Autodesk Identity Manager 열기"를 클릭합니다.
 
 - 라이센스 정보가 리디렉션 되면서 인증이 완료됩니다. Revit의 라이선스 인증이 이루어집니다.  
-
 
 * 상상플렉스 커뮤니티(기술지원 문의)
 https://www.ssflex.co.kr/community/open

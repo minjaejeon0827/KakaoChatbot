@@ -29,7 +29,7 @@ from modules import kakao   # 카카오 json 포맷
 
 # 마스터 데이터 유효성 검사 대상 리스트
 valid_targets = [ chatbot_helper._buttons, 
-                  chatbot_helper._items, 
+                  chatbot_helper._itemList, 
                   chatbot_helper._autoCADInfos, 
                   chatbot_helper._revitInfos, 
                   chatbot_helper._navisworksManageInfos, 

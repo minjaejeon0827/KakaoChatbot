@@ -536,8 +536,8 @@ def chatbot_carousel(chatbotCard: dict) -> tuple[dict, dict]:
         },
         "itemList": [
             {
-                "title": chatbotCard[chatbot_helper._items][chatbot_helper._chatbotItem_Idx][chatbot_helper._title],
-                "description": chatbotCard[chatbot_helper._items][chatbot_helper._chatbotItem_Idx][chatbot_helper._description]
+                "title": chatbotCard[chatbot_helper._itemList][chatbot_helper._chatbotItem_Idx][chatbot_helper._title],
+                "description": chatbotCard[chatbot_helper._itemList][chatbot_helper._chatbotItem_Idx][chatbot_helper._description]
             }
         ],
         "itemListAlignment": "left",

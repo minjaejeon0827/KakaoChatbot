@@ -686,8 +686,8 @@ class KakaoResponseFormat:   # 암시적으로 object 클래스 상속
             },
             "itemList": [
                 {
-                    "title": master_data[chatbot_helper._items][chatbot_helper._chatbotItem_Idx][chatbot_helper._title],
-                    "description": master_data[chatbot_helper._items][chatbot_helper._chatbotItem_Idx][chatbot_helper._description]
+                    "title": master_data[chatbot_helper._itemList][chatbot_helper._chatbotItem_Idx][chatbot_helper._title],
+                    "description": master_data[chatbot_helper._itemList][chatbot_helper._chatbotItem_Idx][chatbot_helper._description]
                 }
             ],
             "itemListAlignment": "left",
