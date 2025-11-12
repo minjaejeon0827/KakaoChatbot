@@ -1,5 +1,6 @@
 """
-* 싱글톤 (singleton) 패턴 전용 모듈 
+* 싱글톤 (singleton) 패턴 전용 모듈
+참고 URL - https://chatgpt.com/c/691424a3-8e0c-8327-98b9-cabf6b80cf17
 
 *** 파이썬 문서 ***
 * 1. 클래스
