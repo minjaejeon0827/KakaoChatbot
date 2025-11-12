@@ -12,8 +12,8 @@ from modules import chatbot_logger   # log.py -> 챗봇 전역 로그 객체(log
 import json      # json 데이터 처리
 import asyncio   # 비동기 프로그래밍(async - await)
 
-# TODO: 추후 테스트 웹서버 구축 후 마스터 데이터 다운로드 Rest API 함수 getMasterDownLoadAsync 로직 수정 예정 (2025.09.11 minjae)
-async def getMasterDownLoadAsync(masterEntity_json_file_path):
+# TODO: 추후 테스트 웹서버 구축 후 마스터 데이터 다운로드 Rest API 함수 get_masterDownLoadAsync 로직 수정 예정 (2025.09.11 minjae)
+async def get_masterDownLoadAsync(masterEntity_json_file_path):
     """  
     Description: 전체 마스터 데이터 다운로드 및 데이터 가져오기
 

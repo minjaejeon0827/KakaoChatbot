@@ -104,9 +104,9 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
         Description: 생성된 객체 초기화
 
                      *** 주요 특징 ***
-                     1. __new__ 메서드는 해당 클래스(KakaoResponseFormatter)에 정의되어 있지 않으면 알아서 부모 클래스(object)의 __new__ 메서드가 호출되어 객체 생성
-                     2. 객체 생성 시 전달된 모든 인자(master_datas 제외)를 __new__ 메서드가 먼저 받고, 그 다음 __init__ 메서드로 전달
-                     3. 생성된 객체에 속성(property) 추가 및 값 할당 
+                     1. __new__ 메서드는 해당 클래스 (KakaoResponseFormatter)에 정의되어 있지 않으면 알아서 부모 클래스 (object)의 __new__ 메서드가 호출되어 객체 생성
+                     2. 객체 생성 시 전달된 모든 인자 (master_datas 제외)를 __new__ 메서드가 먼저 받고, 그 다음 __init__ 메서드로 전달
+                     3. 생성된 객체에 속성 (property) 추가 및 값 할당 
 
                      참고 URL - https://docs.python.org/ko/3.6/reference/datamodel.html#object.__new__
                      참고 2 URL - https://docs.python.org/ko/3.6/reference/datamodel.html#object.__init__

@@ -93,6 +93,9 @@ class MasterEntity:   # 암시적으로 object 클래스 상속
                 _init (bool) - 인스턴스 초기화 완료 여부 (True: 완료, False: 실패)
 
                 __master_datas (dict[str, Any]) - 전체 마스터 데이터
+                __chatbot_messageTexts (list) - [챗봇 문의] 버튼 메시지 리스트
+                __adsk_messageTexts (list) - [Autodesk 제품 설치 문의] 버튼 메시지 리스트
+                __box_messageTexts (list) - [상상진화 BOX 제품 설치 문의] 버튼 메시지 리스트
                 __valid_targets (list[str]) - 마스터 데이터 유효성 검사 시 확인할 대상 키(key) 리스트
                 __isValid (bool) - 마스터 데이터 유효성 검사 통과 여부 (True: 유효함, False: 유효하지 않음)
 
@@ -103,6 +106,9 @@ class MasterEntity:   # 암시적으로 object 클래스 상속
                 (예시) [ "buttons", "items", "autoCADInfos", "revitInfos", "navisworksManageInfos", "infraWorksInfos", "civil3DInfos", "revitBoxInfos", "cadBoxInfos", "energyBoxInfos", "accountInfos", "etcInfos" ]
 
     Properties (읽기 전용): get_master_datas (dict[str, Any]) - 전체 마스터 데이터 가져오기
+                           get_chatbot_messageTexts (list[str]) - [챗봇 문의] 버튼 메시지 리스트 가져오기
+                           get_adsk_messageTexts (list[str]) - [Autodesk 제품 설치 문의] 버튼 메시지 리스트 가져오기
+                           get_box_messageTexts (list[str]) - [상상진화 BOX 제품 설치 문의] 버튼 메시지 리스트 가져오기
                            get_valid_targets (list[str]) - 마스터 데이터 유효성 검사 대상 리스트 가져오기
                            get_isValid (bool) - 마스터 데이터 유효성 검사 결과 가져오기
 
@@ -189,6 +195,84 @@ class MasterEntity:   # 암시적으로 object 클래스 상속
     #     self.__master_datas = master_datas
 
     @cached_property
+    def get_chatbot_messageTexts(self) -> list[str]:
+        """
+        Description: [챗봇 문의] 버튼 메시지 리스트 가져오기   
+
+        Parameters: self - 마스터 데이터 싱글톤 (singleton) 클래스 (MasterEntity) 인스턴스 (Instance)
+
+        Returns: self.__chatbot_messageTexts - [챗봇 문의] 버튼 메시지 리스트
+        """
+
+        return self.__chatbot_messageTexts
+
+    # TODO: setter 메서드 set_chatbot_messageTexts 필요시 사용 예정 (2025.09.16 minjae)
+    # @get_chatbot_messageTexts.setter
+    # def set_chatbot_messageTexts(self, chatbot_messageTexts: list[str]) -> None:
+    #     """
+    #     Description: [챗봇 문의] 버튼 메시지 리스트 설정
+
+    #     Parameters: self - 마스터 데이터 싱글톤 (singleton) 클래스 (MasterEntity) 인스턴스 (Instance)
+    #                 chatbot_messageTexts - [챗봇 문의] 버튼 메시지 리스트
+
+    #     Returns: 없음. 
+    #     """
+        
+    #     self.__chatbot_messageTexts = chatbot_messageTexts
+
+    @cached_property
+    def get_adsk_messageTexts(self) -> list[str]:
+        """
+        Description: [Autodesk 제품 설치 문의] 버튼 메시지 리스트 가져오기 
+
+        Parameters: self - 마스터 데이터 싱글톤 (singleton) 클래스 (MasterEntity) 인스턴스 (Instance)
+
+        Returns: self.__adsk_messageTexts - [Autodesk 제품 설치 문의] 버튼 메시지 리스트
+        """
+
+        return self.__adsk_messageTexts
+
+    # TODO: setter 메서드 set_adsk_messageTexts 필요시 사용 예정 (2025.09.16 minjae)
+    # @get_adsk_messageTexts.setter
+    # def set_adsk_messageTexts(self, adsk_messageTexts: list[str]) -> None:
+    #     """
+    #     Description: [Autodesk 제품 설치 문의] 버튼 메시지 리스트 설정
+
+    #     Parameters: self - 마스터 데이터 싱글톤 (singleton) 클래스 (MasterEntity) 인스턴스 (Instance)
+    #                 adsk_messageTexts - [Autodesk 제품 설치 문의] 버튼 메시지 리스트
+
+    #     Returns: 없음.
+    #     """
+
+    #     self.__adsk_messageTexts = adsk_messageTexts
+
+    @cached_property
+    def get_box_messageTexts(self) -> list[str]:
+        """
+        Description: [상상진화 BOX 제품 설치 문의] 버튼 메시지 리스트 가져오기
+
+        Parameters: self - 마스터 데이터 싱글톤 (singleton) 클래스 (MasterEntity) 인스턴스 (Instance)
+
+        Returns: self.__box_messageTexts - [상상진화 BOX 제품 설치 문의] 버튼 메시지 리스트
+        """
+
+        return self.__box_messageTexts
+
+    # TODO: setter 메서드 set_box_messageTexts 필요시 사용 예정 (2025.09.16 minjae)
+    # @get_box_messageTexts.setter
+    # def set_box_messageTexts(self, box_messageTexts: list[str]) -> None:
+    #     """
+    #     Description: [상상진화 BOX 제품 설치 문의] 버튼 메시지 리스트 설정
+
+    #     Parameters: self - 마스터 데이터 싱글톤 (singleton) 클래스 (MasterEntity) 인스턴스 (Instance)
+    #                 box_messageTexts - [상상진화 BOX 제품 설치 문의] 버튼 메시지 리스트
+
+    #     Returns: 없음. 
+    #     """
+
+    #     self.__box_messageTexts = box_messageTexts
+
+    @cached_property
     def get_valid_targets(self) -> list[str]:
         """
         Description: 마스터 데이터 유효성 검사 대상 리스트 가져오기
@@ -256,7 +340,14 @@ class MasterEntity:   # 암시적으로 object 클래스 상속
             chatbot_logger.info(f"[테스트] help 함수 호출 및 chatbot_restServer.get_masterDownLoadAsync 함수 docstring 내용 확인 - {help(chatbot_restServer.get_masterDownLoadAsync)}")
             chatbot_logger.info(f"[테스트] chatbot_restServer.get_masterDownLoadAsync 함수 속성 __doc__ 사용 및 docstring 내용 확인 - {chatbot_restServer.get_masterDownLoadAsync.__doc__}")
 
-            self.__master_datas = await chatbot_restServer.get_masterDownLoadAsync(chatbot_helper._masterEntity_json_file_path)   # 전체 마스터 데이터 다운로드
+            self.__master_datas = await chatbot_restServer.get_masterDownLoadAsync(chatbot_helper._masterEntity_json_file_path)   # 전체 마스터 데이터 다운로드  
+            # TODO: 리스트 컴프리헨션 문법 사용하여 "buttons" 리스트 객체 (self.__master_datas[chatbot_helper._chatbotCard][chatbot_helper._buttons])에 속한 
+            #       키(key) 'messageText'에 할당된 값 (chatbotButton[chatbot_helper._messageText])만 추출하여 리스트 객체 self.__chatbot_messageTexts 값 할당 처리 (2025.08.25 minjae) 
+            # 참고 URL - https://docs.python.org/ko/3.13/tutorial/datastructures.html#list-comprehensions
+            # 참고 2 URL - https://claude.ai/chat/a6e38078-6a1f-4c67-a1f2-442f04d86938
+            self.__chatbot_messageTexts = [ chatbotButton[chatbot_helper._messageText] for chatbotButton in self.__master_datas[chatbot_helper._chatbotCard][chatbot_helper._buttons] ]   # [챗봇 문의] 버튼 메시지 리스트  
+            self.__adsk_messageTexts = [ adskButton[chatbot_helper._messageText] for adskButton in self.__master_datas[chatbot_helper._adskReplies][chatbot_helper._buttons] ]   # [Autodesk 제품 설치 문의] 버튼 메시지 리스트 
+            self.__box_messageTexts = [ boxButton[chatbot_helper._messageText] for boxButton in self.__master_datas[chatbot_helper._boxReplies][chatbot_helper._buttons] ]   # [상상진화 BOX 제품 설치 문의] 버튼 메시지 리스트
             self.__valid_targets = valid_targets
             self.__isValid = self.isValidator()
  
@@ -436,7 +527,7 @@ class KSTFormatter(logging.Formatter):   # 명시적으로 logging.Formatter 클
                      참고 2 URL - https://docs.python.org/ko/3/library/logging.html#logrecord-objects
 
                      - LogRecord attributes 
-                     참고 3 URL - https://docs.python.org/ko/3/library/logging.html#logrecord-attributes  
+                     참고 3 URL - https://docs.python.org/ko/3/library/logging.html#logrecord-attributes
 
         Parameters: self - 대한민국 표준시 설정 싱글톤 (singleton) 클래스 (KSTFormatter) 인스턴스 (Instance)
                     record - 지정된 LogRecord (record) 클래스 (logging.LogRecord) 인스턴스 (Instance)
@@ -463,14 +554,7 @@ class KSTFormatter(logging.Formatter):   # 명시적으로 logging.Formatter 클
 참고 URL - https://wikidocs.net/69361
 참고 2 URL - https://wikidocs.net/3693  
 
-*** 파이썬 문서 ***
-리스트 컴프리헨션 문법 
-해당 문법 사용하여 "buttons" 리스트 객체 (self.__master_datas[chatbot_helper._chatbotCard][chatbot_helper._buttons])에 속한
-키(key) 'messageText'에 할당된 값 (chatbotButton[chatbot_helper._messageText])만 추출하여 리스트 객체 self.__chatbot_messageTexts 값 할당 처리 (2025.08.25 minjae)
-참고 URL - https://docs.python.org/ko/3.13/tutorial/datastructures.html#list-comprehensions
-참고 2 URL - https://claude.ai/chat/a6e38078-6a1f-4c67-a1f2-442f04d86938
-
-용어 정리  
+파이썬 용어 정리  
 Argument (인자) - 함수를 호출할 때 함수 (또는 메서드)로 전달되는 값.
 Parameter (매개변수) - 함수 (또는 메서드) 정의에서 함수가 받을 수 있는 인자 (또는 어떤 경우 인자들)를 지정하는 이름 붙은 엔티티
 Attribute (어트리뷰트) - 흔히 점표현식을 사용하는 이름으로 참조되는 객체와 결합한 값. (예를 들어, 객체 o가 어트리뷰트 a를 가지면, o.a처럼 참조)
@@ -479,7 +563,7 @@ Attribute (어트리뷰트) - 흔히 점표현식을 사용하는 이름으로 �
 참고 3 URL - https://peps.python.org/pep-3102/
 참고 4 URL - https://leffept.tistory.com/418
 
-가변인자 *args / **kwargs
+파이썬 가변인자 *args / **kwargs
 *args - 위치 가변 인자라고 불리며, 함수를 정의할 때 인자값의 개수를 가변적으로 정의해주는 기능이며, 함수 호출부에서 서로 다른 개수의 인자를 전달하고자 할 때 가변 인자 (Variable argument) 사용함. (예) foo(1, 2, 3), foo(1, 2, 3, 4) 
         함수 호출시 args라는 변수는 여러 개의 입력에 대해 튜플 (tuple)로 저장한 후 이 튜플 (tuple) 객체를 바인딩한다. (예) (1, 2, 3), (1, 2, 3, 4)
 **kwargs - 키워드 가변 인자라고 불리며, keyword arguments의 약어(kwargs)이다. 예를들어 함수 호출부에서 a=1, b=2, c=3과 어떤 키워드와 해당 키워드에 값을 전달힌다. (예) foo(a=1, b=2, c=3)
@@ -487,7 +571,7 @@ Attribute (어트리뷰트) - 흔히 점표현식을 사용하는 이름으로 �
 참고 URL - https://wikidocs.net/69363
 참고 2 URL - https://claude.ai/chat/601e10e4-39ad-48fe-aa73-7070ba600f3d
 
-setter / getter 
+파이썬 setter / getter 
 파이썬에서 class 지원하기 때문에 setter / getter 또한 지원함.
 참고 URL - https://wikidocs.net/21053
 

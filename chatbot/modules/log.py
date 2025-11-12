@@ -59,7 +59,7 @@ def init_logger(name: str = "chatbot_logger") -> logging.Logger:
         logger.removeHandler(handler)   # 기존 핸들러 모두 제거
 
     # formatter 생성 (로그 기록/출력/저장에 사용할 날짜 + 로그 메시지)
-    formatter = KSTFormatter("[%(levelname)s] [%(asctime)s] [%(filename)s | %(funcName)s - L%(lineno)d]: %(message)s")   # KSTFormatter 싱글톤 클래스의 부모 클래스 초기화자 super().__init__(*args, **kwargs) 실행 시 파라미터 datefmt 전달 인자 값이 None일 경우 로그 기록 형식 기본 값 할당 ('%Y-%m-%d %H:%M:%S')
+    formatter = KSTFormatter("[%(levelname)s] [%(asctime)s] [%(filename)s | %(funcName)s - L%(lineno)d]: %(message)s")   # 싱글톤 (singleton) 클래스 (KSTFormatter)의 부모 클래스 (logging.Formatter) 초기화자 super().__init__(*args, **kwargs) 실행 시 파라미터 datefmt 전달 인자 값이 None일 경우 로그 기록 형식 기본 값 할당 (default_time_format = '%Y-%m-%d %H:%M:%S')
 
     streamHandler = logging.StreamHandler(sys.stdout)   # 콘솔 출력용 handler 생성 (streamHandler)
     streamHandler.setFormatter(formatter)   # handler formatter 설정(할당)
