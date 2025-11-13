@@ -142,8 +142,8 @@ class KakaoResponseFormat:   # 암시적으로 object 클래스 상속
             chatbot_helper._adskProduct: lambda: self.__subCat_basicCard(userRequest_msg, master_datas[chatbot_helper._subCatCard]),   # level2 - 문의 유형 (Autodesk 제품)
             chatbot_helper._boxProduct: lambda: self.__subCat_basicCard(userRequest_msg, master_datas[chatbot_helper._subCatCard]),   # level2 - 문의 유형 (상상진화 BOX 제품)
 
-            chatbot_helper._askInst_adskProduct: lambda: self.__common_quickReplies(master_datas[chatbot_helper._adskReplies]),   # level3 - Autodesk 제품 설치 문의
-            chatbot_helper._askInst_boxProduct: lambda: self.__common_quickReplies(master_datas[chatbot_helper._boxReplies]),   # level3 - 상상진화 BOX 제품 설치 문의
+            chatbot_helper._instSupport_adskProduct: lambda: self.__common_quickReplies(master_datas[chatbot_helper._adskReplies]),   # level3 - Autodesk 제품 설치 문의
+            chatbot_helper._instSupport_boxProduct: lambda: self.__common_quickReplies(master_datas[chatbot_helper._boxReplies]),   # level3 - 상상진화 BOX 제품 설치 문의
             # TODO: 아래 주석친 코드 필요시 사용 예정 (2025.10.30 minjae)
             # chatbot_helper._ask_accountProduct: lambda: account_quickReplies(master_datas[chatbot_helper._accountReplies])   # level3 - 계정 & 제품배정 문의
 

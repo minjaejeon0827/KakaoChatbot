@@ -29,7 +29,9 @@ _masterEntity_json_filepath = './resources/json/masterEntity.json'   # 마스터
 # 기술지원 업무 프로세스
 _inst = '설치'
 _ask = '문의'
-_askInst = f'{_inst} {_ask}'
+_support = '지원'
+# _askInst = f'{_inst} {_ask}'
+_instSupport = f'{_inst} {_support}'
 
 _product = '제품'
 _autodeskProduct = f'Autodesk {_product}'
@@ -53,8 +55,8 @@ _chatbotItem_Idx = 0   # [챗봇 문의] itemList 'title', 'description'
 # level2 - 문의 유형 
 
 # level3 
-_askInst_autodeskProduct = f'{_autodeskProduct} {_askInst}' # Autodesk 제품 설치 문의
-_askInst_boxProduct = f'{_boxProduct} {_askInst}'   # 상상진화 BOX 제품 설치 문의
+_askInst_autodeskProduct = f'{_autodeskProduct} {_instSupport}' # Autodesk 제품 설치 지원
+_askInst_boxProduct = f'{_boxProduct} {_instSupport}'   # 상상진화 BOX 제품 설치 지원
 # _ask_accountProduct = f'{_accountProduct} {_ask}'   # 계정 & 제품배정 문의 
 
 # TODO: level4 필요시 구현 예정 (2025.09.05 minjae)

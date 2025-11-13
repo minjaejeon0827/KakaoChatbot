@@ -217,9 +217,7 @@ def chatbot_response(kakao_request, res_queue, file_name):
             res_queue.put(response)
 
         else:   # 마스터 데이터 유효성 검사 결과 실패인 경우
-            raise Exception(chatbot_helper._error_title + 
-                            "사유: 마스터 데이터 유효성 검사 결과 실패!\n" + 
-                            chatbot_helper._error_ssflex)
+            raise Exception("사유: 마스터 데이터 유효성 검사 결과 실패!")
 
         # TODO: 추후 필요시 아래 주석친 코드 참고 예정 (2025.09.12 minjae)
         # else:
@@ -229,7 +227,7 @@ def chatbot_response(kakao_request, res_queue, file_name):
     except Exception as e:   # 하위 코드 블록에서 예외가 발생해도 변수 e에다 넣고 아래 코드 실행됨  
         error_msg = str(e) 
         chatbot_logger.log_write(chatbot_logger._error, "[테스트] 오류", error_msg)
-        res_queue.put(kakao.error_text(error_msg))
+        res_queue.put(kakao.error_text(f"{chatbot_helper._error_title}\n{error_msg}\n{chatbot_helper._error_techSupport}"))
         raise    # raise로 함수 resChatbot의 현재 예외를 다시 발생시켜서 함수 chatbot_response 호출한 상위 코드 블록으로 넘김                             
 
 # 아마존 웹서비스(AWS) 람다 함수(Lambda Function) -> 로그 텍스트 파일("/tmp/botlog.txt") 전용 함수 

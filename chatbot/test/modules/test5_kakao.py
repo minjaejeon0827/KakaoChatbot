@@ -440,8 +440,8 @@ def test_get_response(userRequest_msg: str, masterEntity: dict) -> tuple[dict, d
     # eq_operator_mappings = {   # if 조건절 eq 연산자(==) 매핑 Dictionary 객체
     #     chatbot_helper._remote_text: lambda: empty_response(master_datas[chatbot_helper._startCard]),   # level1 - 원격 지원
     #     chatbot_helper._ask_chatbot: lambda: chatbot_carousel(master_datas[chatbot_helper._chatbotCard]),   # level1 - 챗봇 문의
-    #     chatbot_helper._askInst_adskProduct: lambda: common_quickReplies(master_datas[chatbot_helper._adskReplies]),   # level3 - Autodesk 제품 설치 문의
-    #     chatbot_helper._askInst_boxProduct: lambda: common_quickReplies(master_datas[chatbot_helper._boxReplies])   # level3 - 상상진화 BOX 제품 설치 문의
+    #     chatbot_helper._instSupport_adskProduct: lambda: common_quickReplies(master_datas[chatbot_helper._adskReplies]),   # level3 - Autodesk 제품 설치 문의
+    #     chatbot_helper._instSupport_boxProduct: lambda: common_quickReplies(master_datas[chatbot_helper._boxReplies])   # level3 - 상상진화 BOX 제품 설치 문의
     # }
 
     # TypeError: unhashable type: 'list'
@@ -465,8 +465,8 @@ def test_get_response(userRequest_msg: str, masterEntity: dict) -> tuple[dict, d
     # }
 
     eq_operator_mappings = {   # if 조건절 eq 연산자(==) 매핑 Dictionary 객체
-        chatbot_helper._askInst_adskProduct: lambda: common_quickReplies(master_datas[chatbot_helper._adskReplies]),   # level3 - Autodesk 제품 설치 문의
-        chatbot_helper._askInst_boxProduct: lambda: common_quickReplies(master_datas[chatbot_helper._boxReplies]),   # level3 - 상상진화 BOX 제품 설치 문의
+        chatbot_helper._instSupport_adskProduct: lambda: common_quickReplies(master_datas[chatbot_helper._adskReplies]),   # level3 - Autodesk 제품 설치 문의
+        chatbot_helper._instSupport_boxProduct: lambda: common_quickReplies(master_datas[chatbot_helper._boxReplies]),   # level3 - 상상진화 BOX 제품 설치 문의
         # TODO: 아래 주석친 코드 필요시 사용 예정 (2025.10.30 minjae)
         # chatbot_helper._ask_accountProduct: lambda: account_quickReplies(master_datas[chatbot_helper._accountReplies])   # level3 - 계정 & 제품배정 문의
 
@@ -577,13 +577,13 @@ def get_response(userRequest_msg: str, masterEntity: dict) -> tuple[dict, dict]:
         elif userRequest_msg in chatbot_messageTexts:   # level2 - 문의 유형
             (response, master_data) = subCat_basicCard(userRequest_msg, master_datas[chatbot_helper._subCatCard])
 
-        elif chatbot_helper._askInst_adskProduct in userRequest_msg:   # level3 - Autodesk 제품 설치 문의
+        elif chatbot_helper._instSupport_adskProduct in userRequest_msg:   # level3 - Autodesk 제품 설치 문의
             (response, master_data) = common_quickReplies(master_datas[chatbot_helper._adskReplies])
 
         elif userRequest_msg in adsk_messageTexts:   # level4 - Autodesk 제품 버전
             (response, master_data) = common_ver_quickReplies(userRequest_msg, master_datas[chatbot_helper._adskVerReplies])
 
-        elif chatbot_helper._askInst_boxProduct in userRequest_msg:   # level3 - 상상진화 BOX 제품 설치 문의
+        elif chatbot_helper._instSupport_boxProduct in userRequest_msg:   # level3 - 상상진화 BOX 제품 설치 문의
             (response, master_data) = common_quickReplies(master_datas[chatbot_helper._boxReplies])
 
         elif userRequest_msg in box_messageTexts:   # level4 - 상상진화 BOX 제품 버전

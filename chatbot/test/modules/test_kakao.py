@@ -307,13 +307,13 @@ def get(userRequest_msg, masterEntity):
         elif userRequest_msg in chatbot_messageTexts:   # level2 - 문의 유형 
             response, master_data = subCat_basicCard(userRequest_msg, master_datas[chatbot_helper._subCatCard])
 
-        elif chatbot_helper._askInst_adskProduct == userRequest_msg:   # level3 - Autodesk 제품 설치 문의
+        elif chatbot_helper._instSupport_adskProduct == userRequest_msg:   # level3 - Autodesk 제품 설치 문의
             response, master_data = common_quickReplies(master_datas[chatbot_helper._adskReplies])
 
         elif userRequest_msg in adsk_messageTexts:   # level4 - Autodesk 제품 버전
             response, master_data = common_ver_quickReplies(userRequest_msg, master_datas[chatbot_helper._adskVerReplies])
 
-        elif chatbot_helper._askInst_boxProduct == userRequest_msg:   # level3 - 상상진화 BOX 제품 설치 문의
+        elif chatbot_helper._instSupport_boxProduct == userRequest_msg:   # level3 - 상상진화 BOX 제품 설치 문의
             response, master_data = common_quickReplies(master_datas[chatbot_helper._boxReplies])
 
         elif userRequest_msg in box_messageTexts:   # level4 - 상상진화 BOX 제품 버전

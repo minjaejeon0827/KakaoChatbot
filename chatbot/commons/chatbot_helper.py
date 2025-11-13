@@ -7,12 +7,12 @@
 _datefmt='%Y-%m-%d %H:%M:%S'   # 로그 기록 형식 (년-월-일 시:분:초)
 
 # 오류 안내 메시지 (raise Exception)
-_error_title = '[테스트] [오류 안내]\n'
-_error_ssflex = '상상플렉스 커뮤니티\n(https://www.ssflex.co.kr/community/open)\n문의 부탁드립니다.'
+_error_title = '[테스트] [오류 안내]'
+_error_techSupport = '상상진화 기술지원 콜센터 02-3474-2263\n연락 부탁드립니다.'
 
 # endregion 공통 
 
-# region lambda_function.py  
+# region lambda_function.py
 
 # handler 함수 -> event['body'] - 카카오톡 채팅방 채팅 정보 할당된 변수 의미.
 _body = 'body'   # 키 'body'
@@ -62,7 +62,9 @@ _message = 'message'   # 사용자의 발화로 messageText 실행. (바로가�
 # 기술지원 업무 프로세스
 _inst = '설치'
 _ask = '문의'
-_askInst = f'{_inst} {_ask}'
+_support = '지원'
+# _askInst = f'{_inst} {_ask}'
+_instSupport = f'{_inst} {_support}'
 
 _product = '제품'
 _adskProduct = f'Autodesk {_product}'
@@ -76,17 +78,17 @@ _checkRequest = '요청사항 확인 중이에요.\n잠시후 아래 말풍선�
 _start = '/start'   # 시작 화면
 
 # level1 
-_remote_text = '아래 링크를 클릭하시면 원격 지원 프로그램 다운로드 시작됩니다.\nhttps://113366.com/client/download?relayUri=imbu'   # 원격 지원
+_remote_text = '아래 링크를 클릭하시면 원격 지원 프로그램 다운로드 시작됩니다.\nhttps://113366.com/client/download?relayUri=imbu\n\n프로그램 다운로드 완료 후\n상상진화 기술지원 콜센터 02-3474-2263\n연락 부탁드립니다.'   # 원격 지원
 _ask_chatbot = f'챗봇 {_ask}'   # 챗봇 문의
 # _chatbotItem_Idx = 0   # [챗봇 문의] itemList "title", "description"
 
 # TODO: level2 필요시 구현 예정 (2025.09.05 minjae)
-# level2 - 문의 유형 
+# level2 - 문의 유형
 
 # level3 
-_askInst_adskProduct = f'{_adskProduct} {_askInst}'   # Autodesk 제품 설치 문의
-_askInst_boxProduct = f'{_boxProduct} {_askInst}'   # 상상진화 BOX 제품 설치 문의
-# _ask_accountProduct = f'{_accountProduct} {_ask}'   # 계정 & 제품배정 문의 
+_instSupport_adskProduct = f'{_adskProduct} {_instSupport}'   # Autodesk 제품 설치 지원
+_instSupport_boxProduct = f'{_boxProduct} {_instSupport}'   # 상상진화 BOX 제품 설치 지원
+# _ask_accountProduct = f'{_accountProduct} {_ask}'   # 계정 & 제품배정 문의
 
 # TODO: level4 필요시 구현 예정 (2025.09.05 minjae)
 # level4 - Autodesk 제품 버전 

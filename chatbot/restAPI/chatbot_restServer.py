@@ -1,5 +1,6 @@
 """
-* 챗봇 Rest API 함수 전용 모듈  
+* 챗봇 Rest API 함수 전용 모듈
+코드 리뷰 참고 URL - 
 """
  
 # 1. 공통 모듈 먼저 import 처리 
@@ -45,12 +46,14 @@ async def get_masterDownLoadAsync(masterEntity_json_file_path):
             await asyncio.sleep(0.1)    # 0.1초 대기. asyncio.sleep 비동기 함수도 네이티브 코루틴이다. (async def로 만든 코루틴은 네이티브 코루틴이라고 한다.)
            
         chatbot_logger.info("[테스트] 전체 마스터 데이터 다운로드 결과 - 완료!")
-    
+
+    except (KeyError, ValueError, TypeError) as e:
+        valid_error_msg = str(e)
+        chatbot_logger.error(f"[테스트] 데이터 유효성 오류 - {valid_error_msg}")
     except Exception as e:
-        error_msg = str(e)     
-        chatbot_logger.error(f"[테스트] 오류 - {error_msg}")
-    finally:
-        return master_datas
+        sys_error_msg = str(e)
+        chatbot_logger.critical(f"[테스트] 시스템 오류 - {sys_error_msg}")
+    finally: return master_datas
 
 """
 * 참고

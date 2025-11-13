@@ -1,6 +1,6 @@
 """
 * [카카오톡 서버 전송 용도] 스킬 응답 템플릿 json 포맷 전용 모듈
-참고 URL - https://chatgpt.com/c/69002b43-44c0-8322-8298-e7871b39da2a
+코드 리뷰 참고 URL - https://chatgpt.com/c/69002b43-44c0-8322-8298-e7871b39da2a
 
 * 챗봇 응답 타입별 json 포맷
 참고 URL - https://kakaobusiness.gitbook.io/main/tool/chatbot/skill_guide/answer_json_format
@@ -16,36 +16,6 @@
 참고 URL - https://en.wikipedia.org/wiki/Race_condition
 참고 2 URL - https://namu.wiki/w/%EA%B2%BD%EC%9F%81%20%EC%83%81%ED%83%9C
 참고 3 URL - https://lake0989.tistory.com/121
-
-*** 파이썬 문서 ***
-* 1. 클래스
-참고 URL - https://docs.python.org/ko/3/tutorial/classes.html
-참고 2 URL - https://wikidocs.net/28
-참고 3 URL - https://wikidocs.net/215474
-
-* 2. 클래스 인스턴스 변수 접근제한자 private 대신 언더바(__) 2개 사용
-참고 URL - https://docs.python.org/ko/3/reference/expressions.html#private-name-mangling
-참고 2 URL - https://wikidocs.net/297028
-참고 3 URL - https://wikidocs.net/297029
-참고 4 URL - https://oniondev.tistory.com/20
-
-* 3. functools @cached_property
-참고 URL - https://docs.python.org/ko/dev/library/functools.html
-참고 2 URL - https://sosodev.tistory.com/entry/Python-cachedproperty-%EA%B0%92%EC%9D%84-%EC%9E%AC%EC%82%AC%EC%9A%A9-%ED%95%98%EA%B8%B0
-
-* 4. 패키지, 모듈
-참고 URL - https://docs.python.org/ko/3.13/tutorial/modules.html
-참고 2 URL - https://wikidocs.net/1418
-참고 3 URL - https://dojang.io/mod/page/view.php?id=2450
-
-* 5. Type Hints
-참고 URL - https://docs.python.org/ko/3.14/library/typing.html
-참고 2 URL - https://peps.python.org/pep-0484/
-참고 3 URL - https://devpouch.tistory.com/189
-참고 4 URL - https://supermemi.tistory.com/entry/Python-3-%ED%8C%8C%EC%9D%B4%EC%8D%AC%EC%97%90%EC%84%9C-%EC%9D%98%EB%AF%B8%EB%8A%94-%EB%AC%B4%EC%97%87%EC%9D%BC%EA%B9%8C-%EC%A3%BC%EC%84%9D
-
-* 6. Type Hints class Any
-참고 URL - https://docs.python.org/ko/3.9/library/typing.html#the-any-type
 """
 
 # 1. 공통 모듈 먼저 import
@@ -88,7 +58,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
              __create_buttons - [공통] 버튼 리스트 생성
              __create_quickReplies - [공통] 바로가기 그룹 (quickReplies) 버튼 리스트 생성
              __common_basicCard - [공통] 기본형 카드 (basicCard) 카카오톡 채팅방 전송
-             __common_quickReplies - [공통] Autodesk or 상상진화 BOX 제품 설치 문의 바로가기 그룹 (quickReplies) 카카오톡 채팅방 전송
+             __common_quickReplies - [공통] Autodesk or 상상진화 BOX 제품 설치 지원 바로가기 그룹 (quickReplies) 카카오톡 채팅방 전송
              __common_ver_quickReplies - [공통] Autodesk or 상상진화 BOX 제품 버전 바로가기 그룹 (quickReplies) 카카오톡 채팅방 전송
              __subCat_basicCard - 문의 유형 기본형 카드 (basicCard) 카카오톡 채팅방 전송
 
@@ -145,8 +115,8 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
             chatbot_helper._adskProduct: lambda: self.__subCat_basicCard(userRequest_msg, master_datas[chatbot_helper._subCatCard]),   # level2 - 문의 유형 (Autodesk 제품)
             chatbot_helper._boxProduct: lambda: self.__subCat_basicCard(userRequest_msg, master_datas[chatbot_helper._subCatCard]),   # level2 - 문의 유형 (상상진화 BOX 제품)
 
-            chatbot_helper._askInst_adskProduct: lambda: self.__common_quickReplies(master_datas[chatbot_helper._adskReplies]),   # level3 - Autodesk 제품 설치 문의
-            chatbot_helper._askInst_boxProduct: lambda: self.__common_quickReplies(master_datas[chatbot_helper._boxReplies]),   # level3 - 상상진화 BOX 제품 설치 문의
+            chatbot_helper._instSupport_adskProduct: lambda: self.__common_quickReplies(master_datas[chatbot_helper._adskReplies]),   # level3 - Autodesk 제품 설치 지원
+            chatbot_helper._instSupport_boxProduct: lambda: self.__common_quickReplies(master_datas[chatbot_helper._boxReplies]),   # level3 - 상상진화 BOX 제품 설치 지원
 
             # level4 - 상상진화 BOX 제품 버전
             chatbot_helper._revitBox: lambda: self.__common_ver_quickReplies(userRequest_msg, master_datas[chatbot_helper._boxVerReplies]),
@@ -211,9 +181,13 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
             logger.info("[테스트] [기술지원 문의 제외 일반 문의] 카카오 json 포맷 가져오기 - 완료!")
             return self.__empty_response(master_datas[chatbot_helper._emptyResponse])   # 기술지원 문의 제외 일반 문의
 
+        except (KeyError, ValueError, TypeError) as e:
+            valid_error_msg = str(e)
+            logger.error(f"[테스트] 데이터 유효성 오류 - {valid_error_msg}", exc_info=True)
+            raise
         except Exception as e:
-            error_msg = str(e)
-            logger.error(f"[테스트] 오류 - {error_msg}")
+            sys_error_msg = str(e)
+            logger.critical(f"[테스트] 시스템 오류 - {sys_error_msg}", exc_info=True)
             raise
 
     def __skillTemplate_format(self, outputs: list[dict] = [], quickReplies: list[dict] = []) -> dict[str, Any]:
@@ -583,16 +557,16 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
 
     def __common_quickReplies(self, master_data: dict[str, Any]) -> dict[str, Any]:
         """
-        Description: [private] [공통] Autodesk or 상상진화 BOX 제품 설치 문의 바로가기 그룹 (quickReplies) 카카오톡 채팅방 전송
+        Description: [private] [공통] Autodesk or 상상진화 BOX 제품 설치 지원 바로가기 그룹 (quickReplies) 카카오톡 채팅방 전송
 
         Parameters: self - 카카오 스킬 응답 템플릿 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
                     master_data - 특정 마스터 데이터
 
-        Returns: self.__quickReplies_format(master_data, quickReplies) - [공통] Autodesk or 상상진화 BOX 제품 설치 문의 바로가기 그룹 json 포맷
+        Returns: self.__quickReplies_format(master_data, quickReplies) - [공통] Autodesk or 상상진화 BOX 제품 설치 지원 바로가기 그룹 json 포맷
                  master_data - 특정 마스터 데이터
         """
 
-        logger.info(f"[테스트] [공통] Autodesk or 상상진화 BOX 제품 설치 문의 바로가기 그룹 master_data: '{master_data}'")
+        logger.info(f"[테스트] [공통] Autodesk or 상상진화 BOX 제품 설치 지원 바로가기 그룹 master_data: '{master_data}'")
 
         quickReplies = self.__create_quickReplies(master_data)
 
@@ -683,7 +657,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
         Parameters: self - 카카오 스킬 응답 템플릿 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
                     userRequest_msg - 사용자 입력 채팅 메세지
                     master_data - 특정 마스터 데이터
-                    endInfos - 특정 기술지원 정보 리스트 (예) Autodesk or 상상진화 BOX 제품 설치 문의 등등...
+                    endInfos - 특정 기술지원 정보 리스트 (예) Autodesk or 상상진화 BOX 제품 설치 지원 등등...
 
         Returns: self.__skillTemplate_format(outputs) - 마지막화면 기본형 카드 json 포맷
                  master_data - 특정 마스터 데이터
@@ -736,3 +710,41 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
         })
 
         return { "format": self.__skillTemplate_format(outputs), "meta_data": master_data }
+    
+"""
+*** 참고 ***
+*** 파이썬 문서 ***
+* 1. 클래스
+참고 URL - https://docs.python.org/ko/3/tutorial/classes.html
+참고 2 URL - https://wikidocs.net/28
+참고 3 URL - https://wikidocs.net/215474
+
+* 2. 클래스 다중 상속
+참고 URL - https://docs.python.org/ko/3.10/tutorial/classes.html#multiple-inheritance
+참고 2 URL - https://wikidocs.net/16073
+참고 3 URL - https://dojang.io/mod/page/view.php?id=2388
+
+* 3. 클래스 인스턴스 변수 접근제한자 private 대신 언더바(__) 2개 사용
+참고 URL - https://docs.python.org/ko/3/reference/expressions.html#private-name-mangling
+참고 2 URL - https://wikidocs.net/297028
+참고 3 URL - https://wikidocs.net/297029
+참고 4 URL - https://oniondev.tistory.com/20
+
+* 4. functools @cached_property
+참고 URL - https://docs.python.org/ko/dev/library/functools.html
+참고 2 URL - https://sosodev.tistory.com/entry/Python-cachedproperty-%EA%B0%92%EC%9D%84-%EC%9E%AC%EC%82%AC%EC%9A%A9-%ED%95%98%EA%B8%B0
+
+* 5. 패키지, 모듈
+참고 URL - https://docs.python.org/ko/3.13/tutorial/modules.html
+참고 2 URL - https://wikidocs.net/1418
+참고 3 URL - https://dojang.io/mod/page/view.php?id=2450
+
+* 6. Type Hints
+참고 URL - https://docs.python.org/ko/3.14/library/typing.html
+참고 2 URL - https://peps.python.org/pep-0484/
+참고 3 URL - https://devpouch.tistory.com/189
+참고 4 URL - https://supermemi.tistory.com/entry/Python-3-%ED%8C%8C%EC%9D%B4%EC%8D%AC%EC%97%90%EC%84%9C-%EC%9D%98%EB%AF%B8%EB%8A%94-%EB%AC%B4%EC%97%87%EC%9D%BC%EA%B9%8C-%EC%A3%BC%EC%84%9D
+
+* 7. Type Hints class Any
+참고 URL - https://docs.python.org/ko/3.9/library/typing.html#the-any-type
+"""

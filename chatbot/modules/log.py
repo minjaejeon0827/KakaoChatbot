@@ -1,30 +1,9 @@
 """
 * 챗봇 전역 로그 모듈
-참고 URL - https://chatgpt.com/c/69118414-a588-8323-be5b-b0362b312cfa
+코드 리뷰 참고 URL - https://chatgpt.com/c/69118414-a588-8323-be5b-b0362b312cfa
 
 파이썬 logging 라이브러리 사용해서 전역 로그 객체(logger) 및 로그 기록 기능 구현 (2025.09.18 minjae)
 참고 URL - https://claude.ai/chat/8fc1ceeb-fe95-4d1b-8517-ecec83beb3f2
-
-*** 파이썬 문서 ***
-* 1. os.getenv
-참고 URL - https://docs.python.org/ko/3/library/os.html#os.getenv
-
-* 2. getattr
-참고 URL - https://docs.python.org/ko/3.10/library/functions.html#getattr
-
-* 3. 패키지, 모듈
-참고 URL - https://docs.python.org/ko/3.13/tutorial/modules.html
-참고 2 URL - https://wikidocs.net/1418
-참고 3 URL - https://dojang.io/mod/page/view.php?id=2450
-
-* 4. 파이썬 logging 모듈 사용하여 로그 기록하기
-참고 URL - https://docs.python.org/ko/3/library/logging.html
-참고 2 URL - https://docs.python.org/ko/3/howto/logging.html#basic-logging-tutorial
-참고 3 URL - https://docs.aws.amazon.com/ko_kr/lambda/latest/dg/python-logging.html
-참고 4 URL - https://wikidocs.net/84432
-참고 5 URL - https://wikidocs.net/123324
-참고 6 URL - https://velog.io/@jeongpar/Python-Logging-%EC%82%AC%EC%9A%A9%EB%B2%95
-참고 7 URL - https://aoc55.tistory.com/10
 """
 
 # 1. 공통 모듈 먼저 import
@@ -76,11 +55,34 @@ logger = init_logger()   # 챗봇 전역 로그 객체 생성 및 초기화
 
 """
 *** 참고 ***
-파이썬 logging 모듈 사용하여 전역 로그 기능 구현
-참고 URL - https://chuun92.tistory.com/7
-참고 2 URL - https://malwareanalysis.tistory.com/527
-참고 3 URL - https://github.com/sungwook-practice/python_logging_logger.git
-참고 4 URL - https://velog.io/@qlgks1/python-python-logging-%ED%95%B4%EB%B6%80
+*** 파이썬 문서 ***
+* 1. os.getenv
+참고 URL - https://docs.python.org/ko/3/library/os.html#os.getenv
+
+* 2. getattr
+참고 URL - https://docs.python.org/ko/3.10/library/functions.html#getattr
+
+* 3. 패키지, 모듈
+참고 URL - https://docs.python.org/ko/3.13/tutorial/modules.html
+참고 2 URL - https://wikidocs.net/1418
+참고 3 URL - https://dojang.io/mod/page/view.php?id=2450
+
+* 4. logging 모듈 사용하여 로그 기록하기
+참고 URL - https://docs.python.org/ko/3/library/logging.html
+참고 2 URL - https://docs.python.org/ko/3/howto/logging.html#basic-logging-tutorial
+참고 3 URL - https://docs.aws.amazon.com/ko_kr/lambda/latest/dg/python-logging.html
+참고 4 URL - https://wikidocs.net/84432
+참고 5 URL - https://wikidocs.net/123324
+참고 6 URL - https://velog.io/@jeongpar/Python-Logging-%EC%82%AC%EC%9A%A9%EB%B2%95
+참고 7 URL - https://aoc55.tistory.com/10
+참고 8 URL - https://chuun92.tistory.com/7
+참고 9 URL - https://malwareanalysis.tistory.com/527
+참고 10 URL - https://github.com/sungwook-practice/python_logging_logger.git
+참고 11 URL - https://velog.io/@qlgks1/python-python-logging-%ED%95%B4%EB%B6%80
+
+* 5. logging 모듈 Stack Traces 캡쳐 exc_info=True
+참고 URL - https://docs.python.org/ko/3.7/library/logging.html
+참고 2 URL - https://tjlog-tistory.tistory.com/82
 
 챗봇 전역 로그 모듈 구현 순서 및 로그 기록 방법
 ​1. instance 설정 - log(로그) instance 설정
@@ -92,7 +94,7 @@ logger = init_logger()   # 챗봇 전역 로그 객체 생성 및 초기화
 7. 다른 파이썬 스크립트 파일에서 챗봇 전역 로그 모듈 import 처리 - from modules.log import logger   # 챗봇 전역 로그 객체 (logger)  
 8. 원하는 지점에 로그 기록하기 (예) logger.info("[테스트] ~~~"), logger.error(f"[테스트] 오류 - {error_msg}") 등등...
 
-로그 포맷(format) formatter
+* 로그 포맷(format) formatter
 |     이름    |   포멧           |   설명   |
 | asctime     | %(asctime)s     | 날짜 시간, ex) 2021.04.10 11:21:48,162
 | created     | %(created)f     | 생성 시간 출력

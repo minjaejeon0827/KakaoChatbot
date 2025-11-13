@@ -1,7 +1,8 @@
 """
-* 아마존 웹서비스 람다 함수(AWS Lambda function) 실행 지점 (handler)  
+* 아마존 웹서비스 람다 함수 (AWS Lambda function) 실행 지점 (handler)
+코드 리뷰 참고 URL - 
 
-아마존 웹서비스(AWS) 다중인증(MFA는 Multi-Factor Authentication) 등록 방법 및 모바일 어플 Google Authenticator 설치 및 사용 방법 
+아마존 웹서비스(AWS) 다중인증 (MFA는 Multi-Factor Authentication) 등록 방법 및 모바일 어플 Google Authenticator 설치 및 사용 방법 
 참고 URL - https://happy-jjang-a.tistory.com/223
 """
 
@@ -107,10 +108,13 @@ def handler(event, context):
         
         request_respond.start()
 
+    except (KeyError, ValueError, TypeError) as e:
+        valid_error_msg = str(e)
+        logger.error(f"[테스트] 데이터 유효성 오류 - {valid_error_msg}", exc_info=True)
     except Exception as e:
-        error_msg = str(e)  # str() 함수 사용해서 Exception 클래스 객체 e를 문자열로 변환 및 오류 메시지 변수 error_msg에 할당 (문자열로 변환 안할시 챗봇에서 스킬서버 오류 출력되면서 챗봇이 답변도 안하고 장시간 멈춤 상태 발생.)
-        # logger._error('[테스트] 오류 - %s' %error_msg)
-        logger.error(f"[테스트] 오류 - {error_msg}")
+        sys_error_msg = str(e)  # str() 함수 사용해서 Exception 클래스 객체 e를 문자열로 변환 및 오류 메시지 변수 sys_error_msg에 할당 (문자열로 변환 안할시 챗봇에서 스킬서버 오류 출력되면서 챗봇이 답변도 안하고 장시간 멈춤 상태 발생.)
+        # logger.critical('[테스트] 시스템 오류 - %s' %sys_error_msg)
+        logger.critical(f"[테스트] 시스템 오류 - {sys_error_msg}", exc_info=True)
     finally:
         if None is res_queue:   # 챗봇 답변 내용 담을 큐(queue) 객체 res_queue 값이 None인 경우 
             logger.info("[테스트] handler - finally 강제 종료 - [사유] 큐(queue) 객체 res_queue 생성 안 함.")
@@ -212,9 +216,7 @@ def chatbot_response(kakao_request, res_queue, file_name):
             #     dbReset(file_name)
 
         elif '/error'== userRequest_msg:   # 오류 테스트
-            raise Exception(chatbot_helper._error_title + 
-                            "사유: 오류 테스트!\n" + 
-                            chatbot_helper._error_ssflex)
+            raise Exception("사유: 오류 테스트!")
 
         elif True == masterEntity.get_isValid:   # 마스터 데이터 유효성 검사 결과 성공한 경우
             # response, master_data = kakao.get_response(userRequest_msg, masterEntity)
@@ -244,10 +246,7 @@ def chatbot_response(kakao_request, res_queue, file_name):
             # # time.sleep(5)   # 테스트 - 5초 대기
             # res_queue.put(response)
 
-        else:
-            raise Exception(chatbot_helper._error_title + 
-                            "사유: 마스터 데이터 유효성 검사 결과 실패!\n" + 
-                            chatbot_helper._error_ssflex)
+        else: raise Exception("사유: 마스터 데이터 유효성 검사 결과 실패!")
 
         # TODO: 추후 필요시 아래 주석친 코드 참고 (2025.09.12 minjae)
         # else:
@@ -255,12 +254,17 @@ def chatbot_response(kakao_request, res_queue, file_name):
         #     empty_res = kakaoResponseFormatter.__empty_response()
         #     res_queue.put(empty_res)
 
+    except (KeyError, ValueError, TypeError) as e:
+        valid_error_msg = str(e)
+        logger.error(f"[테스트] 데이터 유효성 오류 - {valid_error_msg}", exc_info=True)
+        # res_queue.put(kakao.error_text(valid_error_msg))
+        res_queue.put(kakaoResponseFormatter.error_text(f"{chatbot_helper._error_title}\n{valid_error_msg}\n{chatbot_helper._error_techSupport}"))        
+        raise    # raise로 함수 resChatbot의 현재 예외를 다시 발생시켜서 함수 chatbot_response 호출한 상위 코드 블록으로 넘김
     except Exception as e:
-        error_msg = str(e) 
-        logger.error(f"[테스트] 오류 - {error_msg}")
-        # res_queue.put(kakao.error_text(error_msg))
-        res_queue.put(kakaoResponseFormatter.error_text(error_msg))
-        
+        sys_error_msg = str(e)
+        logger.critical(f"[테스트] 시스템 오류 - {sys_error_msg}", exc_info=True)
+        # res_queue.put(kakao.error_text(sys_error_msg))
+        res_queue.put(kakaoResponseFormatter.error_text(f"{chatbot_helper._error_title}\n{sys_error_msg}\n{chatbot_helper._error_techSupport}"))
         raise    # raise로 함수 resChatbot의 현재 예외를 다시 발생시켜서 함수 chatbot_response 호출한 상위 코드 블록으로 넘김
 
 def dbReset(file_name):

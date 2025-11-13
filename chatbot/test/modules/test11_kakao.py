@@ -500,8 +500,8 @@ def get_response(userRequest_msg: str, masterEntity: dict[str, Any]) -> dict[str
     # 참고 URL - https://docs.python.org/ko/2/tutorial/controlflow.html#lambda-expressions
 
     eq_operator_mappings = {   # if 조건절 eq 연산자(==) 매핑 Dictionary 객체
-        chatbot_helper._askInst_adskProduct: lambda: __common_quickReplies(master_datas[chatbot_helper._adskReplies]),   # level3 - Autodesk 제품 설치 문의
-        chatbot_helper._askInst_boxProduct: lambda: __common_quickReplies(master_datas[chatbot_helper._boxReplies]),   # level3 - 상상진화 BOX 제품 설치 문의
+        chatbot_helper._instSupport_adskProduct: lambda: __common_quickReplies(master_datas[chatbot_helper._adskReplies]),   # level3 - Autodesk 제품 설치 문의
+        chatbot_helper._instSupport_boxProduct: lambda: __common_quickReplies(master_datas[chatbot_helper._boxReplies]),   # level3 - 상상진화 BOX 제품 설치 문의
         # TODO: 아래 주석친 코드 필요시 사용 예정 (2025.10.30 minjae)
         # chatbot_helper._ask_accountProduct: lambda: account_quickReplies(master_datas[chatbot_helper._accountReplies])   # level3 - 계정 & 제품배정 문의
 

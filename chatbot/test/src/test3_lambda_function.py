@@ -207,9 +207,7 @@ def chatbot_response(kakao_request, res_queue, file_name):
             #     dbReset(file_name)
 
         elif '/error'== userRequest_msg:   # 오류 테스트
-            raise Exception(chatbot_helper._error_title + 
-                            "사유: 오류 테스트!\n" + 
-                            chatbot_helper._error_ssflex)
+            raise Exception("사유: 오류 테스트!")
 
         elif True == masterEntity.get_isValid:   # 마스터 데이터 유효성 검사 결과 성공한 경우
             # response, master_data = kakao.get_response(userRequest_msg, masterEntity)
@@ -236,9 +234,7 @@ def chatbot_response(kakao_request, res_queue, file_name):
             # res_queue.put(response)
 
         else:
-            raise Exception(chatbot_helper._error_title + 
-                            "사유: 마스터 데이터 유효성 검사 결과 실패!\n" + 
-                            chatbot_helper._error_ssflex)
+            raise Exception("사유: 마스터 데이터 유효성 검사 결과 실패!")
 
         # TODO: 추후 필요시 아래 주석친 코드 참고 (2025.09.12 minjae)
         # else:
@@ -248,7 +244,7 @@ def chatbot_response(kakao_request, res_queue, file_name):
     except Exception as e:
         error_msg = str(e) 
         logger.error(f"[테스트] 오류 - {error_msg}")
-        res_queue.put(kakao.error_text(error_msg))
+        res_queue.put(kakao.error_text(f"{chatbot_helper._error_title}\n{error_msg}\n{chatbot_helper._error_techSupport}"))
         raise    # raise로 함수 resChatbot의 현재 예외를 다시 발생시켜서 함수 chatbot_response 호출한 상위 코드 블록으로 넘김
 
 def dbReset(file_name):
