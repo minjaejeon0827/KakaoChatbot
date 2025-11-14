@@ -114,7 +114,7 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
     """
     Description: 마스터 데이터 싱글톤 (singleton) 클래스
 
-                 * 참고
+                 *** 참고 ***
                  마스터 데이터 - SW 프로그램을 실행하기 위해 사용되는 기준 데이터 의미. (특정 기업의 업무지식 및 비즈니스 운영의 핵심 정보 반영 필수!) 
                  참고 URL - https://en.wikipedia.org/wiki/Master_data
                  참고 2 URL - https://wiki1.kr/index.php/%EB%A7%88%EC%8A%A4%ED%84%B0%EB%8D%B0%EC%9D%B4%ED%84%B0#cite_note-masterdata_synopsis-2
@@ -306,11 +306,11 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
     def isValidator(self) -> bool:
         """
         Description: 마스터 데이터 유효성 검사
-                     참고 URL - https://chatgpt.com/c/68017acc-672c-8010-8649-7fa39f17d834 
+                     참고 URL - https://chatgpt.com/c/68017acc-672c-8010-8649-7fa39f17d834
 
         Parameters: self - 마스터 데이터 싱글톤 (singleton) 클래스 (MasterEntity) 인스턴스 (Instance)
 
-        Returns: 마스터 데이터 유효성 검사 결과 
+        Returns: 마스터 데이터 유효성 검사 결과
         """
         
         master_datas = self.get_master_datas     # 전체 마스터 데이터
@@ -343,6 +343,7 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
 
             chatbot_logger.info("[테스트] 마스터 데이터 유효성 검사 결과 - 완료!")
             return True
+        
         except (KeyError, ValueError, TypeError) as e:
             valid_error_msg = str(e)
             chatbot_logger.error(f"[테스트] 데이터 유효성 오류 - {valid_error_msg}")
@@ -358,6 +359,7 @@ class KSTFormatter(SingletonBase, logging.Formatter):   # 상속 구조 단순�
     Description: 대한민국 표준시 설정 싱글톤 (singleton) 클래스 (pytz 라이브러리 사용 안 함.)
                  참고 URL - https://claude.ai/chat/8fc1ceeb-fe95-4d1b-8517-ecec83beb3f2
 
+                 *** 참고 ***
                  class Docstring 작성 가이드라인
                  참고 URL - https://claude.ai/chat/6c33a991-97cf-4736-8bcd-724cbf1a58ee
 
