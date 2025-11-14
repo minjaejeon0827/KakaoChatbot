@@ -14,14 +14,14 @@
         }
       },
       "buttons": [ { "action": "message", "label": "챗봇 문의", "messageText": "챗봇 문의", "webLinkUrl": null }, 
-                   { "action": "message", "label": "원격 지원", "messageText": "아래 링크를 클릭하시면 원격 지원 프로그램 다운로드 시작됩니다.\nhttps://113366.com/client/download?relayUri=imbu\n\n프로그램 다운로드 완료 후\n상상진화 기술지원 콜센터 02-3474-2263\n연락 부탁드립니다.", "webLinkUrl": null } ],
+                   { "action": "message", "label": "원격 지원", "messageText": "아래 링크를 클릭하시면 원격 지원 프로그램 다운로드 시작됩니다.\nhttps://113366.com/client/download?relayUri=imbu", "webLinkUrl": null } ],
       "quickReplies": [ { "action": null, "label": null, "messageText": null } ],
       "itemList": [ { "title": null, "description": null } ]
     },
     "chatbotCard": {
       "levelNo": "level1",
       "type": "carousel",
-      "displayName": "[챗봇 문의]",
+      "displayName": "[챗봇 문의]", 
       "text": "안녕하세요.😀\n기술지원 챗봇 '상진'이에요.\n문의사항 선택해주세요.",
       "title": "[챗봇 문의]",
       "description": "제품 설치 안내 받고 싶어요!",
@@ -31,13 +31,30 @@
           "web": "https://www.ssflex.co.kr/app/shop/goods"
         }
       },
-      "buttons": [ { "action": "message", "label": "Autodesk 제품", "messageText": "Autodesk 제품 설치 지원", "webLinkUrl": null }, 
-                   { "action": "message", "label": "상상진화 BOX 제품", "messageText": "상상진화 BOX 제품 설치 지원", "webLinkUrl": null } ],
+      "buttons": [ { "action": "message", "label": "Autodesk 제품", "messageText": "Autodesk 제품", "webLinkUrl": null }, 
+                   { "action": "message", "label": "상상진화 BOX 제품", "messageText": "상상진화 BOX 제품", "webLinkUrl": null } ],
       "quickReplies": [ { "action": null, "label": null, "messageText": null } ],
       "itemList": [ { "title": "▶", "description": "쉽고 빠른 제품 설치 안내" } ]
     },
-    "adskReplies": {
+    "subCatCard": {
       "levelNo": "level2",
+      "type": "basicCard",
+      "displayName": "[문의 유형]",
+      "text": null,
+      "title": "[문의 유형]",
+      "description": "안내가 필요한 항목 선택해주세요.",
+      "thumbnail": {
+        "imageUrl": "https://testkakao.s3.ap-northeast-2.amazonaws.com/dynamo.png",
+        "link": {
+          "web": "https://www.ssflex.co.kr/e-learning-services/200101/%EC%98%A4%ED%86%A0%EB%8D%B0%EC%8A%A4%ED%81%AC_%EC%A0%9C%ED%92%88%EB%B3%84_%ED%95%99%EC%8A%B5"
+        }
+      },
+      "buttons": [ { "action": "message", "label": "설치 지원", "messageText": "설치 지원", "webLinkUrl": null } ],
+      "quickReplies": [ { "action": null, "label": null, "messageText": null } ],
+      "itemList": [ { "title": null, "description": null } ]
+    },
+    "adskReplies": {
+      "levelNo": "level3",
       "type": "quickReplies",
       "displayName": "[Autodesk 제품 설치 지원]",
       "text": "안내가 필요한 항목 선택해주세요.",
@@ -58,7 +75,7 @@
       "itemList": [ { "title": null, "description": null } ]
     },
     "adskVerReplies": {
-      "levelNo": "level3",
+      "levelNo": "level4",
       "type": "quickReplies",
       "displayName": "[Autodesk 제품 버전]",
       "text": "버전을 선택해주세요.",
@@ -71,11 +88,12 @@
         }
       },
       "buttons": [ { "action": null, "label": null, "messageText": null, "webLinkUrl": null } ],
-      "quickReplies": [ { "action": "message", "label": "2025, 2026", "messageText": "2025, 2026 버전 공통 설치 방법" } ],
+      "quickReplies": [ { "action": "message", "label": "2026", "messageText": "2026 버전 설치 방법" },
+                        { "action": "message", "label": "2025", "messageText": "2025 버전 설치 방법" } ],
       "itemList": [ { "title": null, "description": null } ]
     },
     "boxReplies": {
-      "levelNo": "level2",
+      "levelNo": "level3",
       "type": "quickReplies",
       "displayName": "[상상진화 BOX 제품 설치 지원]",
       "text": "안내가 필요한 항목 선택해주세요.",
@@ -94,7 +112,7 @@
       "itemList": [ { "title": null, "description": null } ]
     },
     "boxVerReplies": {
-      "levelNo": "level3",
+      "levelNo": "level4",
       "type": "quickReplies",
       "displayName": "[상상진화 BOX 제품 버전]",
       "text": "버전을 선택해주세요.",
@@ -107,7 +125,11 @@
         }
       }, 
       "buttons": [ { "action": null, "label": null, "messageText": null, "webLinkUrl": null } ],
-      "quickReplies": [ { "action": "message", "label": "2022~2026", "messageText": "2022~2026 버전 공통 설치 방법" } ],
+      "quickReplies": [ { "action": "message", "label": "2026", "messageText": "2026 버전 설치 방법" },
+                        { "action": "message", "label": "2025", "messageText": "2025 버전 설치 방법" },
+                        { "action": "message", "label": "2024", "messageText": "2024 버전 설치 방법" },
+                        { "action": "message", "label": "2023", "messageText": "2023 버전 설치 방법" },
+                        { "action": "message", "label": "2022", "messageText": "2022 버전 설치 방법" } ],
       "itemList": [ { "title": null, "description": null } ]    
     },
     "endCard": {

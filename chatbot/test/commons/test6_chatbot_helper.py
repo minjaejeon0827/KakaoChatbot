@@ -82,15 +82,23 @@ _remote_text = '아래 링크를 클릭하시면 원격 지원 프로그램 다�
 _ask_chatbot = f'챗봇 {_ask}'   # 챗봇 문의
 # _chatbotItem_Idx = 0   # [챗봇 문의] itemList "title", "description"
 
-# level2
+# TODO: level2 필요시 구현 예정 (2025.09.05 minjae)
+# level2 - 문의 유형
+
+# level3 
 _instSupport_adskProduct = f'{_adskProduct} {_instSupport}'   # Autodesk 제품 설치 지원
 _instSupport_boxProduct = f'{_boxProduct} {_instSupport}'   # 상상진화 BOX 제품 설치 지원
 # _ask_accountProduct = f'{_accountProduct} {_ask}'   # 계정 & 제품배정 문의
 
-# TODO: level3 필요시 구현 예정 (2025.09.05 minjae)
-# level3 - Autodesk 제품 버전 
+# TODO: level4 필요시 구현 예정 (2025.09.05 minjae)
+# level4 - Autodesk 제품 버전 
 # Language Pack 존재
 # Language Pack 존재 X
+
+# TODO: level5 필요시 추가 구현 예정 (2025.09.05 minjae)
+# level5 - Autodesk 제품 설치 언어
+# _langPack = 'Language Pack'
+# _instMethod = f'{_inst} 방법'
 
 # end - 마지막 화면
 
@@ -168,6 +176,7 @@ _boxVerReplies = 'boxVerReplies'
 # 카드 이름 (card Name)
 _startCard = 'startCard'
 _chatbotCard = 'chatbotCard'
+_subCatCard = 'subCatCard'
 _endCard = 'endCard'
 _surveyCard = 'surveyCard'
 

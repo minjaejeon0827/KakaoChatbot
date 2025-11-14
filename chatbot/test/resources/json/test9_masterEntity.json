@@ -71,7 +71,8 @@
         }
       },
       "buttons": [ { "action": null, "label": null, "messageText": null, "webLinkUrl": null } ],
-      "quickReplies": [ { "action": "message", "label": "2025, 2026", "messageText": "2025, 2026 버전 공통 설치 방법" } ],
+      "quickReplies": [ { "action": "message", "label": "2026", "messageText": "2026 버전 설치 방법" },
+                        { "action": "message", "label": "2025", "messageText": "2025 버전 설치 방법" } ],
       "itemList": [ { "title": null, "description": null } ]
     },
     "boxReplies": {
@@ -107,7 +108,11 @@
         }
       }, 
       "buttons": [ { "action": null, "label": null, "messageText": null, "webLinkUrl": null } ],
-      "quickReplies": [ { "action": "message", "label": "2022~2026", "messageText": "2022~2026 버전 공통 설치 방법" } ],
+      "quickReplies": [ { "action": "message", "label": "2026", "messageText": "2026 버전 설치 방법" },
+                        { "action": "message", "label": "2025", "messageText": "2025 버전 설치 방법" },
+                        { "action": "message", "label": "2024", "messageText": "2024 버전 설치 방법" },
+                        { "action": "message", "label": "2023", "messageText": "2023 버전 설치 방법" },
+                        { "action": "message", "label": "2022", "messageText": "2022 버전 설치 방법" } ],
       "itemList": [ { "title": null, "description": null } ]    
     },
     "endCard": {

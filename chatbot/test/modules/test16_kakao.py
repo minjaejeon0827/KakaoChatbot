@@ -67,7 +67,8 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
              __common_basicCard - [공통] 기본형 카드 (basicCard) 카카오톡 채팅방 전송
              __common_quickReplies - [공통] Autodesk or 상상진화 BOX 제품 설치 지원 바로가기 그룹 (quickReplies) 카카오톡 채팅방 전송
              __common_ver_quickReplies - [공통] Autodesk or 상상진화 BOX 제품 버전 바로가기 그룹 (quickReplies) 카카오톡 채팅방 전송
-             
+             __subCat_basicCard - 문의 유형 기본형 카드 (basicCard) 카카오톡 채팅방 전송
+
              __chatbot_carousel - 챗봇 문의 아이템형 케로셀 (carousel) 카카오톡 채팅방 전송
              __end_basicCard - 마지막화면 기본형 카드 (basicCard) 카카오톡 채팅방 전송
 
@@ -118,15 +119,18 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
             chatbot_helper._remote_text: lambda: self.__empty_response(master_datas[chatbot_helper._startCard]),   # level1 - 원격 지원
             chatbot_helper._ask_chatbot: lambda: self.__chatbot_carousel(master_datas[chatbot_helper._chatbotCard]),   # level1 - 챗봇 문의
             
-            chatbot_helper._instSupport_adskProduct: lambda: self.__common_quickReplies(master_datas[chatbot_helper._adskReplies]),   # level2 - Autodesk 제품 설치 지원
-            chatbot_helper._instSupport_boxProduct: lambda: self.__common_quickReplies(master_datas[chatbot_helper._boxReplies]),   # level2 - 상상진화 BOX 제품 설치 지원
+            chatbot_helper._adskProduct: lambda: self.__subCat_basicCard(userRequest_msg, master_datas[chatbot_helper._subCatCard]),   # level2 - 문의 유형 (Autodesk 제품)
+            chatbot_helper._boxProduct: lambda: self.__subCat_basicCard(userRequest_msg, master_datas[chatbot_helper._subCatCard]),   # level2 - 문의 유형 (상상진화 BOX 제품)
 
-            # level3 - 상상진화 BOX 제품 버전
+            chatbot_helper._instSupport_adskProduct: lambda: self.__common_quickReplies(master_datas[chatbot_helper._adskReplies]),   # level3 - Autodesk 제품 설치 지원
+            chatbot_helper._instSupport_boxProduct: lambda: self.__common_quickReplies(master_datas[chatbot_helper._boxReplies]),   # level3 - 상상진화 BOX 제품 설치 지원
+
+            # level4 - 상상진화 BOX 제품 버전
             chatbot_helper._revitBox: lambda: self.__common_ver_quickReplies(userRequest_msg, master_datas[chatbot_helper._boxVerReplies]),
             chatbot_helper._cadBox: lambda: self.__common_ver_quickReplies(userRequest_msg, master_datas[chatbot_helper._boxVerReplies]),
             chatbot_helper._energyBox: lambda: self.__common_ver_quickReplies(userRequest_msg, master_datas[chatbot_helper._boxVerReplies]),
 
-            # level3 - Autodesk 제품 버전
+            # level4 - Autodesk 제품 버전
             chatbot_helper._autoCAD: lambda: self.__common_ver_quickReplies(userRequest_msg, master_datas[chatbot_helper._adskVerReplies]),
             chatbot_helper._revit: lambda: self.__common_ver_quickReplies(userRequest_msg, master_datas[chatbot_helper._adskVerReplies]),
             chatbot_helper._navisworksManage: lambda: self.__common_ver_quickReplies(userRequest_msg, master_datas[chatbot_helper._adskVerReplies]),
@@ -594,8 +598,27 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
 
         return { "format": self.__quickReplies_format(master_data, quickReplies), "meta_data": master_data }
 
-    def __chatbot_carousel(self, master_data: dict[str, Any]) -> dict[str, Any]:
+    def __subCat_basicCard(self, userRequest_msg: str, master_data: dict[str, Any]) -> dict[str, Any]:
         """
+        Description: [private] 문의 유형 기본형 카드 (basicCard) 카카오톡 채팅방 전송
+
+        Parameters: self - 카카오 스킬 응답 템플릿 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
+                    userRequest_msg - 사용자 입력 채팅 메세지
+                    master_data - 특정 마스터 데이터
+
+        Returns: self.__basicCard_format(master_data, buttons) - 문의 유형 기본형 카드 json 포맷
+                 master_data - 특정 마스터 데이터
+        """
+
+        logger.info(f"[테스트] 문의 유형 기본형 카드 userRequest_msg: '{userRequest_msg}', master_data: '{master_data}'")
+
+        message_prefix = userRequest_msg
+        buttons = self.__create_buttons(master_data, message_prefix)
+
+        return { "format": self.__basicCard_format(master_data, buttons), "meta_data": master_data }
+
+    def __chatbot_carousel(self, master_data: dict[str, Any]) -> dict[str, Any]:
+        """  
         Description: [private] 챗봇 문의 아이템형 케로셀 (carousel) 카카오톡 채팅방 전송
 
         Parameters: self - 카카오 스킬 응답 템플릿 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
