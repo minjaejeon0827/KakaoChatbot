@@ -155,7 +155,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
             #                 '사유: 카카오 json 포맷 가져오기 오류 발생!!!\n'+
             #                 chatbot_helper._error_ssflex)   # 예외 발생시킴
 
-            # 브루트 포스 완전 탐색 알고리즘 (Brute Force Algorithm) - 무차별 대입법이라고 불리며, 문제를 해결하기 위해 가능한 경우의 수를 모두 검사(완전 탐색) 해보는 방법이다.
+            # 브루트 포스 완전 탐색 알고리즘 (Brute Force Algorithm) - 무차별 대입법이라고 불리며, 문제를 해결하기 위해 가능한 경우의 수를 모두 검사(완전 탐색)해보는 방법이다.
             # 참고 URL - https://ko.wikipedia.org/wiki/%EB%AC%B4%EC%B0%A8%EB%B3%84_%EB%8C%80%EC%9E%85_%EA%B2%80%EC%83%89
             # 참고 2 URL - https://wikidocs.net/233719
             # 참고 3 URL - https://youtu.be/QhMY4t2xwG0?si=uYsaL7CLHmx-RHV8
@@ -210,7 +210,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
             "version": "2.0",
             "template": {
                 "outputs": outputs,
-                "quickReplies": quickReplies
+                'quickReplies': quickReplies
             }
         }
     
@@ -228,7 +228,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
 
         outputs = []
 
-        if text:   # text에 할당된 값이 None 또는 공백("")이 아닌 경우 (None or Empty String Check)
+        if text:   # text에 할당된 값이 null 또는 공백("")이 아닌 경우 (None or Empty String Check)
             outputs.append({
                 "simpleText": {
                     "text": text
@@ -244,6 +244,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
 
     #     Parameters: self - 카카오 스킬 응답 템플릿 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
     #                 imageUrl - DALLE2 이미지 URL 주소 (default parameter)
+
     #                 prompt - 사용자가 카카오톡 채팅방에 그려 달라고 요청한 이미지 설명 (default parameter)
         
     #     Returns: self.__skillTemplate_format(outputs) - DALLE2 이미지 json 포맷
@@ -254,7 +255,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
     #     outputs = []
     #     output_text = prompt + "내용에 관한 이미지 입니다"
 
-    #     if imageUrl:   # imageUrl에 할당된 값이 None 또는 공백("")이 아닌 경우 (None or Empty String Check)
+    #     if imageUrl:   # imageUrl에 할당된 값이 null 또는 공백("")이 아닌 경우 (None or Empty String Check)
     #         outputs.append({
     #             "simpleImage": {
     #                 "imageUrl": imageUrl,
@@ -269,7 +270,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
     #       아래와 같은 오류 발생하여 해당 오류 해결하기 위해 None으로 리턴 되지 않도록 로직 보완 (2025.11.03 minjae)
     # 참고 URL - https://python.realjourney.co.kr/entry/OpenCV-TypeError-NoneType-object-is-not-subscriptable
     # 오류 메시지 - TypeError: 'NoneType' object is not subscriptable
-    # def error_text(error_msg: str | None = None, master_data: dict[str, Any] | None = None) -> dict[str, Any]:
+    # def error_text(error_msg: str | None = None, master_data: dict[str, Any] | None = None = None) -> dict[str, Any]:
     def error_text(self, error_msg: str | None = None) -> dict[str, Any]:
         """
         Description: [public] 오류 메세지 (error_msg) 카카오톡 채팅방 전송
@@ -285,7 +286,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
         outputs = []
         quickReplies = []
 
-        if error_msg:   # error_msg에 할당된 값이 None 또는 공백("")이 아닌 경우 (None or Empty String Check)
+        if error_msg:   # error_msg에 할당된 값이 null 또는 공백("")이 아닌 경우 (None or Empty String Check)
             outputs.append({
                 "simpleText": {
                     "text": error_msg
@@ -302,16 +303,17 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
 
         return self.__skillTemplate_format(outputs, quickReplies)
 
-    def timeover_quickReplies(self) -> dict[str, Any]:
+    def timeover_quickReplies(self, requestAgain_msg: str) -> dict[str, Any]:
         """
-        Description: [public] 챗봇 응답 제한 시간 5초 초과시 응답 재요청 메세지 (chatbot_helper._done_thinking) 카카오톡 채팅방 전송
+        Description: [public] 챗봇 응답 제한 시간 5초 초과시 응답 재요청 메세지 (requestAgain_msg) 카카오톡 채팅방 전송
 
         Parameters: self - 카카오 스킬 응답 템플릿 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
+                    requestAgain_msg - 응답 재요청 메세지
 
         Returns: self.__skillTemplate_format(outputs, quickReplies) - 응답 재요청 메세지 json 포맷
         """
 
-        logger.info(f"[테스트] 응답 재요청 메세지: '{chatbot_helper._done_thinking}'")
+        logger.info(f"[테스트] 응답 재요청 requestAgain_msg: '{requestAgain_msg}'")
 
         outputs = []
         quickReplies = []
@@ -324,8 +326,8 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
 
         quickReplies.append({
             "action": chatbot_helper._message,
-            "label": chatbot_helper._done_thinking,
-            "messageText": chatbot_helper._done_thinking
+            "label": requestAgain_msg,
+            "messageText": requestAgain_msg
         })
 
         return self.__skillTemplate_format(outputs, quickReplies)
@@ -335,7 +337,8 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
         Description: [private] 바로가기 그룹 (quickReplies) json 포맷
 
         Parameters: self - 카카오 스킬 응답 템플릿 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
-                    master_data - 특정 마스터 데이터 (default parameter)                    
+                    master_data - 특정 마스터 데이터 (default parameter)
+                    
                     quickReplies - 바로가기 그룹 버튼 리스트 (label + messageText) (default parameter)
 
         Returns: self.__skillTemplate_format(outputs, quickReplies) - 바로가기 그룹 json 포맷
@@ -345,14 +348,14 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
 
         outputs = []
 
-        # 아래 주석친 코드 처럼 master_data[chatbot_helper._text]에 할당된 값이 None 또는 공백("")일 경우 바로가기 그룹이 카카오톡 채팅방에 출력 안되는 오류 발생함.
+        # 아래 주석친 코드 처럼 master_data[chatbot_helper._text]에 할당된 값이 null 또는 공백("")일 경우 바로가기 그룹이 카카오톡 채팅방에 출력 안되는 오류 발생함.
         # master_data[chatbot_helper._text] = None
-        # 하여 None 또는 공백("")이 아닌 문자열로 할당 해야함. (2025.11.03 minjae)
+        # 하여 null 또는 공백("")이 아닌 문자열로 할당 해야함. (2025.11.03 minjae)
         # 참고 URL - https://stackoverflow.com/questions/9573244/how-to-check-if-the-string-is-empty-in-python
         # 참고 2 URL - https://hello-bryan.tistory.com/131
         # 참고 3 URL - https://jino-dev-diary.tistory.com/42
         # 참고 4 URL - https://claude.ai/chat/eaf7856e-1b5e-4c26-992e-de1683005638
-        if master_data[chatbot_helper._text]:   # master_data[chatbot_helper._text]에 할당된 값이 None 또는 공백("")이 아닌 경우 (None or Empty String Check)
+        if master_data[chatbot_helper._text]:   # master_data[chatbot_helper._text]에 할당된 값이 null 또는 공백("")이 아닌 경우 (None or Empty String Check)
             outputs.append({
                 "simpleText": {
                     "text": master_data[chatbot_helper._text]
@@ -367,6 +370,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
 
         Parameters: self - 카카오 스킬 응답 템플릿 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
                     master_data - 특정 마스터 데이터 (default parameter)
+
                     buttons - 버튼 리스트 (label + messageText) (default parameter)
 
         Returns: self.__skillTemplate_format(outputs) - 텍스트 카드 json 포맷
@@ -392,6 +396,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
 
         Parameters: self - 카카오 스킬 응답 템플릿 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
                     master_data - 특정 마스터 데이터 (default parameter)
+
                     buttons - 버튼 리스트 (label + messageText) (default parameter)
 
         Returns: self.__skillTemplate_format(outputs) - 기본형 카드 json 포맷
@@ -401,13 +406,13 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
 
         outputs = []
 
-        # master_data[chatbot_helper._text]에 할당된 값이 None 또는 공백("")일 경우 basicCard 가 카카오톡 채팅방에 출력 안되는 오류 발생함. 
-        # 하여 None 또는 공백("")이 아닌 문자열로 할당 해야함. (2025.09.03 minjae)
+        # master_data[chatbot_helper._text]에 할당된 값이 null 또는 공백("")일 경우 basicCard 가 카카오톡 채팅방에 출력 안되는 오류 발생함. 
+        # 하여 null 또는 공백("")이 아닌 문자열로 할당 해야함. (2025.09.03 minjae)
         # 참고 URL - https://stackoverflow.com/questions/9573244/how-to-check-if-the-string-is-empty-in-python
         # 참고 2 URL - https://hello-bryan.tistory.com/131
         # 참고 3 URL - https://jino-dev-diary.tistory.com/42
         # 참고 4 URL - https://claude.ai/chat/eaf7856e-1b5e-4c26-992e-de1683005638
-        if master_data[chatbot_helper._text]:   # master_data[chatbot_helper._text]에 할당된 값이 None 또는 공백("")이 아닌 경우 (None or Empty String Check)
+        if master_data[chatbot_helper._text]:   # master_data[chatbot_helper._text]에 할당된 값이 null 또는 공백("")이 아닌 경우 (None or Empty String Check)
             outputs.append({
                 "simpleText": {
                     "text": master_data[chatbot_helper._text]
@@ -431,6 +436,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
 
         Parameters: self - 카카오 스킬 응답 템플릿 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
                     master_data - 특정 마스터 데이터 (default parameter)
+
                     items - 아이템 리스트 (imageTitle + thumbnail + itemList 등등 ...) (default parameter)
 
         Returns: self.__skillTemplate_format(outputs) - 아이템형 케로셀 json 포맷 
@@ -440,7 +446,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
 
         outputs = []
 
-        if master_data[chatbot_helper._text]:   # master_data[chatbot_helper._text]에 할당된 값이 None 또는 공백("")이 아닌 경우 (None or Empty String Check)
+        if master_data[chatbot_helper._text]:   # master_data[chatbot_helper._text]에 할당된 값이 null 또는 공백("")이 아닌 경우 (None or Empty String Check)
             outputs.append({
                 "simpleText": {
                     "text": master_data[chatbot_helper._text]
@@ -461,7 +467,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
         Description: [private] 비어있는 메세지 카카오톡 채팅방 전송 (기술지원 문의 제외 일반 문의 또는 응답 메시지 출력하고 싶지 않은 경우 모두 해당)
 
         Parameters: self - 카카오 스킬 응답 템플릿 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
-                    master_data - 특정 마스터 데이터 (default parameter)
+                    master_data - 특정 마스터 데이터
 
         Returns: { "format": empty_format, "meta_data": master_data } - 비어있는 메세지 json 포맷
         """
@@ -477,7 +483,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
         Description: [private] [공통] 버튼 리스트 생성
 
         Parameters: self - 카카오 스킬 응답 템플릿 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
-                    master_data - 특정 마스터 데이터 (default parameter)
+                    master_data - 특정 마스터 데이터
                     message_prefix - 버튼 messageText 접두사 (default parameter)
 
         Returns: buttons - [공통] 버튼 리스트 (label + messageText)
@@ -487,19 +493,19 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
 
         buttons = []
 
-        # 브루트 포스 완전 탐색 알고리즘 (Brute Force Algorithm) - 무차별 대입법이라고 불리며, 문제를 해결하기 위해 가능한 경우의 수를 모두 검사(완전 탐색) 해보는 방법이다.
+        # 브루트 포스 완전 탐색 알고리즘 (Brute Force Algorithm) - 무차별 대입법이라고 불리며, 문제를 해결하기 위해 가능한 경우의 수를 모두 검사(완전 탐색)해보는 방법이다.
         # 참고 URL - https://ko.wikipedia.org/wiki/%EB%AC%B4%EC%B0%A8%EB%B3%84_%EB%8C%80%EC%9E%85_%EA%B2%80%EC%83%89
         # 참고 2 URL - https://wikidocs.net/233719
         # 참고 3 URL - https://youtu.be/QhMY4t2xwG0?si=uYsaL7CLHmx-RHV8
         for button in master_data[chatbot_helper._buttons]:   # [공통] 버튼 텍스트 및 메세지 추가
-            if button[chatbot_helper._webLinkUrl]:   # button[chatbot_helper._webLinkUrl]에 할당된 값이 None 또는 공백("")이 아닌 경우 (None or Empty String Check)
+            if button[chatbot_helper._webLinkUrl]:   # button[chatbot_helper._webLinkUrl]에 할당된 값이 null 또는 공백("")이 아닌 경우 (None or Empty String Check)
                 buttons.append({
                     "action": button[chatbot_helper._action],
                     "label": button[chatbot_helper._label],
                     "webLinkUrl": button[chatbot_helper._webLinkUrl]
                 })
                 
-            else:   # button[chatbot_helper._webLinkUrl]에 할당된 값이 None 또는 공백("")인 경우
+            else:   # button[chatbot_helper._webLinkUrl]에 할당된 값이 null 또는 공백("")인 경우
                 messageText = f"{message_prefix} {button[chatbot_helper._messageText]}" if message_prefix else button[chatbot_helper._messageText]
                 buttons.append({
                     "action": button[chatbot_helper._action],
@@ -514,7 +520,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
         Description: [private] [공통] 바로가기 그룹 (quickReplies) 버튼 리스트 생성
 
         Parameters: self - 카카오 스킬 응답 템플릿 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
-                    master_data - 특정 마스터 데이터 (default parameter)
+                    master_data - 특정 마스터 데이터
                     message_prefix - 버튼 messageText 접두사 (default parameter)
 
         Returns: quickReplies - [공통] 바로가기 그룹 버튼 리스트 (label + messageText)
@@ -524,7 +530,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
 
         quickReplies = []
 
-        # 브루트 포스 완전 탐색 알고리즘 (Brute Force Algorithm) - 무차별 대입법이라고 불리며, 문제를 해결하기 위해 가능한 경우의 수를 모두 검사(완전 탐색) 해보는 방법이다.
+        # 브루트 포스 완전 탐색 알고리즘 (Brute Force Algorithm) - 무차별 대입법이라고 불리며, 문제를 해결하기 위해 가능한 경우의 수를 모두 검사(완전 탐색)해보는 방법이다.
         # 참고 URL - https://ko.wikipedia.org/wiki/%EB%AC%B4%EC%B0%A8%EB%B3%84_%EB%8C%80%EC%9E%85_%EA%B2%80%EC%83%89
         # 참고 2 URL - https://wikidocs.net/233719
         # 참고 3 URL - https://youtu.be/QhMY4t2xwG0?si=uYsaL7CLHmx-RHV8
@@ -543,7 +549,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
         Description: [private] [공통] 기본형 카드 (basicCard) 카카오톡 채팅방 전송
 
         Parameters: self - 카카오 스킬 응답 템플릿 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
-                    master_data - 특정 마스터 데이터 (default parameter)
+                    master_data - 특정 마스터 데이터
 
         Returns: self.__basicCard_format(master_data, buttons) - [공통] 기본형 카드 json 포맷
                  master_data - 특정 마스터 데이터
@@ -560,7 +566,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
         Description: [private] [공통] Autodesk or 상상진화 BOX 제품 설치 지원 바로가기 그룹 (quickReplies) 카카오톡 채팅방 전송
 
         Parameters: self - 카카오 스킬 응답 템플릿 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
-                    master_data - 특정 마스터 데이터 (default parameter)
+                    master_data - 특정 마스터 데이터
 
         Returns: self.__quickReplies_format(master_data, quickReplies) - [공통] Autodesk or 상상진화 BOX 제품 설치 지원 바로가기 그룹 json 포맷
                  master_data - 특정 마스터 데이터
@@ -596,7 +602,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
         Description: [private] 챗봇 문의 아이템형 케로셀 (carousel) 카카오톡 채팅방 전송
 
         Parameters: self - 카카오 스킬 응답 템플릿 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
-                    master_data - 특정 마스터 데이터 (default parameter)
+                    master_data - 특정 마스터 데이터
 
         Returns: self.__carousel_format(master_data, chatbot_items) - 챗봇 문의 아이템형 케로셀 json 포맷
                  master_data - 특정 마스터 데이터
@@ -638,7 +644,8 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
         Parameters: self - 카카오 스킬 응답 템플릿 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
                     userRequest_msg - 사용자 입력 채팅 메세지 (default parameter)
                     master_data - 특정 마스터 데이터 (default parameter)
-                    endInfos - 특정 기술지원 정보 리스트 (예) Autodesk or 상상진화 BOX 제품 설치 지원 등등... (default parameter) 
+
+                    endInfos - 특정 기술지원 정보 리스트 (예) Autodesk or 상상진화 BOX 제품 설치 지원 등등...
 
         Returns: self.__skillTemplate_format(outputs) - 마지막화면 기본형 카드 json 포맷
                  master_data - 특정 마스터 데이터
@@ -649,12 +656,12 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
         outputs = []
         buttons = []
 
-        # 브루트 포스 완전 탐색 알고리즘 (Brute Force Algorithm) - 무차별 대입법이라고 불리며, 문제를 해결하기 위해 가능한 경우의 수를 모두 검사(완전 탐색) 해보는 방법이다.
+        # 브루트 포스 완전 탐색 알고리즘 (Brute Force Algorithm) - 무차별 대입법이라고 불리며, 문제를 해결하기 위해 가능한 경우의 수를 모두 검사(완전 탐색)해보는 방법이다.
         # 참고 URL - https://ko.wikipedia.org/wiki/%EB%AC%B4%EC%B0%A8%EB%B3%84_%EB%8C%80%EC%9E%85_%EA%B2%80%EC%83%89
         # 참고 2 URL - https://wikidocs.net/233719
         # 참고 3 URL - https://youtu.be/QhMY4t2xwG0?si=uYsaL7CLHmx-RHV8
         # 오류 메시지 "string indices must be integers, not 'str'" 출력되어 아래처럼 코드 변경 처리함. (2025.08.28 minjae)
-        # (기존) master_data -> (변경) master_data[chatbot_helper._buttons]
+        # (기존) master_data -> (변경) master_data[chatbot_helper._buttons]  
         for endButton in master_data[chatbot_helper._buttons]:   # 처음으로, 동영상 버튼 텍스트 및 메세지 추가
             if chatbot_helper._video == endButton[chatbot_helper._label]:   # 버튼 '동영상'인 경우
                 for endInfo in endInfos:
@@ -665,7 +672,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
                             "webLinkUrl": endInfo[chatbot_helper._webLinkUrl]
                         })
 
-                        if endInfo[chatbot_helper._text]:   # endInfo[chatbot_helper._text]에 할당된 값이 None 또는 공백("")이 아닌 경우 (None or Empty String Check)
+                        if endInfo[chatbot_helper._text]:   # endInfo[chatbot_helper._text]에 할당된 값이 null 또는 공백("")이 아닌 경우 (None or Empty String Check)
                             outputs.append({
                                 "simpleText": {
                                     "text": endInfo[chatbot_helper._text]
