@@ -21,6 +21,7 @@ from commons import chatbot_helper   # 챗봇 전용 도움말 텍스트
 # 2. singleton 모듈을 log 모듈 보다 먼저 import 
 from modules import test
 from modules.singleton import MasterEntity   # 싱글톤(singleton) 패턴
+from modules.chatbot_enum import EnumValidator   # 데이터 유효성 검사
 
 # 3. singleton 모듈이 먼저 초기화된 후 log 모듈 import 
 from modules.log import logger   # 챗봇 전역 로그 객체(logger)
@@ -218,7 +219,8 @@ def chatbot_response(kakao_request, res_queue, file_name):
         elif '/error'== userRequest_msg:   # 오류 테스트
             raise Exception("사유: 오류 테스트!")
 
-        elif True == masterEntity.get_isValid:   # 마스터 데이터 유효성 검사 결과 성공한 경우
+        # elif True == masterEntity.get_isValid:   # 마스터 데이터 유효성 검사 결과 성공한 경우
+        elif EnumValidator.EXISTENCE == masterEntity.get_isValid:   # 마스터 데이터 유효성 검사 결과 성공한 경우
             # response, master_data = kakao.get_response(userRequest_msg, masterEntity)
             # response_data = kakao.get_response(userRequest_msg, masterEntity)
             # TODO: 아래 코드 실행시 오류 메시지 "KakaoResponseFormatter.get_response() takes 2 positional arguments but 3 were given" 출력되어 코드 변경 처리 (2025.11.07 minjae)

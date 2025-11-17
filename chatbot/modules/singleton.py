@@ -27,37 +27,7 @@ from zoneinfo import ZoneInfo    # 대한민국 표준시 설정
 # 2. [ERROR] Runtime.ImportModuleError: Unable to import module 'lambda_function': cannot import name 'KSTFormatter' from partially initialized module 'modules.singleton' (most likely due to a circular import) (/var/task/modules/singleton.py)Traceback (most recent call last):
 # from modules.log import logger   # 챗봇 전역 로그 객체(logger)
 from restAPI import chatbot_restServer   # 챗봇 웹서버 Rest API 메서드
-from enum import Enum    # Enum 열거형 구조체
-
-class EnumValidator(Enum):   # 명시적으로 Enum 클래스 상속
-    """
-    Description: 데이터 유효성 검사 Enum 열거형 구조체 클래스
-                 참고 URL - https://docs.python.org/ko/3.9/library/enum.html#functional-api
-                 참고 2 URL - https://wikidocs.net/105486
-
-    Attributes: NOT_EXISTENCE (int) - 데이터 존재 안 함. (default: 0)
-                EXISTENCE (int) - 데이터 존재함. (default: 1)
-                VALIDATION_ERROR (int) - 데이터 유효성 검사 오류 (default: 2)
-                DATA_TYPE_MISMATCH (int) - 데이터 타입 불일치 (default: 3)
-    """
-
-    NOT_EXISTENCE = 0
-    EXISTENCE = 1
-    VALIDATION_ERROR = 2
-    DATA_TYPE_MISMATCH = 3
-
-    @classmethod
-    def to_str(_class, value) -> str:
-        """
-        Description: Enum 열거형 구조체 멤버변수 값을 사람이 읽기 쉬운 문자열로 변환
-
-        Parameters: _class - 데이터 유효성 검사 Enum 열거형 구조체 클래스 (EnumValidator)
-                    value - Enum 열거형 구조체 멤버변수 값
-
-        Returns: 데이터 존재 여부 문자열 
-        """
-        
-        return "데이터 존재함." if value == _class.EXISTENCE else "데이터 존재 안 함."
+from modules.chatbot_enum import EnumValidator   # 데이터 유효성 검사
 
 class SingletonBase:
     """
@@ -81,7 +51,7 @@ class SingletonBase:
     Methods: 없음.
 
     Notes: - 싱글톤 (singleton) 패턴으로 구현되어 여러 번 인스턴스 (Instance) 생성해도 동일한 객체 반환
-           - 아마존 웹서비스 람다 함수 (AWS Lambda function) 환경에서는 단일 스레드(single thread)로 실행되므로 스레드 락(_lock = threading.Lock()) 불필요
+           - 아마존 웹서비스 람다 함수 (AWS Lambda function) 환경에서는 단일 스레드 (single thread)로 실행되므로 스레드 락 (_lock = threading.Lock()) 불필요
            _lock = threading.Lock()   # _lock = threading.Lock() 용도 - 일반적인 Python 응용 프로그램 환경에서 여러 스레드가 동시에 싱글톤 (singleton) 클래스 인스턴스 (Instance)를 생성하려 할 때 또는 Race condition으로 인해 여러 인스턴스 (Instance)가 생성될 가능성이 있을 때 사용함.
     """
     def __new__(_class, *args: tuple, **kwargs: dict) -> Self:
@@ -144,16 +114,19 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
                            get_isValid (bool) - 마스터 데이터 유효성 검사 결과 가져오기
 
     Methods: initSettingAsync - 마스터 데이터 초기 설정
-             isValidator - 마스터 데이터 유효성 검사
+             __isValidator - 마스터 데이터 유효성 검사
 
     Notes: - 싱글톤 (singleton) 패턴으로 구현되어 여러 번 인스턴스 (Instance) 생성해도 동일한 객체 반환
-           - 아마존 웹서비스 람다 함수 (AWS Lambda function) 환경에서는 단일 스레드(single thread)로 실행되므로 스레드 락(_lock = threading.Lock()) 불필요
+           - 아마존 웹서비스 람다 함수 (AWS Lambda function) 환경에서는 단일 스레드 (single thread)로 실행되므로 스레드 락 (_lock = threading.Lock()) 불필요
            _lock = threading.Lock()   # _lock = threading.Lock() 용도 - 일반적인 Python 응용 프로그램 환경에서 여러 스레드가 동시에 싱글톤 (singleton) 클래스 인스턴스 (Instance)를 생성하려 할 때 또는 Race condition으로 인해 여러 인스턴스 (Instance)가 생성될 가능성이 있을 때 사용함.
     """
 
     # _lock = threading.Lock()   # _lock = threading.Lock() 용도 - 일반적인 Python 응용 프로그램 환경에서 여러 스레드가 동시에 싱글톤 (singleton) 클래스 인스턴스 (Instance)를 생성하려 할 때 또는 Race condition으로 인해 여러 인스턴스 (Instance)가 생성될 가능성이 있을 때 사용함.
+    __master_datas: dict[str, Any]
+    __valid_targets: list[str]
+    __isValid: EnumValidator    
 
-    def __init__(self, valid_targets: list[str]) -> None:
+    def __init__(self, valid_targets: list[str] | None = None) -> None:
         """
         Description: 생성된 객체 초기화
 
@@ -164,7 +137,7 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
                      참고 URL - https://docs.python.org/ko/3.6/reference/datamodel.html#object.__init__
 
         Parameters: self - 마스터 데이터 싱글톤 (singleton) 클래스 (MasterEntity) 인스턴스 (Instance)
-                    valid_targets - 마스터 데이터 유효성 검사 대상 리스트
+                    valid_targets - 마스터 데이터 유효성 검사 대상 리스트 (default parameter)
 
         Returns: 없음. 
         """
@@ -185,8 +158,8 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
             
             if True == loop.is_running():   # 이벤트 루프 (event loop) 현재 실행 중인 경우
                 chatbot_logger.info("[테스트] 아마존 웹서비스 람다 함수 (AWS Lambda function) 내부 이벤트 루프 (event loop) 실행 중!")
-                loop.create_task(self.initSettingAsync(valid_targets))   # 코루틴(coroutine)을 Task로 감싸고 비동기 메서드 실행 예약 및 Task 객체 반환
-            else: asyncio.run(self.initSettingAsync(valid_targets))   # 이벤트 루프(asyncio.run) 실행하여 비동기 메서드 self.initSettingAsync(valid_targets) 호출
+                loop.create_task(self.__initSettingAsync(valid_targets))   # 코루틴(coroutine)을 Task로 감싸고 비동기 메서드 실행 예약 및 Task 객체 반환
+            else: asyncio.run(self.__initSettingAsync(valid_targets))   # 이벤트 루프(asyncio.run) 실행하여 비동기 메서드 self.initSettingAsync(valid_targets) 호출
 
             chatbot_logger.info("[테스트] MasterEntity __init__ 메서드 - 호출 완료!")
             _class._init = True   # 초기화 완료
@@ -209,12 +182,12 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
 
     # TODO: setter 메서드 set_master_datas 필요시 사용 예정 (2025.09.15 minjae)
     # @get_master_datas.setter
-    # def set_master_datas(self, master_datas: dict[str, Any]) -> None:
+    # def set_master_datas(self, master_datas: dict[str, Any] | None = None) -> None:
     #     """
     #     Description: 전체 마스터 데이터 설정  
 
     #     Parameters: self - 마스터 데이터 싱글톤 (singleton) 클래스 (MasterEntity) 인스턴스 (Instance)
-    #                 master_datas - 전체 마스터 데이터 
+    #                 master_datas - 전체 마스터 데이터 (default parameter) 
 
     #     Returns: 없음.
     #     """
@@ -235,12 +208,12 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
 
     # TODO: setter 메서드 set_valid_targets 필요시 사용 예정 (2025.09.15 minjae)
     # @get_valid_targets.setter
-    # def set_valid_targets(self, valid_targets: list[str]) -> None:
+    # def set_valid_targets(self, valid_targets: list[str] | None = None) -> None:
     #     """
     #     Description: 마스터 데이터 유효성 검사 대상 리스트 설정 
 
     #     Parameters: self - 마스터 데이터 싱글톤 (singleton) 클래스 (MasterEntity) 인스턴스 (Instance)
-    #                 valid_targets - 마스터 데이터 유효성 검사 대상 리스트
+    #                 valid_targets - 마스터 데이터 유효성 검사 대상 리스트 (default parameter)
 
     #     Returns: 없음. 
     #     """
@@ -248,7 +221,7 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
     #     self.__valid_targets = valid_targets
 
     @cached_property
-    def get_isValid(self) -> bool:
+    def get_isValid(self) -> EnumValidator:
         """
         Description: 마스터 데이터 유효성 검사 결과 가져오기
 
@@ -261,24 +234,24 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
 
     # TODO: setter 메서드 set_isValid 필요시 사용 예정 (2025.09.15 minjae)
     # @get_isValid.setter
-    # def set_isValid(self, isValid: bool) -> None:
+    # def set_isValid(self, isValid: EnumValidator | None = None) -> None:
     #     """
     #     Description: 마스터 데이터 유효성 검사 결과 설정 
 
     #     Parameters: self - 마스터 데이터 싱글톤 (singleton) 클래스 (MasterEntity) 인스턴스 (Instance)
-    #                 isValid - 마스터 데이터 유효성 검사 결과
+    #                 isValid - 마스터 데이터 유효성 검사 결과 (default parameter)
 
     #     Returns: 없음. 
     #     """
         
     #     self.__isValid = isValid
 
-    async def initSettingAsync(self, valid_targets: list[str]) -> None:
+    async def __initSettingAsync(self, valid_targets: list[str] | None = None) -> None:
         """
-        Description: 마스터 데이터 초기 설정
+        Description: [private] 마스터 데이터 초기 설정
 
         Parameters: self - 마스터 데이터 싱글톤 (singleton) 클래스 (MasterEntity) 인스턴스 (Instance)  
-                    valid_targets - 마스터 데이터 유효성 검사 대상 리스트
+                    valid_targets - 마스터 데이터 유효성 검사 대상 리스트 (default parameter)
 
         Returns: 없음.
         """
@@ -290,22 +263,24 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
             chatbot_logger.info(f"[테스트] chatbot_restServer.get_masterDownLoadAsync 함수 속성 __doc__ 사용 및 docstring 내용 확인 - {chatbot_restServer.get_masterDownLoadAsync.__doc__}")
 
             self.__master_datas = await chatbot_restServer.get_masterDownLoadAsync(chatbot_helper._masterEntity_json_file_path)   # 전체 마스터 데이터 다운로드
-            self.__valid_targets = valid_targets
-            self.__isValid = self.isValidator()
+            self.__valid_targets = valid_targets if len(valid_targets) >= EnumValidator.EXISTENCE.value else None
+            self.__isValid = self.__isValidator()
  
             chatbot_logger.info("[테스트] 마스터 데이터 초기 설정 결과 - 완료!")
 
         except (KeyError, ValueError, TypeError) as e:
             valid_error_msg = str(e)
             chatbot_logger.error(f"[테스트] 데이터 유효성 오류 - {valid_error_msg}")
+            self.__isValid = EnumValidator.VALIDATION_ERROR
         except Exception as e:
             sys_error_msg = str(e)
             chatbot_logger.critical(f"[테스트] 시스템 오류 - {sys_error_msg}")
+            self.__isValid = EnumValidator.NOT_EXISTENCE
 
-    # TODO: 추후 필요시 아래 메서드 isValidator 로직 수정 예정 (2025.09.02 minjae)
-    def isValidator(self) -> bool:
+    # TODO: 추후 필요시 아래 메서드 __isValidator 로직 수정 예정 (2025.09.02 minjae)
+    def __isValidator(self) -> EnumValidator:
         """
-        Description: 마스터 데이터 유효성 검사
+        Description: [private] 마스터 데이터 유효성 검사
                      참고 URL - https://chatgpt.com/c/68017acc-672c-8010-8649-7fa39f17d834
 
         Parameters: self - 마스터 데이터 싱글톤 (singleton) 클래스 (MasterEntity) 인스턴스 (Instance)
@@ -320,8 +295,11 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
             chatbot_logger.info(f"[테스트] 마스터 데이터 유효성 검사 대상 리스트 - {valid_targets}")
             chatbot_logger.info("[테스트] 마스터 데이터 유효성 검사 - 시작!")
 
-            if None is master_datas:    
+            if None is master_datas:
                 raise Exception("전체 마스터 데이터 로드 실패!")
+            
+            if None is valid_targets:
+                raise Exception("데이터 유효성 검사 오류")
             
             # 그리디 알고리즘 (Greedy Algorithm) - 탐욕법이라고 불리며, 현재 상황에서 지금 당장 좋은 것만 고르는 방법이다.
             # 참고 URL - https://youtu.be/5OYlS2QQMPA?si=LzCRpZvGmEXI5Ean
@@ -338,20 +316,20 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
                         # 파이썬 함수 len 사용하여 문자열, 리스트 객체 길이 구하기
                         # 참고 URL - https://docs.python.org/ko/3/library/functions.html#len                               
                         if (None is child_value or EnumValidator.NOT_EXISTENCE.value >= len(child_value)):   # child_value 값이 존재하지 않거나(None) 길이가 0보다 작거나 같은 경우 
-                            chatbot_logger.info("[테스트] 마스터 데이터 유효성 검사 결과 - 오류!")
-                            return False
+                            chatbot_logger.info("[테스트] 마스터 데이터 존재 안 함.")
+                            return EnumValidator.NOT_EXISTENCE
 
             chatbot_logger.info("[테스트] 마스터 데이터 유효성 검사 결과 - 완료!")
-            return True
+            return EnumValidator.EXISTENCE
         
         except (KeyError, ValueError, TypeError) as e:
             valid_error_msg = str(e)
             chatbot_logger.error(f"[테스트] 데이터 유효성 오류 - {valid_error_msg}")
-            return False
+            return EnumValidator.VALIDATION_ERROR
         except Exception as e:
             sys_error_msg = str(e)
             chatbot_logger.critical(f"[테스트] 시스템 오류 - {sys_error_msg}")
-            return False
+            return EnumValidator.NOT_EXISTENCE
                 
 # class KSTFormatter(logging.Formatter):   # 명시적으로 logging.Formatter 클래스 상속
 class KSTFormatter(SingletonBase, logging.Formatter):   # 상속 구조 단순화 하기 위해 명시적으로 SingletonBase, logging.Formatter 클래스 다중 상속
@@ -380,7 +358,7 @@ class KSTFormatter(SingletonBase, logging.Formatter):   # 상속 구조 단순�
     Notes: 사용 예시: formatter = KSTFormatter('[%(levelname)s] [%(asctime)s] [%(filename)s | %(funcName)s - L%(lineno)d]: %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
 
            - 싱글톤 패턴으로 구현되어 여러 번 인스턴스를 생성해도 동일한 객체 반환
-           - 아마존 웹서비스 람다 함수 (AWS Lambda function) 환경에서는 단일 스레드(single thread)로 실행되므로 스레드 락(_lock = threading.Lock()) 불필요
+           - 아마존 웹서비스 람다 함수 (AWS Lambda function) 환경에서는 단일 스레드 (single thread)로 실행되므로 스레드 락 (_lock = threading.Lock()) 불필요
            _lock = threading.Lock()   # _lock = threading.Lock() 용도 - 일반적인 Python 응용 프로그램 환경에서 여러 스레드가 동시에 싱글톤 (singleton) 클래스 인스턴스 (Instance)를 생성하려 할 때 또는 Race condition으로 인해 여러 인스턴스 (Instance)가 생성될 가능성이 있을 때 사용함.
     """
     
@@ -444,7 +422,7 @@ class KSTFormatter(SingletonBase, logging.Formatter):   # 상속 구조 단순�
 
     #     self.__kst = kst
         
-    def formatTime(self, record: logging.LogRecord, datefmt: str = None) -> str:
+    def formatTime(self, record: logging.LogRecord, datefmt: str | None = None) -> str:
         """
         Description: LogRecord (record)의 생성 시간 (현재 날짜 및 시간)을 대한민국 표준시로 변환하여 포맷된 문자열 가져오기
                      아래 코드처럼 매개변수 record 생략하고 구현시 오류 발생하여 매개변수 record 작성 필수! (2025.09.18 minjae)
@@ -520,11 +498,14 @@ class KSTFormatter(SingletonBase, logging.Formatter):   # 상속 구조 단순�
 * 7. Type Hints class Any
 참고 URL - https://docs.python.org/ko/3.9/library/typing.html#the-any-type
 
-* 8. 리스트 컴프리헨션 문법
+* 8. Union Type
+참고 URL - https://docs.python.org/ko/3.11/library/stdtypes.html#types-union
+
+* 9. 리스트 컴프리헨션 문법
 참고 URL - https://docs.python.org/ko/3.13/tutorial/datastructures.html#list-comprehensions
 참고 2 URL - https://claude.ai/chat/a6e38078-6a1f-4c67-a1f2-442f04d86938
 
-* 9. 용어 정리
+* 10. 용어 정리
 Argument (인자) - 함수를 호출할 때 함수 (또는 메서드)로 전달되는 값.
 Parameter (매개변수) - 함수 (또는 메서드) 정의에서 함수가 받을 수 있는 인자 (또는 어떤 경우 인자들)를 지정하는 이름 붙은 엔티티
 Attribute (어트리뷰트) - 흔히 점표현식을 사용하는 이름으로 참조되는 객체와 결합한 값. (예를 들어, 객체 o가 어트리뷰트 a를 가지면, o.a처럼 참조)
@@ -533,7 +514,7 @@ Attribute (어트리뷰트) - 흔히 점표현식을 사용하는 이름으로 �
 참고 3 URL - https://peps.python.org/pep-3102/
 참고 4 URL - https://leffept.tistory.com/418
 
-* 10. 가변인자 *args / **kwargs
+* 11. 가변인자 *args / **kwargs
 *args - 위치 가변 인자라고 불리며, 함수를 정의할 때 인자값의 개수를 가변적으로 정의해주는 기능이며, 함수 호출부에서 서로 다른 개수의 인자를 전달하고자 할 때 가변 인자 (Variable argument) 사용함. (예) foo(1, 2, 3), foo(1, 2, 3, 4) 
         함수 호출시 args라는 변수는 여러 개의 입력에 대해 튜플 (tuple)로 저장한 후 이 튜플 (tuple) 객체를 바인딩한다. (예) (1, 2, 3), (1, 2, 3, 4)
 **kwargs - 키워드 가변 인자라고 불리며, keyword arguments의 약어(kwargs)이다. 예를들어 함수 호출부에서 a=1, b=2, c=3과 어떤 키워드와 해당 키워드에 값을 전달힌다. (예) foo(a=1, b=2, c=3)
@@ -541,11 +522,11 @@ Attribute (어트리뷰트) - 흔히 점표현식을 사용하는 이름으로 �
 참고 URL - https://wikidocs.net/69363
 참고 2 URL - https://claude.ai/chat/601e10e4-39ad-48fe-aa73-7070ba600f3d
 
-* 11. setter / getter 
+* 12. setter / getter 
 파이썬에서 class 지원하기 때문에 setter / getter 또한 지원함.
 참고 URL - https://wikidocs.net/21053
 
-* 12. 비동기 프로그래밍 asyncio (asyncio는 async / await 구문을 사용하여 동시성 코드를 작성하는 라이브러리이다.)
+* 13. 비동기 프로그래밍 asyncio (asyncio는 async / await 구문을 사용하여 동시성 코드를 작성하는 라이브러리이다.)
 참고 URL - https://docs.python.org/3/library/asyncio.html
 참고 2 URL - https://docs.python.org/ko/3/library/asyncio-task.html
 참고 3 URL - https://dojang.io/mod/page/view.php?id=2469

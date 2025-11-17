@@ -193,7 +193,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
             logger.critical(f"[테스트] 시스템 오류 - {sys_error_msg}", exc_info=True)
             raise
 
-    def __skillTemplate_format(self, outputs: list[dict] | None = [], quickReplies: list[dict] | None = []) -> dict[str, Any]:
+    def __skillTemplate_format(self, outputs: list[dict] | None = None, quickReplies: list[dict] | None = None) -> dict[str, Any]:
         """
         Description: [private] 스킬 응답 템플릿 json 포맷
 
