@@ -17,7 +17,7 @@ import logging   # 로그 기록
 import asyncio   # 비동기 프로그래밍 (async - await) 
 
 from functools import cached_property
-from datetime import datetime, timezone
+from datetime import datetime
 from zoneinfo import ZoneInfo    # 대한민국 표준시 설정
 
 # TODO: 순환 임포트 (circular import) 문제 (modules.singleton.py → modules.log import 처리 <-> modules.log.py → modules.singleton.KSTFormatter import 처리)로 인해 아래와 같은 오류 발생하여 챗봇 전역 로그 객체(logger) import 처리문 주석 처리 진행 (2025.09.19 minjae)
@@ -29,8 +29,7 @@ from zoneinfo import ZoneInfo    # 대한민국 표준시 설정
 from restAPI import chatbot_restServer   # 챗봇 웹서버 Rest API 메서드
 from modules.chatbot_enum import EnumValidator   # 데이터 유효성 검사
 
-# class SingletonBase(object):   # 명시적으로 object 클래스 상속
-class SingletonBase:   # 암시적으로 object 클래스 상속
+class SingletonBase:
     """
     Description: 싱글톤 (singleton) 패턴 기본 클래스
 
@@ -53,9 +52,8 @@ class SingletonBase:   # 암시적으로 object 클래스 상속
 
     Notes: - 싱글톤 (singleton) 패턴으로 구현되어 여러 번 인스턴스 (Instance) 생성해도 동일한 객체 반환
            - 아마존 웹서비스 람다 함수 (AWS Lambda function) 환경에서는 단일 스레드 (single thread)로 실행되므로 스레드 락 (_lock = threading.Lock()) 불필요
+           _lock = threading.Lock()   # _lock = threading.Lock() 용도 - 일반적인 Python 응용 프로그램 환경에서 여러 스레드가 동시에 싱글톤 (singleton) 클래스 인스턴스 (Instance)를 생성하려 할 때 또는 Race condition으로 인해 여러 인스턴스 (Instance)가 생성될 가능성이 있을 때 사용함.
     """
-    
-    # _lock = threading.Lock()   # _lock = threading.Lock() 용도 - 일반적인 Python 응용 프로그램 환경에서 여러 스레드가 동시에 싱글톤 (singleton) 클래스 인스턴스 (Instance)를 생성하려 할 때 또는 Race condition으로 인해 여러 인스턴스 (Instance)가 생성될 가능성이 있을 때 사용함.
     def __new__(_class, *args: tuple, **kwargs: dict) -> Self:
         """
         Description: 객체 생성자 - 부모 클래스 (object) 상속 받아 재정의된 생성자 (__new__) 
@@ -80,6 +78,8 @@ class SingletonBase:   # 암시적으로 object 클래스 상속
 
         return _class._instance
 
+# class MasterEntity(object):   # 명시적으로 object 클래스 상속
+# class MasterEntity:   # 암시적으로 object 클래스 상속
 class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명시적으로 SingletonBase 클래스 상속
     """
     Description: 마스터 데이터 싱글톤 (singleton) 클래스
@@ -94,7 +94,7 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
                 _init (bool) - 인스턴스 초기화 완료 여부 (True: 완료, False: 실패)
 
                 __master_datas (dict[str, Any]) - 전체 마스터 데이터
-                __valid_targets (list[str]) - 마스터 데이터 유효성 검사 대상 리스트
+                __valid_targets (list[str]) - 마스터 데이터 유효성 검사 시 확인할 대상 키(key) 리스트
                 __isValid (bool) - 마스터 데이터 유효성 검사 통과 여부 (True: 유효함, False: 유효하지 않음)
 
     Parameters: *args (tuple) - object 위치 가변 인자
@@ -107,12 +107,15 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
                            get_valid_targets (list[str]) - 마스터 데이터 유효성 검사 대상 리스트 가져오기
                            get_isValid (bool) - 마스터 데이터 유효성 검사 결과 가져오기
 
-    Methods: __initSettingAsync - 마스터 데이터 초기 설정
+    Methods: initSettingAsync - 마스터 데이터 초기 설정
              __isValidator - 마스터 데이터 유효성 검사
 
-    Notes: 없음. (추후 필요시 작성 예정!)
+    Notes: - 싱글톤 (singleton) 패턴으로 구현되어 여러 번 인스턴스 (Instance) 생성해도 동일한 객체 반환
+           - 아마존 웹서비스 람다 함수 (AWS Lambda function) 환경에서는 단일 스레드 (single thread)로 실행되므로 스레드 락 (_lock = threading.Lock()) 불필요
+           _lock = threading.Lock()   # _lock = threading.Lock() 용도 - 일반적인 Python 응용 프로그램 환경에서 여러 스레드가 동시에 싱글톤 (singleton) 클래스 인스턴스 (Instance)를 생성하려 할 때 또는 Race condition으로 인해 여러 인스턴스 (Instance)가 생성될 가능성이 있을 때 사용함.
     """
 
+    # _lock = threading.Lock()   # _lock = threading.Lock() 용도 - 일반적인 Python 응용 프로그램 환경에서 여러 스레드가 동시에 싱글톤 (singleton) 클래스 인스턴스 (Instance)를 생성하려 할 때 또는 Race condition으로 인해 여러 인스턴스 (Instance)가 생성될 가능성이 있을 때 사용함.
     __master_datas: dict[str, Any]
     __valid_targets: list[str]
     __isValid: EnumValidator    
@@ -133,14 +136,14 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
         Returns: 없음. 
         """
 
-        # TODO: 아마존 웹서비스 람다 함수 (AWS Lambda function) 내부에서 이미 event loop 실행 중일 경우 아래와 같은 오류 메시지가 출력되어 asyncio.get_event_loop, loop.create_task 로직 보완 (2025.11.13 minjae)
+        # TODO: 아마존 웹서비스 람다 함수 (AWS Lambda function) 내부에서 이미 event loop가 실행 중일 경우 아래와 같은 오류 메시지가 출력되어 asyncio.get_event_loop, loop.create_task 로직 보완 (2025.11.13 minjae)
         # 오류 메시지 - RuntimeError: asyncio.run() cannot be called from a running event loop
         # 참고 URL - https://docs.python.org/ko/3/library/asyncio-eventloop.html
         # 참고 2 URL - https://docs.python.org/ko/3/library/asyncio-task.html#asyncio.create_task
         # 참고 3 URL - https://stackoverflow.com/questions/55409641/asyncio-run-cannot-be-called-from-a-running-event-loop-when-using-jupyter-no
         # 참고 4 URL - https://brownbears.tistory.com/540
 
-        # 코루틴(coroutine) - 루틴이 서브루틴을 호출하는 방식이 아닌 여러 일을 동시에 하면서도 각각의 task가 서로 독립적으로 할 수 있도록 하는 방법 (즉, 메인 루틴과 서브 루틴처럼 종속된 관계가 아니라 서로 독립적인 관계로 특정 시점에 상대방의 코드를 실행)
+        # 코루틴(coroutine) - 루틴이 서브루틴을 후출하는식이 아닌 여러 일을 동시에 하면서도 각각의 task가 서로 독립적으로 할 수 있도록 하는 방법 (즉, 메인 루틴과 서브 루틴처럼 종속된 관계가 아니라 서로 독립적인 관계로 특정 시점에 상대방의 코드를 실행)
         # 참고 URL - https://wikidocs.net/234355
 
         _class = type(self)
@@ -250,9 +253,9 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
 
         try:
             chatbot_logger.info("[테스트] 마스터 데이터 초기 설정 - 시작!")
-            # chatbot_logger.info(f"[테스트] help 함수 호출 및 chatbot_restServer 모듈 전체 docstring 내용 확인 - {help(chatbot_restServer)}")
-            # chatbot_logger.info(f"[테스트] help 함수 호출 및 chatbot_restServer.get_masterDownLoadAsync 함수 docstring 내용 확인 - {help(chatbot_restServer.get_masterDownLoadAsync)}")
-            # chatbot_logger.info(f"[테스트] chatbot_restServer.get_masterDownLoadAsync 함수 속성 __doc__ 사용 및 docstring 내용 확인 - {chatbot_restServer.get_masterDownLoadAsync.__doc__}")
+            chatbot_logger.info(f"[테스트] help 함수 호출 및 chatbot_restServer 모듈 전체 docstring 내용 확인 - {help(chatbot_restServer)}")
+            chatbot_logger.info(f"[테스트] help 함수 호출 및 chatbot_restServer.get_masterDownLoadAsync 함수 docstring 내용 확인 - {help(chatbot_restServer.get_masterDownLoadAsync)}")
+            chatbot_logger.info(f"[테스트] chatbot_restServer.get_masterDownLoadAsync 함수 속성 __doc__ 사용 및 docstring 내용 확인 - {chatbot_restServer.get_masterDownLoadAsync.__doc__}")
 
             self.__master_datas = await chatbot_restServer.get_masterDownLoadAsync(chatbot_helper._masterEntity_json_file_path)   # 전체 마스터 데이터 다운로드
             self.__valid_targets = valid_targets if len(valid_targets) >= EnumValidator.EXISTENCE.value else None
@@ -293,17 +296,16 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
             if None is valid_targets:
                 raise Exception("valid_targets - 마스터 데이터 유효성 검사 대상 리스트 데이터 존재 안 함.")
             
-            # 브루트 포스 완전 탐색 알고리즘 (Brute Force Algorithm) - 무차별 대입법이라고 불리며, 문제를 해결하기 위해 가능한 경우의 수를 모두 검사(완전 탐색) 해보는 방법이다.
-            # 참고 URL - https://ko.wikipedia.org/wiki/%EB%AC%B4%EC%B0%A8%EB%B3%84_%EB%8C%80%EC%9E%85_%EA%B2%80%EC%83%89
-            # 참고 2 URL - https://wikidocs.net/233719
-            # 참고 3 URL - https://youtu.be/QhMY4t2xwG0?si=uYsaL7CLHmx-RHV8
+            # 그리디 알고리즘 (Greedy Algorithm) - 탐욕법이라고 불리며, 현재 상황에서 지금 당장 좋은 것만 고르는 방법이다.
+            # 참고 URL - https://youtu.be/5OYlS2QQMPA?si=LzCRpZvGmEXI5Ean
+            # 참고 2 URL - https://youtu.be/_TG0hVYJ6D8?si=j85mnzUabJeClsoQ
 
             # dict 객체 master_datas를 for문으로 루핑하기 위해 items() 메서드 호출 (2025.09.02 minjae)
             # 참고 URL - https://docs.python.org/ko/3.13/tutorial/datastructures.html#looping-techniques 
-            for (parent_key, parent_value) in master_datas.items():
+            for parent_key, parent_value in master_datas.items():
                 chatbot_logger.info(f"[테스트] master_datas - parent_key: {parent_key} / parent_value: {parent_value}")
                 master_data = parent_value
-                for (child_key, child_value) in master_data.items():
+                for child_key, child_value in master_data.items():
                     if child_key in valid_targets:   # 유효성 검사 대상 키들만 확인
                         chatbot_logger.info(f"[테스트] master_data - child_key: {child_key} / child_value: {child_value}")
                         # 파이썬 함수 len 사용하여 문자열, 리스트 객체 길이 구하기
@@ -323,8 +325,9 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
             sys_error_msg = str(e)
             chatbot_logger.critical(f"[테스트] 시스템 오류 - {sys_error_msg}")
             return EnumValidator.NOT_EXISTENCE
-        
-class KSTFormatter(SingletonBase, logging.Formatter):   # 명시적으로 SingletonBase, logging.Formatter 클래스 다중 상속
+                
+# class KSTFormatter(logging.Formatter):   # 명시적으로 logging.Formatter 클래스 상속
+class KSTFormatter(SingletonBase, logging.Formatter):   # 상속 구조 단순화 하기 위해 명시적으로 SingletonBase, logging.Formatter 클래스 다중 상속
     """
     Description: 대한민국 표준시 설정 싱글톤 (singleton) 클래스 (pytz 라이브러리 사용 안 함.)
                  참고 URL - https://claude.ai/chat/8fc1ceeb-fe95-4d1b-8517-ecec83beb3f2
@@ -333,30 +336,26 @@ class KSTFormatter(SingletonBase, logging.Formatter):   # 명시적으로 Single
                  class Docstring 작성 가이드라인
                  참고 URL - https://claude.ai/chat/6c33a991-97cf-4736-8bcd-724cbf1a58ee
 
-                 *** 파이썬 문서 ***
-                 - datetime
-                 참고 URL - https://docs.python.org/ko/3.9/library/datetime.html
-
-                 - zoneinfo
-                 참고 URL - https://docs.python.org/ko/3.13/library/zoneinfo.html
-                 
-                 - datetime + zoneinfo 
-                 참고 URL - https://wikidocs.net/299600
-
     Attributes: _instance (KSTFormatter) - 대한민국 표준시 설정 싱글톤 (singleton) 클래스 (KSTFormatter) 인스턴스 (Instance)
                 _init (bool) - 인스턴스 초기화 완료 여부 (True: 완료, False: 실패)
+                __kst (ZoneInfo): 대한민국 표준시(Asia/Seoul) 클래스 (ZoneInfo) 인스턴스 (Instance)
 
     Parameters: *args (tuple) - logging.Formatter 위치 가변 인자 (fmt, datefmt 등)
                 **kwargs (dict) - logging.Formatter 키워드 가변 인자
 
-    Properties (읽기 전용): 없음.
+    Properties (읽기 전용): get_kst (ZoneInfo) - 설정된 대한민국 표준시 (Asia/Seoul) 클래스 (ZoneInfo) 인스턴스 (Instance) 가져오기
     
-    Methods: __converter - UTC timestamp -> 대한민국 표준시 datetime 변환
-             formatTime - LogRecord(record)의 생성 시간(현재 날짜 및 시간)을 대한민국 표준시로 변환하여 포맷된 문자열 가져오기
+    Methods: formatTime - LogRecord(record)의 생성 시간(현재 날짜 및 시간)을 대한민국 표준시로 변환하여 포맷된 문자열 가져오기 
 
-    Notes: 사용 예시 - formatter = KSTFormatter('[%(levelname)s] [%(asctime)s] [%(filename)s | %(funcName)s - L%(lineno)d]: %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+    Notes: 사용 예시: formatter = KSTFormatter('[%(levelname)s] [%(asctime)s] [%(filename)s | %(funcName)s - L%(lineno)d]: %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+
+           - 싱글톤 패턴으로 구현되어 여러 번 인스턴스를 생성해도 동일한 객체 반환
+           - 아마존 웹서비스 람다 함수 (AWS Lambda function) 환경에서는 단일 스레드 (single thread)로 실행되므로 스레드 락 (_lock = threading.Lock()) 불필요
+           _lock = threading.Lock()   # _lock = threading.Lock() 용도 - 일반적인 Python 응용 프로그램 환경에서 여러 스레드가 동시에 싱글톤 (singleton) 클래스 인스턴스 (Instance)를 생성하려 할 때 또는 Race condition으로 인해 여러 인스턴스 (Instance)가 생성될 가능성이 있을 때 사용함.
     """
     
+    # _lock = threading.Lock()   # _lock = threading.Lock() 용도 - 일반적인 Python 응용 프로그램 환경에서 여러 스레드가 동시에 싱글톤 (singleton) 클래스 인스턴스 (Instance)를 생성하려 할 때 또는 Race condition으로 인해 여러 인스턴스 (Instance)가 생성될 가능성이 있을 때 사용함.
+
     def __init__(self, *args: tuple, **kwargs: dict) -> None:
         """
         Description: 생성된 객체 초기화
@@ -380,57 +379,75 @@ class KSTFormatter(SingletonBase, logging.Formatter):   # 명시적으로 Single
             # 오류 메시지: AttributeError: 'KSTFormatter' object has no attribute '_style'
             super().__init__(*args, **kwargs)   # 싱글톤 (singleton) 클래스 (KSTFormatter)의 부모 클래스 (logging.Formatter) 초기화자 super().__init__(*args, **kwargs) 실행 시 파라미터 datefmt 전달 인자 값이 None일 경우 로그 기록 형식 기본 값 할당 (default_time_format = '%Y-%m-%d %H:%M:%S')
 
+            self.__kst = ZoneInfo("Asia/Seoul")   # 대한민국 표준시 설정할 수 있도록 클래스 (ZoneInfo) 인스턴스 (Instance) __kst 생성
+            chatbot_logger.info("[테스트] 싱글톤 (singleton) 클래스 (KSTFormatter) 인스턴스 (Instance) __kst - 생성 완료!")
             chatbot_logger.info("[테스트] KSTFormatter __init__ 메서드 - 호출 완료!")
             _class._init = True   # 초기화 완료
 
-    def __converter(self, timestamp: float) -> datetime:
+    @cached_property
+    def get_kst(self) -> ZoneInfo:
         """
-        Description: [private] UTC timestamp -> 대한민국 표준시 datetime 변환
+        Description: 설정된 대한민국 표준시 (Asia/Seoul) 클래스 (ZoneInfo) 인스턴스 (Instance) 가져오기
 
         Parameters: self - 대한민국 표준시 설정 싱글톤 (singleton) 클래스 (KSTFormatter) 인스턴스 (Instance)
-                    timestamp - LogRecord 생성된 시간 (time.time() 반환 시간)
 
-        Returns: datetime.fromtimestamp(timestamp, timezone.utc).astimezone(ZoneInfo("Asia/Seoul")) - LogRecord 생성된 대한민국 표준시 datetime
+        Returns: self.__kst - 설정된 대한민국 표준시 (Asia/Seoul) 클래스 (ZoneInfo) 인스턴스 (Instance)
         """
 
-        # zoneinfo 파이썬 라이브러리 사용하여 로그 출력시 대한민국 표준시 출력 기능 구현 (2025.11.18 minjae)
-        # 참고 URL - https://docs.python.org/ko/3.9/library/zoneinfo.html#module-zoneinfo
-        # 참고 2 URL - https://wikidocs.net/236273
-        # 참고 3 URL - https://chatgpt.com/c/684b79a8-8c20-8010-9d14-41ab28f12747
-        # time_stamp = datetime.fromtimestamp(record.created, tz=self.__kst)   # LogRecord (record)의 생성 시간을 KST (self.__kst)로 변환
-        return datetime.fromtimestamp(timestamp, timezone.utc).astimezone(ZoneInfo("Asia/Seoul"))
+        # TODO: 마스터 데이터 싱글톤 (singleton) 클래스 (KSTFormatter) 인스턴스 (Instance) 초기화(__init__) 완료 전 속성 접근 시 AttributeError 발생할 수 있어서 초기화(__init__) 완료 후 접근하도록 로직 보완 (2025.11.13 minjae)
+        if not hasattr(self, "_KSTFormatter__kst"):  # 인스턴스 (Instance) 초기화(__init__) 완료되지 않은 경우
+            raise RuntimeError("[테스트] 대한민국 표준시 설정 싱글톤 (singleton) 클래스 (KSTFormatter) 인스턴스 (Instance) 초기화 완료 못함.")
 
+        return self.__kst
+
+    # TODO: setter 메서드 set_kst 필요시 사용 예정 (2025.09.18 minjae)
+    # @get_kst.setter
+    # def set_kst(self, kst: ZoneInfo) -> None:
+    #     """
+    #     Description: 설정된 대한민국 표준시 (Asia/Seoul) 클래스 (ZoneInfo) 인스턴스 (Instance) 설정
+
+    #     Parameters: self - 대한민국 표준시 설정 싱글톤 (singleton) 클래스 (KSTFormatter) 인스턴스 (Instance)
+    #                 kst - 설정된 대한민국 표준시 (Asia/Seoul) 클래스 (ZoneInfo) 인스턴스 (Instance)
+
+    #     Returns: 없음.
+    #     """
+
+    #     self.__kst = kst
+        
     def formatTime(self, record: logging.LogRecord, datefmt: str | None = None) -> str:
         """
-        Description: [public] LogRecord (record)의 생성 시간 (현재 날짜 및 시간)을 대한민국 표준시로 변환하여 포맷된 문자열 가져오기
-        
+        Description: LogRecord (record)의 생성 시간 (현재 날짜 및 시간)을 대한민국 표준시로 변환하여 포맷된 문자열 가져오기
                      아래 코드처럼 매개변수 record 생략하고 구현시 오류 발생하여 매개변수 record 작성 필수! (2025.09.18 minjae)
                      def formatTime(self, datefmt=None):
 
-                     *** 파이썬 문서 ***
+                     *** 파이썬 공식 문서 ***
                      - formatTime(record, datefmt=None)
                      참고 URL - https://docs.python.org/ko/3/library/logging.html#logging.Formatter.formatTime
 
                      - class logging.LogRecord(name, level, pathname, lineno, msg, args, exc_info, func=None, sinfo=None) 
-                     참고 URL - https://docs.python.org/ko/3/library/logging.html#logrecord-objects
+                     참고 2 URL - https://docs.python.org/ko/3/library/logging.html#logrecord-objects
 
                      - LogRecord attributes 
-                     참고 URL - https://docs.python.org/ko/3/library/logging.html#logrecord-attributes  
+                     참고 3 URL - https://docs.python.org/ko/3/library/logging.html#logrecord-attributes  
 
         Parameters: self - 대한민국 표준시 설정 싱글톤 (singleton) 클래스 (KSTFormatter) 인스턴스 (Instance)
                     record - 지정된 LogRecord (record) 클래스 (logging.LogRecord) 인스턴스 (Instance)
                     datefmt - 날짜 출력 형식 문자열. (default parameter) 
                               datefmt 값이 None일 경우 기본 값 사용 (예) self.default_time_format = '%Y-%m-%d %H:%M:%S'.
 
-        Returns: dt.strftime(datefmt) / dt.strftime(chatbot_helper._datefmt) - 지정된 LogRecord (record)의 생성 시간 (현재 날짜 및 시간)을 대한민국 표준시 포맷된 문자열
+        Returns: time_stamp.strftime(datefmt) / time_stamp.strftime(chatbot_helper._datefmt) - 지정된 LogRecord (record)의 생성 시간 (현재 날짜 및 시간)을 대한민국 표준시 포맷된 문자열
         """
-    
-        dt = self.__converter(record.created)   # UTC timestamp -> 대한민국 표준시 datetime 변환
-    
-        # 대한민국 현재 날짜와 시간을 특정 포맷으로 변환하기 구현 (2025.11.18 minjae)
+                
+        # zoneinfo 파이썬 라이브러리 사용하여 로그 출력시 대한민국 표준시 출력 기능 구현 (2025.06.13 minjae)
+        # 참고 URL - https://docs.python.org/ko/3.9/library/zoneinfo.html#module-zoneinfo
+        # 참고 2 URL - https://wikidocs.net/236273
+        # 참고 3 URL - https://chatgpt.com/c/684b79a8-8c20-8010-9d14-41ab28f12747
+        time_stamp = datetime.fromtimestamp(record.created, tz=self.__kst)   # LogRecord (record)의 생성 시간을 KST (self.__kst)로 변환
+
+        # 대한민국 현재 날짜와 시간을 특정 포맷으로 변환하기 구현 (2025.03.27 minjae)
         # 참고 URL - https://wikidocs.net/269063
-        if datefmt: return dt.strftime(datefmt)
-        return dt.strftime(chatbot_helper._datefmt)
+        if datefmt: return time_stamp.strftime(datefmt)
+        else: return time_stamp.strftime(chatbot_helper._datefmt)
 
 """
 *** 참고 ***
@@ -497,7 +514,7 @@ Attribute (어트리뷰트) - 흔히 점표현식을 사용하는 이름으로 �
 참고 URL - https://wikidocs.net/69363
 참고 2 URL - https://claude.ai/chat/601e10e4-39ad-48fe-aa73-7070ba600f3d
 
-* 12. setter / getter
+* 12. setter / getter 
 파이썬에서 class 지원하기 때문에 setter / getter 또한 지원함.
 참고 URL - https://wikidocs.net/21053
 
