@@ -19,7 +19,7 @@ def init_logger(name: str = "chatbot_logger") -> logging.Logger:
     """
     Description: 챗봇 전역 로그 객체 (logger) 생성 및 초기화
 
-    Parameters: name - 챗봇 전역 로그 객체 (logger) 이름 (default parameter)
+    Parameters: name - 챗봇 전역 로그 객체 (logger) 이름 (non-default value parameter)
                 참고 URL - https://docs.python.org/ko/3/glossary.html#term-parameter
 
     Returns: logger - 챗봇 전역 로그 객체
@@ -56,18 +56,18 @@ logger = init_logger()   # 챗봇 전역 로그 객체 생성 및 초기화
 """
 *** 참고 ***
 *** 파이썬 문서 ***
-* 1. os.getenv
+* os.getenv
 참고 URL - https://docs.python.org/ko/3/library/os.html#os.getenv
 
-* 2. getattr
+* getattr
 참고 URL - https://docs.python.org/ko/3.10/library/functions.html#getattr
 
-* 3. 패키지, 모듈
+* 패키지, 모듈
 참고 URL - https://docs.python.org/ko/3.13/tutorial/modules.html
 참고 2 URL - https://wikidocs.net/1418
 참고 3 URL - https://dojang.io/mod/page/view.php?id=2450
 
-* 4. logging 모듈 사용하여 로그 기록하기
+* logging 모듈 사용하여 로그 기록하기
 참고 URL - https://docs.python.org/ko/3/library/logging.html
 참고 2 URL - https://docs.python.org/ko/3/howto/logging.html#basic-logging-tutorial
 참고 3 URL - https://docs.aws.amazon.com/ko_kr/lambda/latest/dg/python-logging.html
@@ -80,7 +80,7 @@ logger = init_logger()   # 챗봇 전역 로그 객체 생성 및 초기화
 참고 10 URL - https://github.com/sungwook-practice/python_logging_logger.git
 참고 11 URL - https://velog.io/@qlgks1/python-python-logging-%ED%95%B4%EB%B6%80
 
-* 5. logging 모듈 Stack Traces 캡쳐 exc_info=True
+* logging 모듈 Stack Traces 캡쳐 exc_info=True
 참고 URL - https://docs.python.org/ko/3.7/library/logging.html
 참고 2 URL - https://tjlog-tistory.tistory.com/82
 

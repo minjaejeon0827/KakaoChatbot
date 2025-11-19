@@ -234,13 +234,13 @@ def critical(msg: str) -> None:
 """
 *** 참고 ***
 *** 파이썬 문서 ***
-* 1. Type Hints
+* Type Hints
 참고 URL - https://docs.python.org/ko/3.14/library/typing.html
 참고 2 URL - https://peps.python.org/pep-0484/
 참고 3 URL - https://devpouch.tistory.com/189
 참고 4 URL - https://supermemi.tistory.com/entry/Python-3-%ED%8C%8C%EC%9D%B4%EC%8D%AC%EC%97%90%EC%84%9C-%EC%9D%98%EB%AF%B8%EB%8A%94-%EB%AC%B4%EC%97%87%EC%9D%BC%EA%B9%8C-%EC%A3%BC%EC%84%9D
 
-* 2. 패키지, 모듈(module) 
+* 패키지, 모듈(module) 
 참고 URL - https://docs.python.org/ko/3.13/tutorial/modules.html
 참고 2 URL - https://wikidocs.net/1418
 참고 3 URL - https://dojang.io/mod/page/view.php?id=2450

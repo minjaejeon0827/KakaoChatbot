@@ -15,7 +15,7 @@ from typing import Any, Self
 
 # 4. 나머지 모듈 import
 import logging   # 로그 기록
-import asyncio   # 비동기 프로그래밍 (async/await)
+import asyncio   # 비동기 프로그래밍 (async - await)
 
 from functools import cached_property
 from datetime import datetime, timezone
@@ -118,18 +118,18 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
     __valid_targets: list[str]
     __isValid: EnumValidator    
 
-    def __init__(self, valid_targets: list[str]) -> None:
+    def __init__(self, valid_targets: list[str] | None = None) -> None:
         """
         Description: 생성된 객체 초기화
 
                      *** 주요 특징 ***
                      1. 객체 생성 시 전달된 모든 인자 (valid_targets 제외)를 __new__ 메서드가 먼저 받고, 그 다음 __init__ 메서드로 전달
-                     2. 생성된 객체에 속성 (property) 추가 및 값 할당
+                     2. 생성된 객체에 속성 (property) 추가 및 값 할당 
 
                      참고 URL - https://docs.python.org/ko/3.6/reference/datamodel.html#object.__init__
 
         Parameters: self - 마스터 데이터 싱글톤 (singleton) 클래스 (MasterEntity) 인스턴스 (Instance)
-                    valid_targets - 마스터 데이터 유효성 검사 대상 리스트
+                    valid_targets - 마스터 데이터 유효성 검사 대상 리스트 (default parameter)
 
         Returns: 없음.
         """
@@ -178,12 +178,12 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
 
     # TODO: setter 메서드 set_master_datas 필요시 사용 예정 (2025.09.15 minjae)
     # @get_master_datas.setter
-    # def set_master_datas(self, master_datas: dict[str, Any]) -> None:
+    # def set_master_datas(self, master_datas: dict[str, Any] | None = None) -> None:
     #     """
     #     Description: 전체 마스터 데이터 설정  
 
     #     Parameters: self - 마스터 데이터 싱글톤 (singleton) 클래스 (MasterEntity) 인스턴스 (Instance)
-    #                 master_datas - 전체 마스터 데이터
+    #                 master_datas - 전체 마스터 데이터 (default parameter) 
 
     #     Returns: 없음.
     #     """
@@ -204,12 +204,12 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
 
     # TODO: setter 메서드 set_valid_targets 필요시 사용 예정 (2025.09.15 minjae)
     # @get_valid_targets.setter
-    # def set_valid_targets(self, valid_targets: list[str]) -> None:
+    # def set_valid_targets(self, valid_targets: list[str] | None = None) -> None:
     #     """
     #     Description: 마스터 데이터 유효성 검사 대상 리스트 설정
 
     #     Parameters: self - 마스터 데이터 싱글톤 (singleton) 클래스 (MasterEntity) 인스턴스 (Instance)
-    #                 valid_targets - 마스터 데이터 유효성 검사 대상 리스트
+    #                 valid_targets - 마스터 데이터 유효성 검사 대상 리스트 (default parameter)
 
     #     Returns: 없음.
     #     """
@@ -230,12 +230,12 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
 
     # TODO: setter 메서드 set_isValid 필요시 사용 예정 (2025.09.15 minjae)
     # @get_isValid.setter
-    # def set_isValid(self, isValid: EnumValidator) -> None:
+    # def set_isValid(self, isValid: EnumValidator | None = None) -> None:
     #     """
     #     Description: 마스터 데이터 유효성 검사 결과 설정 
 
     #     Parameters: self - 마스터 데이터 싱글톤 (singleton) 클래스 (MasterEntity) 인스턴스 (Instance)
-    #                 isValid - 마스터 데이터 유효성 검사 결과
+    #                 isValid - 마스터 데이터 유효성 검사 결과 (default parameter)
 
     #     Returns: 없음. 
     #     """
@@ -247,15 +247,12 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
         Description: [private] 마스터 데이터 초기 설정
 
         Parameters: self - 마스터 데이터 싱글톤 (singleton) 클래스 (MasterEntity) 인스턴스 (Instance)  
-                    valid_targets - 마스터 데이터 유효성 검사 대상 리스트 (non-default value parameter)
+                    valid_targets - 마스터 데이터 유효성 검사 대상 리스트 (default parameter)
 
         Returns: 없음.
         """
 
         try:
-            if None is valid_targets:
-                raise ValueError("valid_targets - 마스터 데이터 유효성 검사 대상 리스트 데이터 존재 안 함.")
-
             chatbot_logger.info("[테스트] 마스터 데이터 초기 설정 - 시작!")
             # chatbot_logger.info(f"[테스트] help 함수 호출 및 chatbot_restServer 모듈 전체 docstring 내용 확인 - {help(chatbot_restServer)}")
             # chatbot_logger.info(f"[테스트] help 함수 호출 및 chatbot_restServer.get_masterDownLoadAsync 함수 docstring 내용 확인 - {help(chatbot_restServer.get_masterDownLoadAsync)}")
@@ -291,11 +288,14 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
         valid_targets = self.get_valid_targets   # 마스터 데이터 유효성 검사 대상 리스트
 
         try:
-            if None is master_datas:
-                raise ValueError("master_datas - 전체 마스터 데이터 로드 실패!")
-            
             chatbot_logger.info(f"[테스트] 마스터 데이터 유효성 검사 대상 리스트 - {valid_targets}")
             chatbot_logger.info("[테스트] 마스터 데이터 유효성 검사 - 시작!")
+
+            if None is master_datas:
+                raise Exception("master_datas - 전체 마스터 데이터 로드 실패!")
+            
+            if None is valid_targets:
+                raise Exception("valid_targets - 마스터 데이터 유효성 검사 대상 리스트 데이터 존재 안 함.")
             
             # 브루트 포스 완전 탐색 알고리즘 (Brute Force Algorithm) - 무차별 대입법이라고 불리며, 문제를 해결하기 위해 가능한 경우의 수를 모두 검사(완전 탐색) 해보는 방법이다.
             # 참고 URL - https://ko.wikipedia.org/wiki/%EB%AC%B4%EC%B0%A8%EB%B3%84_%EB%8C%80%EC%9E%85_%EA%B2%80%EC%83%89
@@ -426,7 +426,7 @@ class KSTFormatter(SingletonBase, logging.Formatter):   # 명시적으로 Single
 
         Parameters: self - 대한민국 표준시 설정 싱글톤 (singleton) 클래스 (KSTFormatter) 인스턴스 (Instance)
                     record - 지정된 LogRecord (record) 클래스 (logging.LogRecord) 인스턴스 (Instance)
-                    datefmt - 날짜 출력 형식 문자열. (non-default value parameter)
+                    datefmt - 날짜 출력 형식 문자열. (default parameter)
                               datefmt 값이 None일 경우 기본 값 사용 (예) self.default_time_format = '%Y-%m-%d %H:%M:%S'.
 
         Returns: dt.strftime(datefmt) / dt.strftime(chatbot_helper._datefmt) - 지정된 LogRecord (record)의 생성 시간 (현재 날짜 및 시간)을 대한민국 표준시 포맷된 문자열
@@ -436,7 +436,7 @@ class KSTFormatter(SingletonBase, logging.Formatter):   # 명시적으로 Single
     
         # 대한민국 현재 날짜와 시간을 특정 포맷으로 변환하기 구현 (2025.11.18 minjae)
         # 참고 URL - https://wikidocs.net/269063
-        if datefmt: return dt.strftime(datefmt)    # datefmt에 할당된 값이 None 또는 공백("")이 아닌 경우 (None or Empty String Check)
+        if datefmt: return dt.strftime(datefmt)
         return dt.strftime(chatbot_helper._datefmt)
 
 """
@@ -446,58 +446,48 @@ class KSTFormatter(SingletonBase, logging.Formatter):   # 명시적으로 Single
 참고 2 URL - https://wikidocs.net/3693  
 
 *** 파이썬 문서 ***
-* 클래스
+* 1. 클래스
 참고 URL - https://docs.python.org/ko/3/tutorial/classes.html
 참고 2 URL - https://wikidocs.net/28
 참고 3 URL - https://wikidocs.net/215474
 
-* 클래스 다중 상속
+* 2. 클래스 다중 상속
 참고 URL - https://docs.python.org/ko/3.10/tutorial/classes.html#multiple-inheritance
 참고 2 URL - https://wikidocs.net/16073
 참고 3 URL - https://dojang.io/mod/page/view.php?id=2388
 
-* 클래스 인스턴스 변수 접근제한자 private 대신 언더바(__) 2개 사용
+* 3. 클래스 인스턴스 변수 접근제한자 private 대신 언더바(__) 2개 사용
 참고 URL - https://docs.python.org/ko/3/reference/expressions.html#private-name-mangling
 참고 2 URL - https://wikidocs.net/297028
 참고 3 URL - https://wikidocs.net/297029
 참고 4 URL - https://oniondev.tistory.com/20
 
-* functools @cached_property
+* 4. functools @cached_property
 참고 URL - https://docs.python.org/ko/dev/library/functools.html
 참고 2 URL - https://sosodev.tistory.com/entry/Python-cachedproperty-%EA%B0%92%EC%9D%84-%EC%9E%AC%EC%82%AC%EC%9A%A9-%ED%95%98%EA%B8%B0
 
-* 패키지, 모듈
+* 5. 패키지, 모듈
 참고 URL - https://docs.python.org/ko/3.13/tutorial/modules.html
 참고 2 URL - https://wikidocs.net/1418
 참고 3 URL - https://dojang.io/mod/page/view.php?id=2450
 
-* Type Hints
+* 6. Type Hints
 참고 URL - https://docs.python.org/ko/3.14/library/typing.html
 참고 2 URL - https://peps.python.org/pep-0484/
 참고 3 URL - https://devpouch.tistory.com/189
 참고 4 URL - https://supermemi.tistory.com/entry/Python-3-%ED%8C%8C%EC%9D%B4%EC%8D%AC%EC%97%90%EC%84%9C-%EC%9D%98%EB%AF%B8%EB%8A%94-%EB%AC%B4%EC%97%87%EC%9D%BC%EA%B9%8C-%EC%A3%BC%EC%84%9D
 
-* Type Hints class Any
+* 7. Type Hints class Any
 참고 URL - https://docs.python.org/ko/3.9/library/typing.html#the-any-type
 
-* Union Type
+* 8. Union Type
 참고 URL - https://docs.python.org/ko/3.11/library/stdtypes.html#types-union
 
-* non-default value parameter, default value parameter
-참고 URL - https://docs.python.org/ko/3/glossary.html#term-parameter
-참고 2 URL - https://docs.python.org/3/faq/programming.html#why-are-default-values-shared-between-objects
-
-* ValueError
-참고 URL - https://docs.python.org/ko/3.13/library/exceptions.html#ValueError
-
-* raise ValueError()
-참고 URL - https://docs.python.org/ko/3/tutorial/errors.html#raising-exceptions
-
-* 리스트 컴프리헨션 문법
+* 9. 리스트 컴프리헨션 문법
 참고 URL - https://docs.python.org/ko/3.13/tutorial/datastructures.html#list-comprehensions
 참고 2 URL - https://claude.ai/chat/a6e38078-6a1f-4c67-a1f2-442f04d86938
 
-* 용어 정리
+* 10. 용어 정리
 Argument (인자) - 함수를 호출할 때 함수 (또는 메서드)로 전달되는 값.
 Parameter (매개변수) - 함수 (또는 메서드) 정의에서 함수가 받을 수 있는 인자 (또는 어떤 경우 인자들)를 지정하는 이름 붙은 엔티티
 Attribute (어트리뷰트) - 흔히 점표현식을 사용하는 이름으로 참조되는 객체와 결합한 값. (예를 들어, 객체 o가 어트리뷰트 a를 가지면, o.a처럼 참조)
@@ -506,7 +496,7 @@ Attribute (어트리뷰트) - 흔히 점표현식을 사용하는 이름으로 �
 참고 3 URL - https://peps.python.org/pep-3102/
 참고 4 URL - https://leffept.tistory.com/418
 
-* 가변인자 *args / **kwargs
+* 11. 가변인자 *args / **kwargs
 *args - 위치 가변 인자라고 불리며, 함수를 정의할 때 인자값의 개수를 가변적으로 정의해주는 기능이며, 함수 호출부에서 서로 다른 개수의 인자를 전달하고자 할 때 가변 인자 (Variable argument) 사용함. (예) foo(1, 2, 3), foo(1, 2, 3, 4) 
         함수 호출시 args라는 변수는 여러 개의 입력에 대해 튜플 (tuple)로 저장한 후 이 튜플 (tuple) 객체를 바인딩한다. (예) (1, 2, 3), (1, 2, 3, 4)
 **kwargs - 키워드 가변 인자라고 불리며, keyword arguments의 약어(kwargs)이다. 예를들어 함수 호출부에서 a=1, b=2, c=3과 어떤 키워드와 해당 키워드에 값을 전달힌다. (예) foo(a=1, b=2, c=3)
@@ -514,11 +504,11 @@ Attribute (어트리뷰트) - 흔히 점표현식을 사용하는 이름으로 �
 참고 URL - https://wikidocs.net/69363
 참고 2 URL - https://claude.ai/chat/601e10e4-39ad-48fe-aa73-7070ba600f3d
 
-* setter / getter
+* 12. setter / getter
 파이썬에서 class 지원하기 때문에 setter / getter 또한 지원함.
 참고 URL - https://wikidocs.net/21053
 
-* 비동기 프로그래밍 asyncio (asyncio는 async / await 구문을 사용하여 동시성 코드를 작성하는 라이브러리이다.)
+* 13. 비동기 프로그래밍 asyncio (asyncio는 async / await 구문을 사용하여 동시성 코드를 작성하는 라이브러리이다.)
 참고 URL - https://docs.python.org/3/library/asyncio.html
 참고 2 URL - https://docs.python.org/ko/3/library/asyncio-task.html
 참고 3 URL - https://dojang.io/mod/page/view.php?id=2469

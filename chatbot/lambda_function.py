@@ -73,10 +73,11 @@ def handler(event, context):
     try: 
         test._testDebug('handler 함수 로그 테스트')
 
+        # 키(key) 누락 체크
         # event['body']가 존재하지 않는 경우 - ColdStart(콜드 스타트)인 경우 제외 
         # 참고 URL - https://chatgpt.com/c/687a0180-e2bc-8010-9a19-90695a1bf477
         if chatbot_helper._body not in event: 
-            raise KeyError("event['body'] 객체 KeyError 발생!")
+            raise KeyError(f"카카오톡 채팅방 실제 채팅 정보 저장된 변수 event['body'] - '{chatbot_helper._body}' 키 값 존재 안 함.")
         
         # logger.info("[테스트] 사용자 입력 채팅 정보 - %s" %event['body'])
         logger.info(f"[테스트] 사용자 입력 채팅 정보 - {event[chatbot_helper._body]}")
@@ -220,10 +221,10 @@ def chatbot_response(kakao_request, res_queue, file_name):
         #     raise Exception("사유: 오류 테스트!")
         
         elif EnumValidator.VALIDATION_ERROR == masterEntity.get_isValid:   # 데이터 유효성 검사 결과 오류인 경우
-            raise Exception("[테스트] 데이터 유효성 검사 오류.")
+            raise ValueError("데이터 유효성 검사 오류.")
         
         elif EnumValidator.NOT_EXISTENCE == masterEntity.get_isValid:   # 마스터 데이터 유효성 검사 결과 실패한 경우
-            raise Exception("[테스트] 마스터 데이터 존재 안 함.")
+            raise ValueError("마스터 데이터 존재 안 함.")
 
         # elif True == masterEntity.get_isValid:   # 마스터 데이터 유효성 검사 결과 성공한 경우
         elif EnumValidator.EXISTENCE == masterEntity.get_isValid:   # 마스터 데이터 유효성 검사 결과 성공한 경우
@@ -254,7 +255,7 @@ def chatbot_response(kakao_request, res_queue, file_name):
             # # time.sleep(5)   # 테스트 - 5초 대기
             # res_queue.put(response)
 
-        else: raise Exception("사유: 마스터 데이터 유효성 검사 결과 실패!")
+        else: raise Exception("시스템 오류!")
 
         # TODO: 추후 필요시 아래 주석친 코드 참고 (2025.09.12 minjae)
         # else:

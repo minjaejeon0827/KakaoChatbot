@@ -23,7 +23,7 @@
 from commons import chatbot_helper   # 챗봇 전용 도움말 텍스트
 
 # 2. log 모듈 import
-from modules.log import logger       # 챗봇 전역 로그 객체(logger)
+from modules.log import logger       # 챗봇 전역 로그 객체(logger)  
 
 # 3. Type Hints class Any import
 from typing import Any
@@ -53,6 +53,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
 
              __skillTemplate_format - 스킬 응답 템플릿 json 포맷
              simple_text - 텍스트 메시지 (text) 카카오톡 채팅방 전송
+             simple_image - DALLE2 이미지 (imageUrl) 카카오톡 채팅방 전송
              error_text - 오류 메세지 (error_msg) 카카오톡 채팅방 전송
              timeover_quickReplies - 챗봇 응답 제한 시간 5초 초과시 응답 재요청 메세지 (requestAgain_msg) 카카오톡 채팅방 전송
 
@@ -75,7 +76,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
 
     """
 
-    def __init__(self, master_datas: dict[str, Any]) -> None:
+    def __init__(self, master_datas: dict[str, Any] | None = None) -> None:
         """
         Description: 생성된 객체 초기화
 
@@ -88,19 +89,19 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
                      참고 2 URL - https://docs.python.org/ko/3.6/reference/datamodel.html#object.__init__
 
         Parameters: self - 카카오 스킬 응답 템플릿 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
-                    master_datas - 전체 마스터 데이터
+                    master_datas - 전체 마스터 데이터 (default parameter)
 
         Returns: 없음.
         """
 
         self.__master_datas = master_datas
         
-    def get_response(self, userRequest_msg: str) -> dict[str, Any]:
+    def get_response(self, userRequest_msg: str | None = None) -> dict[str, Any]:
         """
         Description: [public] 카카오 json 포맷 가져오기
 
         Parameters: self - 카카오 스킬 응답 템플릿 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
-                    userRequest_msg - 사용자 입력 채팅 메세지
+                    userRequest_msg - 사용자 입력 채팅 메세지 (default parameter)
 
         Returns: dict[str, Any] key "format" - 카카오 json 포맷 기반 챗봇 답변 내용,
                  dict[str, Any] key "meta_data" - 특정 마스터 데이터 (예) 아이템 카드 (basicCard, carousel) or 바로가기 그룹 (quickReplies)
@@ -193,20 +194,18 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
             logger.critical(f"[테스트] 시스템 오류 - {sys_error_msg}", exc_info=True)
             raise
 
-    def __skillTemplate_format(self, outputs: list[dict], quickReplies: list[dict] | None = None) -> dict[str, Any]:
+    def __skillTemplate_format(self, outputs: list[dict] | None = None, quickReplies: list[dict] | None = None) -> dict[str, Any]:
         """
         Description: [private] 스킬 응답 템플릿 json 포맷
 
         Parameters: self - 카카오 스킬 응답 템플릿 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
-                    outputs - 출력 그룹 리스트
-                    quickReplies - 바로가기 그룹 버튼 리스트 (label + messageText) (non-default value parameter)
+                    outputs - 출력 그룹 리스트 (default parameter)
+                    quickReplies - 바로가기 그룹 버튼 리스트 (label + messageText) (default parameter)
 
         Returns: 스킬 응답 템플릿 json 포맷
         """
-    
-        if None is quickReplies: quickReplies = []
 
-        logger.info(f"[테스트] 스킬 응답 템플릿 출력 그룹 리스트 - outputs: '{outputs}', 바로가기 그룹 버튼 리스트 - quickReplies: '{quickReplies}'")
+        logger.info(f"[테스트] 스킬 응답 템플릿 outputs: '{outputs}', quickReplies: '{quickReplies}'")
 
         return {
             "version": "2.0",
@@ -221,7 +220,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
         Description: [public] 텍스트 메시지 (text) 카카오톡 채팅방 전송
 
         Parameters: self - 카카오 스킬 응답 템플릿 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
-                    text - 챗봇 답변 내용 (non-default value parameter)
+                    text - 챗봇 답변 내용 (default parameter)
 
         Returns: self.__skillTemplate_format(outputs) - 텍스트 메시지 json 포맷
         """
@@ -239,17 +238,45 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
             
         return self.__skillTemplate_format(outputs)
 
+    # TODO: 아래 주석친 코드 필요시 사용 예정 (2025.09.29 minjae)
+    # def simple_image(self, imageUrl: str | None = None, prompt: str | None = None) -> dict[str, Any]:
+    #     """
+    #     Description: [public] DALLE2 이미지 (imageUrl) 카카오톡 채팅방 전송
+
+    #     Parameters: self - 카카오 스킬 응답 템플릿 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
+    #                 imageUrl - DALLE2 이미지 URL 주소 (default parameter)
+    #                 prompt - 사용자가 카카오톡 채팅방에 그려 달라고 요청한 이미지 설명 (default parameter)
+        
+    #     Returns: self.__skillTemplate_format(outputs) - DALLE2 이미지 json 포맷
+    #     """
+
+    #     logger.info(f"[테스트] DALLE2 이미지 imageUrl: '{imageUrl}', prompt: '{prompt}'")
+
+    #     outputs = []
+    #     output_text = prompt + "내용에 관한 이미지 입니다"
+
+    #     if imageUrl:   # imageUrl에 할당된 값이 None 또는 공백("")이 아닌 경우 (None or Empty String Check)
+    #         outputs.append({
+    #             "simpleImage": {
+    #                 "imageUrl": imageUrl,
+    #                 "altText": output_text
+    #             }
+    #         })
+
+    #     return self.__skillTemplate_format(outputs)
+
     # TODO: 아래 구현한 error_text 함수 Parameters "master_data"에 값이 None 들어와서 None 으로 리턴될 경우
     #       lambda_function.py 소스파일 -> chatbot_response 함수 몸체 -> 해당 NoneType 객체(response_data[chatbot_helper._meta_data]) 인덱싱 또는 슬라이싱 시도할 때 (response_data[chatbot_helper._meta_data][chatbot_helper._displayName]) 
     #       아래와 같은 오류 발생하여 해당 오류 해결하기 위해 None으로 리턴 되지 않도록 로직 보완 (2025.11.03 minjae)
     # 참고 URL - https://python.realjourney.co.kr/entry/OpenCV-TypeError-NoneType-object-is-not-subscriptable
     # 오류 메시지 - TypeError: 'NoneType' object is not subscriptable
+    # def error_text(error_msg: str | None = None, master_data: dict[str, Any] | None = None) -> dict[str, Any]:
     def error_text(self, error_msg: str | None = None) -> dict[str, Any]:
         """
         Description: [public] 오류 메세지 (error_msg) 카카오톡 채팅방 전송
 
         Parameters: self - 카카오 스킬 응답 템플릿 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
-                    error_msg - 오류 메세지 (non-default value parameter)
+                    error_msg - 오류 메세지 (default parameter)
 
         Returns: self.__skillTemplate_format(outputs, quickReplies) - 오류 메세지 json 포맷
         """
@@ -304,13 +331,13 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
 
         return self.__skillTemplate_format(outputs, quickReplies)
 
-    def __quickReplies_format(self, master_data: dict[str, Any], quickReplies: list[dict]) -> dict[str, Any]:
+    def __quickReplies_format(self, master_data: dict[str, Any] | None = None, quickReplies: list[dict] | None = None) -> dict[str, Any]:
         """
         Description: [private] 바로가기 그룹 (quickReplies) json 포맷
 
         Parameters: self - 카카오 스킬 응답 템플릿 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
-                    master_data - 특정 마스터 데이터
-                    quickReplies - 바로가기 그룹 버튼 리스트 (label + messageText)
+                    master_data - 특정 마스터 데이터 (default parameter)                    
+                    quickReplies - 바로가기 그룹 버튼 리스트 (label + messageText) (default parameter)
 
         Returns: self.__skillTemplate_format(outputs, quickReplies) - 바로가기 그룹 json 포맷
         """
@@ -335,13 +362,13 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
 
         return self.__skillTemplate_format(outputs, quickReplies)
 
-    def __textCard_format(self, master_data: dict[str, Any], buttons: list[dict]) -> dict[str, Any]:
+    def __textCard_format(self, master_data: dict[str, Any] | None = None, buttons: list[dict] | None = None) -> dict[str, Any]:
         """
         Description: [private] 텍스트 카드 (textCard) json 포맷
 
         Parameters: self - 카카오 스킬 응답 템플릿 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
-                    master_data - 특정 마스터 데이터
-                    buttons - 버튼 리스트 (label + messageText)
+                    master_data - 특정 마스터 데이터 (default parameter)
+                    buttons - 버튼 리스트 (label + messageText) (default parameter)
 
         Returns: self.__skillTemplate_format(outputs) - 텍스트 카드 json 포맷
         """
@@ -349,7 +376,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
         logger.info(f"[테스트] 텍스트 카드 master_data: '{master_data}', buttons: '{buttons}'")
 
         outputs = []
-        
+
         outputs.append({   # textCard 항상 추가
             "textCard": {
                 "title": master_data[chatbot_helper._title],
@@ -360,13 +387,13 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
 
         return self.__skillTemplate_format(outputs)
 
-    def __basicCard_format(self, master_data: dict[str, Any], buttons: list[dict]) -> dict[str, Any]:
+    def __basicCard_format(self, master_data: dict[str, Any] | None = None, buttons: list[dict] | None = None) -> dict[str, Any]:
         """
         Description: [private] 기본형 카드 (basicCard) json 포맷
 
         Parameters: self - 카카오 스킬 응답 템플릿 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
-                    master_data - 특정 마스터 데이터
-                    buttons - 버튼 리스트 (label + messageText)
+                    master_data - 특정 마스터 데이터 (default parameter)
+                    buttons - 버튼 리스트 (label + messageText) (default parameter)
 
         Returns: self.__skillTemplate_format(outputs) - 기본형 카드 json 포맷
         """
@@ -399,13 +426,13 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
 
         return self.__skillTemplate_format(outputs)
 
-    def __carousel_format(self, master_data: dict[str, Any], items: list[dict]) -> dict[str, Any]:
+    def __carousel_format(self, master_data: dict[str, Any] | None = None, items: list[dict] | None = None) -> dict[str, Any]:
         """
         Description: [private] 아이템형 케로셀 (carousel) json 포맷
 
         Parameters: self - 카카오 스킬 응답 템플릿 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
-                    master_data - 특정 마스터 데이터
-                    items - 아이템 리스트 (imageTitle + thumbnail + itemList 등등 ...)
+                    master_data - 특정 마스터 데이터 (default parameter)
+                    items - 아이템 리스트 (imageTitle + thumbnail + itemList 등등 ...) (default parameter)
 
         Returns: self.__skillTemplate_format(outputs) - 아이템형 케로셀 json 포맷 
         """
@@ -430,12 +457,12 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
 
         return self.__skillTemplate_format(outputs)
 
-    def __empty_response(self, master_data: dict[str, Any]) -> dict[str, Any]:
+    def __empty_response(self, master_data: dict[str, Any] | None = None) -> dict[str, Any]:
         """
         Description: [private] 비어있는 메세지 카카오톡 채팅방 전송 (기술지원 문의 제외 일반 문의 또는 응답 메시지 출력하고 싶지 않은 경우 모두 해당)
 
         Parameters: self - 카카오 스킬 응답 템플릿 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
-                    master_data - 특정 마스터 데이터
+                    master_data - 특정 마스터 데이터 (default parameter)
 
         Returns: { "format": empty_format, "meta_data": master_data } - 비어있는 메세지 json 포맷
         """
@@ -446,13 +473,13 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
 
         return { "format": empty_format, "meta_data": master_data }
 
-    def __create_buttons(self, master_data: dict[str, Any], message_prefix: str | None = None) -> list[dict]:
+    def __create_buttons(self, master_data: dict[str, Any] | None = None, message_prefix: str | None = None) -> list[dict]:
         """
         Description: [private] [공통] 버튼 리스트 생성
 
         Parameters: self - 카카오 스킬 응답 템플릿 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
-                    master_data - 특정 마스터 데이터
-                    message_prefix - 버튼 messageText 접두사 (non-default value parameter)
+                    master_data - 특정 마스터 데이터 (default parameter)
+                    message_prefix - 버튼 messageText 접두사 (default parameter)
 
         Returns: buttons - [공통] 버튼 리스트 (label + messageText)
         """
@@ -483,13 +510,13 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
 
         return buttons
 
-    def __create_quickReplies(self, master_data: dict[str, Any], message_prefix: str | None = None) -> list[dict]:
+    def __create_quickReplies(self, master_data: dict[str, Any] | None = None, message_prefix: str | None = None) -> list[dict]:
         """
         Description: [private] [공통] 바로가기 그룹 (quickReplies) 버튼 리스트 생성
 
         Parameters: self - 카카오 스킬 응답 템플릿 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
-                    master_data - 특정 마스터 데이터
-                    message_prefix - 버튼 messageText 접두사 (non-default value parameter)
+                    master_data - 특정 마스터 데이터 (default parameter)
+                    message_prefix - 버튼 messageText 접두사 (default parameter)
 
         Returns: quickReplies - [공통] 바로가기 그룹 버튼 리스트 (label + messageText)
         """
@@ -512,29 +539,29 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
 
         return quickReplies
 
-    def __common_basicCard(self, master_data: dict[str, Any]) -> dict[str, Any]:
+    def __common_basicCard(self, master_data: dict[str, Any] | None = None) -> dict[str, Any]:
         """
         Description: [private] [공통] 기본형 카드 (basicCard) 카카오톡 채팅방 전송
 
         Parameters: self - 카카오 스킬 응답 템플릿 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
-                    master_data - 특정 마스터 데이터
+                    master_data - 특정 마스터 데이터 (default parameter)
 
         Returns: self.__basicCard_format(master_data, buttons) - [공통] 기본형 카드 json 포맷
                  master_data - 특정 마스터 데이터
         """
-    
+
         logger.info(f"[테스트] [공통] 기본형 카드 master_data: '{master_data}'")
 
         buttons = self.__create_buttons(master_data)   # [공통] 버튼 리스트 생성
 
         return { "format": self.__basicCard_format(master_data, buttons), "meta_data": master_data }
 
-    def __common_quickReplies(self, master_data: dict[str, Any]) -> dict[str, Any]:
+    def __common_quickReplies(self, master_data: dict[str, Any] | None = None) -> dict[str, Any]:
         """
         Description: [private] [공통] Autodesk or 상상진화 BOX 제품 설치 지원 바로가기 그룹 (quickReplies) 카카오톡 채팅방 전송
 
         Parameters: self - 카카오 스킬 응답 템플릿 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
-                    master_data - 특정 마스터 데이터
+                    master_data - 특정 마스터 데이터 (default parameter)
 
         Returns: self.__quickReplies_format(master_data, quickReplies) - [공통] Autodesk or 상상진화 BOX 제품 설치 지원 바로가기 그룹 json 포맷
                  master_data - 특정 마스터 데이터
@@ -546,13 +573,13 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
 
         return { "format": self.__quickReplies_format(master_data, quickReplies), "meta_data": master_data }
 
-    def __common_ver_quickReplies(self, userRequest_msg: str, master_data: dict[str, Any]) -> dict[str, Any]:
+    def __common_ver_quickReplies(self, userRequest_msg: str | None = None, master_data: dict[str, Any] | None = None) -> dict[str, Any]:
         """
         Description: [private] [공통] Autodesk or 상상진화 BOX 제품 버전 바로가기 그룹 (quickReplies) 카카오톡 채팅방 전송
 
         Parameters: self - 카카오 스킬 응답 템플릿 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
-                    userRequest_msg - 사용자 입력 채팅 메세지
-                    master_data - 특정 마스터 데이터
+                    userRequest_msg - 사용자 입력 채팅 메세지 (default parameter)
+                    master_data - 특정 마스터 데이터 (default parameter)
 
         Returns: self.__quickReplies_format(master_data, quickReplies) - [공통] Autodesk or 상상진화 BOX 제품 버전 바로가기 그룹 json 포맷
                  master_data - 특정 마스터 데이터
@@ -565,12 +592,12 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
 
         return { "format": self.__quickReplies_format(master_data, quickReplies), "meta_data": master_data }
 
-    def __chatbot_carousel(self, master_data: dict[str, Any]) -> dict[str, Any]:
+    def __chatbot_carousel(self, master_data: dict[str, Any] | None = None) -> dict[str, Any]:
         """
         Description: [private] 챗봇 문의 아이템형 케로셀 (carousel) 카카오톡 채팅방 전송
 
         Parameters: self - 카카오 스킬 응답 템플릿 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
-                    master_data - 특정 마스터 데이터
+                    master_data - 특정 마스터 데이터 (default parameter)
 
         Returns: self.__carousel_format(master_data, chatbot_items) - 챗봇 문의 아이템형 케로셀 json 포맷
                  master_data - 특정 마스터 데이터
@@ -605,14 +632,14 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
         return { "format": self.__carousel_format(master_data, chatbot_items), "meta_data": master_data }
 
     # TODO: 아래 함수 __end_basicCard 필요시 로직 수정 예정 (2025.09.05 minjae)
-    def __end_basicCard(self, userRequest_msg: str, master_data: dict[str, Any], endInfos: list[dict]) -> dict[str, Any]:
+    def __end_basicCard(self, userRequest_msg: str | None = None, master_data: dict[str, Any] | None = None, endInfos: list[dict] | None = None) -> dict[str, Any]:
         """
         Description: [private] 마지막화면 기본형 카드 (basicCard) 카카오톡 채팅방 전송
 
         Parameters: self - 카카오 스킬 응답 템플릿 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
-                    userRequest_msg - 사용자 입력 채팅 메세지
-                    master_data - 특정 마스터 데이터
-                    endInfos - 특정 기술지원 정보 리스트 (예) Autodesk or 상상진화 BOX 제품 설치 지원 등등...
+                    userRequest_msg - 사용자 입력 채팅 메세지 (default parameter)
+                    master_data - 특정 마스터 데이터 (default parameter)
+                    endInfos - 특정 기술지원 정보 리스트 (예) Autodesk or 상상진화 BOX 제품 설치 지원 등등... (default parameter) 
 
         Returns: self.__skillTemplate_format(outputs) - 마지막화면 기본형 카드 json 포맷
                  master_data - 특정 마스터 데이터
@@ -669,50 +696,43 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
 """
 *** 참고 ***
 *** 파이썬 문서 ***
-* 클래스
+* 1. 클래스
 참고 URL - https://docs.python.org/ko/3/tutorial/classes.html
 참고 2 URL - https://wikidocs.net/28
 참고 3 URL - https://wikidocs.net/215474
 
-* 클래스 다중 상속
+* 2. 클래스 다중 상속
 참고 URL - https://docs.python.org/ko/3.10/tutorial/classes.html#multiple-inheritance
 참고 2 URL - https://wikidocs.net/16073
 참고 3 URL - https://dojang.io/mod/page/view.php?id=2388
 
-* 클래스 인스턴스 변수 접근제한자 private 대신 언더바(__) 2개 사용
+* 3. 클래스 인스턴스 변수 접근제한자 private 대신 언더바(__) 2개 사용
 참고 URL - https://docs.python.org/ko/3/reference/expressions.html#private-name-mangling
 참고 2 URL - https://wikidocs.net/297028
 참고 3 URL - https://wikidocs.net/297029
 참고 4 URL - https://oniondev.tistory.com/20
 
-* functools @cached_property
+* 4. functools @cached_property
 참고 URL - https://docs.python.org/ko/dev/library/functools.html
 참고 2 URL - https://sosodev.tistory.com/entry/Python-cachedproperty-%EA%B0%92%EC%9D%84-%EC%9E%AC%EC%82%AC%EC%9A%A9-%ED%95%98%EA%B8%B0
 
-* 패키지, 모듈
+* 5. 패키지, 모듈
 참고 URL - https://docs.python.org/ko/3.13/tutorial/modules.html
 참고 2 URL - https://wikidocs.net/1418
 참고 3 URL - https://dojang.io/mod/page/view.php?id=2450
 
-* Type Hints
+* 6. Type Hints
 참고 URL - https://docs.python.org/ko/3.14/library/typing.html
 참고 2 URL - https://peps.python.org/pep-0484/
 참고 3 URL - https://devpouch.tistory.com/189
 참고 4 URL - https://supermemi.tistory.com/entry/Python-3-%ED%8C%8C%EC%9D%B4%EC%8D%AC%EC%97%90%EC%84%9C-%EC%9D%98%EB%AF%B8%EB%8A%94-%EB%AC%B4%EC%97%87%EC%9D%BC%EA%B9%8C-%EC%A3%BC%EC%84%9D
 
-* Type Hints class Any
+* 7. Type Hints class Any
 참고 URL - https://docs.python.org/ko/3.9/library/typing.html#the-any-type
 
-* Union Type
+* 8. Union Type
 참고 URL - https://docs.python.org/ko/3.11/library/stdtypes.html#types-union
 
-* non-default value parameter, default value parameter
+* 9. default parameter
 참고 URL - https://docs.python.org/ko/3/glossary.html#term-parameter
-참고 2 URL - https://docs.python.org/3/faq/programming.html#why-are-default-values-shared-between-objects
-
-* ValueError
-참고 URL - https://docs.python.org/ko/3.13/library/exceptions.html#ValueError
-
-* raise ValueError()
-참고 URL - https://docs.python.org/ko/3/tutorial/errors.html#raising-exceptions
 """

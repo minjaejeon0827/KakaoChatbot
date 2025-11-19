@@ -13,7 +13,7 @@
           "web": "https://www.ssflex.co.kr/"
         }
       },
-      "buttons": [ { "action": "message", "label": "챗봇 문의", "messageText": "챗봇 문의", "webLinkUrl": null }, 
+      "buttons": [ { "action": "message", "label": "챗봇 문의", "messageText": "챗봇 문의", "webLinkUrl": null },
                    { "action": "message", "label": "원격 지원", "messageText": "아래 링크를 클릭하시면 원격 지원 프로그램 다운로드 시작됩니다.\nhttps://113366.com/client/download?relayUri=imbu\n\n프로그램 다운로드 완료 후\n상상진화 기술지원 콜센터 02-3474-2263\n연락 부탁드립니다.", "webLinkUrl": null } ],
       "quickReplies": [ { "action": null, "label": null, "messageText": null } ],
       "itemList": [ { "title": null, "description": null } ]
@@ -31,7 +31,7 @@
           "web": "https://www.ssflex.co.kr/app/shop/goods"
         }
       },
-      "buttons": [ { "action": "message", "label": "Autodesk 제품", "messageText": "Autodesk 제품 설치 지원", "webLinkUrl": null }, 
+      "buttons": [ { "action": "message", "label": "Autodesk 제품", "messageText": "Autodesk 제품 설치 지원", "webLinkUrl": null },
                    { "action": "message", "label": "상상진화 BOX 제품", "messageText": "상상진화 BOX 제품 설치 지원", "webLinkUrl": null } ],
       "quickReplies": [ { "action": null, "label": null, "messageText": null } ],
       "itemList": [ { "title": "▶", "description": "쉽고 빠른 제품 설치 안내" } ]
@@ -48,7 +48,7 @@
         "link": {
           "web": null
         }
-      }, 
+      },
       "buttons": [ { "action": null, "label": null, "messageText": null, "webLinkUrl": null } ],
       "quickReplies": [ { "action": "message", "label": "AutoCAD", "messageText": "AutoCAD" },
                         { "action": "message", "label": "Revit", "messageText": "Revit" },
@@ -108,7 +108,7 @@
       }, 
       "buttons": [ { "action": null, "label": null, "messageText": null, "webLinkUrl": null } ],
       "quickReplies": [ { "action": "message", "label": "2022~2026", "messageText": "2022~2026 버전 공통 설치 방법" } ],
-      "itemList": [ { "title": null, "description": null } ]    
+      "itemList": [ { "title": null, "description": null } ]
     },
     "endCard": {
       "levelNo": "end",
@@ -127,7 +127,7 @@
                    { "action": "webLink", "label": "동영상", "messageText": null, "webLinkUrl": null } ],
       "quickReplies": [ { "action": null, "label": null, "messageText": null } ],
       "itemList": [ { "title": null, "description": null } ],
-      "autoCADInfos": [ 
+      "autoCADInfos": [
         {
           "version": "2025, 2026",
           "videoYn": "Y", 
@@ -135,7 +135,7 @@
           "webLinkUrl": "https://www.ssflex.co.kr/support-services/guide_install?mode=list&page=0&size=10&sort=createDate,DESC&searchKey=&searchText=2024&statusCode=&cateCode=&idx=1309&boardKey=guide_install" 
         }
       ],
-      "revitInfos": [ 
+      "revitInfos": [
         { 
           "version": "2025, 2026",
           "videoYn": "Y", 
@@ -143,7 +143,7 @@
           "webLinkUrl": "https://www.ssflex.co.kr/support-services/guide_install?mode=list&page=0&size=10&sort=createDate,DESC&searchKey=&searchText=2024&statusCode=&cateCode=&idx=1308&boardKey=guide_install" 
         }
       ],
-      "navisworksManageInfos": [ 
+      "navisworksManageInfos": [
         { 
           "version": "2025, 2026",
           "videoYn": "Y", 
@@ -151,7 +151,7 @@
           "webLinkUrl": "https://www.ssflex.co.kr/support-services/guide_install?mode=list&page=0&size=10&sort=createDate,DESC&searchKey=&searchText=&statusCode=&cateCode=&idx=1307&boardKey=guide_install"
         }
       ],
-      "infraWorksInfos": [ 
+      "infraWorksInfos": [
         { 
           "version": "2025, 2026",
           "videoYn": "Y", 
@@ -167,7 +167,7 @@
           "webLinkUrl": "https://www.ssflex.co.kr/support-services/guide_install?mode=list&page=0&size=10&sort=createDate,DESC&searchKey=&searchText=2024&statusCode=&cateCode=&idx=1306&boardKey=guide_install"
         }
       ],                     
-      "revitBoxInfos": [ 
+      "revitBoxInfos": [
         { 
           "version": "2022~2026",
           "videoYn": "Y", 
@@ -175,7 +175,7 @@
           "webLinkUrl": "https://www.ssflex.co.kr/support-services/guide_install?mode=list&page=0&size=10&sort=createDate,DESC&searchKey=&searchText=&statusCode=&cateCode=&idx=1303&boardKey=guide_install"
         }
       ],
-      "cadBoxInfos": [ 
+      "cadBoxInfos": [
         { 
           "version": "2022~2026", 
           "videoYn": "Y", 
@@ -183,15 +183,15 @@
           "webLinkUrl": "https://www.ssflex.co.kr/support-services/guide_install?mode=list&page=0&size=10&sort=createDate,DESC&searchKey=&searchText=cadbox&statusCode=&cateCode=&idx=1304&boardKey=guide_install" 
         }
       ],
-      "energyBoxInfos": [ 
+      "energyBoxInfos": [
         { 
-          "version": "2022~2026", 
-          "videoYn": "Y", 
+          "version": "2022~2026",
+          "videoYn": "Y",
           "text": "안녕하세요 상상진화 입니다.\n\nEnergyBOX 2022~2026 버전 공통\n제품 설치방법을 안내 드립니다.\n\nEnergyBOX v2.1.9 파일 다운로드 링크\n\n다운로드 링크 클릭\nhttps://43834191.fs1.hubspotusercontent-na2.net/hubfs/43834191/1.%20%EA%B8%B0%EC%88%A0%EC%A7%80%EC%9B%90/ENERGYBOX/Imagine%20Builder%20ENERGYBOX_Setup_x64_v2.1.9.exe\n\n1. 먼저 EnergyBOX의 설치파일을 더블클릭하여 실행합니다.\n\n2. \"다음\"을 클릭합니다.\n\n3. 약관을 확인하고, \"동의함\"을 클릭합니다.\n\n4. \"설치\"를 클릭합니다.\n\n5. 설치가 완료될 때까지 대기합니다.\n\n6. \"마침\"을 클릭합니다.\n\n7. EnergyBOX 설치가 완료되면, EnergyBOX 매뉴얼이 자동으로 실행됩니다.\n\n8. EnergyBOX의 실행은 AutoCAD를 실행하는 것이 아닌, 바탕화면의 EnergyBOX 아이콘을 더블클릭하여 실행합니다.\n\n9. EnergyBOX를 실행할 AutoCAD의 버전을 선택합니다. 버전을 선택하면 AutoCAD가 자동으로 실행됩니다.\n\n10. 활성화 된 DLL 파일에 \"항상 로드\"를 클릭합니다.\n\n11. 고객번호와 제품번호를 입력하고 온라인 인증을 클릭합니다.\n\n12. 고객 정보를 입력하고, \"인증\" 버튼을 클릭합니다.\n\n13. 인증이 성공하면 제품을 사용할 수 있습니다. 감사합니다.", 
           "webLinkUrl": "https://www.ssflex.co.kr/support-services/guide_install?mode=list&page=0&size=10&sort=createDate,DESC&searchKey=&searchText=energybox&statusCode=&cateCode=&idx=1302&boardKey=guide_install" 
         }
       ],
-      "etcInfos": [ { "typeCode": "etcTest", "videoYn": null, "text": null, "webLinkUrl": null } ] 
+      "etcInfos": [ { "typeCode": "etcTest", "videoYn": null, "text": null, "webLinkUrl": null } ]
     },
     "emptyResponse": {
       "levelNo": "etc",
@@ -205,10 +205,10 @@
         "link": {
           "web": null
         }
-      }, 
+      },
       "buttons": [ { "action": null, "label": null, "messageText": null, "webLinkUrl": null } ],
       "quickReplies": [ { "action": null, "label": null, "messageText": null } ],
       "itemList": [ { "title": null, "description": null } ]
-    }   
+    }
   }
 }
