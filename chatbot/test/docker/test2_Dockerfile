@@ -1,0 +1,67 @@
+# Dockerfile 명령어
+# 코드 리뷰 참고 URL - https://chatgpt.com/c/691d6f71-6a90-8321-951f-e270ab4aa753
+# Base image (Amazon Linux 기반의 Lambda 런타임)
+FROM public.ecr.aws/lambda/python:3.11
+
+# 필수 패키지 설치
+RUN yum install -y \
+    gcc \
+    gcc-c++ \
+    make \
+    cmake \
+    swig \
+    python3-devel \
+    wget \
+    git
+
+# requirements.txt 사용해서 Python 패키지 설치
+COPY requirements.txt .
+RUN pip install --upgrade pip
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 전체 파일 복사 (.dockerignore 파일 작성된 디렉토리 - chatbot_env, 파일 - Dockerfile, 파일 - .git 3가지 복사 대상 제외!)
+COPY . .
+
+# 람다 함수(Lambda Function) 핸들러 설정
+CMD ["lambda_function.handler"]
+
+# * 참고
+# *** 카카오 챗봇 배포 순서 ***
+# 1 단계: Docker 카카오 챗봇 이미지 배포 - 아마존 웹서비스(AWS) ECR(Elastic Container Registry)
+# 참고 URL - https://chatgpt.com/c/6822e459-65f8-8010-b848-afebf01bf52e
+# 참고 2 URL - https://chatgpt.com/c/6823d65b-23c8-8010-8e97-4b64d38f226f
+
+# 1. 파일 탐색기 실행 -> 폴더 경로 (예) "D:\minjae" 이동 -> 키보드 "Shift" 키 누르고 -> 폴더 (예) "testKakaoChatbot" 마우스 우클릭 -> "여기에 PowerShell 창 열기(S)" 클릭 
+# 2. Windows PowerShell 창 실행 -> 터미널창에 아래 명령어 순서대로 입력 
+# 3. 명령어 aws configure 입력 및 엔터
+#    -> 명령어 AWS Access Key ID [None]: 액세스 키 입력 및 엔터
+#    -> 명령어 AWS Secret Access Key [None]: 비밀(Secret) 액세스 키 입력 및 엔터
+#    -> 명령어 Default region name [None]: ap-northeast-2 입력 및 엔터
+#    -> 명령어 Default output format [None]: json 입력 및 엔터
+#    -> 명령어 type $env:USERPROFILE\.aws\credentials 입력 및 엔터 -> 아래처럼 액세스키, 시크릿 액세스 키 출력
+#       [default]
+#       aws_access_key_id = 액세스 키
+#       aws_secret_access_key = 비밀(Secret) 액세스 키
+#    -> 명령어 aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 980921720325.dkr.ecr.ap-northeast-2.amazonaws.com 입력 및 엔터 
+#    -> 아래처럼 로그인 성공 출력 
+#       Login Succeeded
+#    -> 자격증명 명령어 aws sts get-caller-identity 입력 및 엔터 
+#    -> 아래처럼 자격증명 결과 출력
+#       {
+#           "UserId": "AIDA6IY35TYC7JM4K6R5E",
+#           "Account": "980921720325",
+#           "Arn": "arn:aws:iam::980921720325:user/codingapple1"
+#       }
+
+# * 별도 버전 필요 없는 경우
+# 4. 명령어 docker build -t test_kakao_repo . 입력 및 엔터
+# 5. 명령어 docker tag test_kakao_repo:latest 980921720325.dkr.ecr.ap-northeast-2.amazonaws.com/test_kakao_repo:latest 입력 및 엔터 
+# 6. 명령어 docker push 980921720325.dkr.ecr.ap-northeast-2.amazonaws.com/test_kakao_repo:latest 입력 및 엔터 
+# 7. 아마존 웹서비스(AWS) 람다 함수(Lambda Function) 함수명 (예) test_kakao 콘솔창 들어와서 탭 "이미지" 클릭 -> 화면 우측 버튼 "새 이미지 배포" 클릭 
+# 8. 화면 "이미지 선택" 이동 -> 버튼 "이미지 찾아보기" 클릭 -> 팝업화면 "컨테이너 이미지 선택" 출력 
+#    -> 이미지 태그 항목 "latest"에 속한 위의 Docker 명령어 입력해서 업로드 된 카카오 챗봇 이미지 체크 -> 버튼 "이미지 선택" 클릭 -> 버튼 "저장" 클릭
+# 9. 시간 대기 -> 화면 상단 녹색 바 출력되면 카카오 챗봇 이미지 배포 완료 
+
+# 2 단계: 카카오 챗봇 관리자센터 최종 배포
+# 10. 카카오 챗봇 관리자센터 이동 -> 화면 좌측 탭 "배포" 클릭 -> 화면 "배포" 이동 -> 항목 "배포 형태" 전체 배포 체크 -> 버튼 "배포" 클릭 
+# 11. 카카오 챗봇 최종 배포 완료   
