@@ -1,24 +1,36 @@
 # Dockerfile 명령어
+# 코드 리뷰 참고 URL - https://chatgpt.com/c/691d6f71-6a90-8321-951f-e270ab4aa753
 # Base image (Amazon Linux 기반의 Lambda 런타임)
-FROM public.ecr.aws/lambda/python:3.11
+# ============================
+# Stage 1: Build Layer
+# ============================
+FROM public.ecr.aws/lambda/python:3.11 AS builder
 
-# 필수 패키지 설치
-RUN yum install -y \
+# 보안 패치 & 빌드에 필요한 최소 패키지만 설치
+RUN yum update -y && \
+    yum install -y \ 
     gcc \
     gcc-c++ \
-    make \
-    cmake \
-    swig \
-    python3-devel \
-    wget \
-    git
+    make \ 
+    python3-devel && \
+    yum clean all && \
+    rm -rf /var/cache/yum
 
-# requirements.txt 사용해서 Python 패키지 설치
+# requirements.txt만 우선 복사 (캐싱 최적화)
 COPY requirements.txt .
-RUN pip install --upgrade pip
-RUN pip install --no-cache-dir -r requirements.txt
 
-# 전체 파일 복사 (.dockerignore 파일 작성된 디렉토리 - chatbot_env, 파일 - Dockerfile, 파일 - .git 3가지 복사 대상 제외!)
+# python 패키지를 /tmp/python 에 설치 (AWS Lambda 표준 구조)
+RUN pip install --no-cache-dir -r requirements.txt --target /tmp/python
+
+# ============================
+# Stage 2: Runtime Image
+# ============================
+FROM public.ecr.aws/lambda/python:3.11
+
+# Stage 1에서 빌드한 패키지들만 복사 (가볍고 빠른 런타임)
+COPY --from=builder /tmp/python /var/task/
+
+# 애플리케이션 코드만 복사 (.dockerignore 파일 작성된 디렉토리 - chatbot_env, 파일 - Dockerfile, 파일 - .git 3가지 복사 대상 제외!)
 COPY . .
 
 # 람다 함수(Lambda Function) 핸들러 설정
