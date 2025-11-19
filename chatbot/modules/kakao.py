@@ -442,9 +442,9 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
 
         logger.info(f"[테스트] 비어있는 메세지 master_data: '{master_data}'")
 
-        empty_format = self.__skillTemplate_format()
+        outputs = []
 
-        return { "format": empty_format, "meta_data": master_data }
+        return { "format": self.__skillTemplate_format(outputs), "meta_data": master_data }
 
     def __create_buttons(self, master_data: dict[str, Any], message_prefix: str | None = None) -> list[dict]:
         """
