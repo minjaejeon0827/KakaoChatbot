@@ -2,37 +2,31 @@
 * 아마존 웹서비스 람다 함수 (AWS Lambda function) 실행 진입점 (handler)
 코드 리뷰 참고 URL - https://chatgpt.com/c/691e9f6e-3940-832a-afda-92c53ae4b49a
 
-* 아마존 웹서비스 (AWS) 다중인증 (MFA는 Multi-Factor Authentication) 등록 방법 및 모바일 어플 Google Authenticator 설치 및 사용 방법
+아마존 웹서비스(AWS) 다중인증 (MFA는 Multi-Factor Authentication) 등록 방법 및 모바일 어플 Google Authenticator 설치 및 사용 방법 
 참고 URL - https://happy-jjang-a.tistory.com/223
-
-* lambda_function.py 파이썬 스크립트 파일 소스 코드 리팩토링 (2025.09.30 minjae)
-참고 URL - https://claude.ai/chat/786c45b9-f744-4fcf-950a-bcc178417e1c
 """
 
+# TODO: lambda_function.py 파이썬 스크립트 파일 소스 코드 리팩토링 하기 (2025.09.30 minjae)
+# 참고 URL - https://claude.ai/chat/786c45b9-f744-4fcf-950a-bcc178417e1c
+
+import json         # json 데이터 처리   
+import threading    # 멀티스레드 패키지 
+import time         # 챗봇 답변 시간 계산 
+import queue as q   # 자료구조 queue (deque 기반) 
+import os           # 답변 결과 임시 로그 텍스트 파일('/tmp/botlog.txt') 저장
+
 # 1. 공통 모듈 먼저 import
-from commons import chatbot_helper   # 챗봇 전용 도움말 텍스트
+from commons import chatbot_helper   # 챗봇 전용 도움말 텍스트  
 
 # 2. singleton 모듈을 log 모듈 보다 먼저 import
-from modules.singleton import MasterEntity   # 싱글톤 (singleton) 패턴
+from modules.singleton import MasterEntity   # 싱글톤(singleton) 패턴
 from modules.chatbot_enum import EnumValidator   # 데이터 유효성 검사
 
 # 3. singleton 모듈이 먼저 초기화된 후 log 모듈 import 
-from modules.log import logger   # 챗봇 전역 로그 객체 (logger)
+from modules.log import logger   # 챗봇 전역 로그 객체(logger)
 
-# 4. Type Hints class Any import
-from typing import Any
-
-# 5. 나머지 모듈 import
+# 4. 나머지 모듈 import
 from modules.kakao import KakaoResponseFormatter   # 카카오 스킬 응답 템플릿 json 포맷
-# 아래처럼 LambdaContext 클래스 import 처리하기 위해 비쥬얼스튜디오코드 (VSCode) cmd 터미널창 열고 -> 파이썬 패키지 설치 명령어 "pip install aws-lambda-powertools" 입력 및 엔터 (2025.11.20 minjae)
-# 참고 URL - https://claude.ai/chat/27384cf9-7899-4dd6-9bde-12f1245c7da0
-from aws_lambda_powertools.utilities.typing import LambdaContext
-
-import json         # json 데이터 처리
-import threading    # 멀티스레드 패키지
-import time         # 챗봇 답변 시간 계산
-import queue as q   # 자료구조 queue (deque 기반)
-import os           # 답변 결과 임시 로그 텍스트 파일 ('/tmp/botlog.txt') 저장
 
 # 마스터 데이터 유효성 검사 대상 리스트
 valid_targets = [ chatbot_helper._buttons,
@@ -53,28 +47,31 @@ kakaoResponseFormatter = KakaoResponseFormatter(masterEntity.get_master_datas)  
 
 prev_userRequest_msg = None   # 이전 사용자 입력 채팅 메세지 (챗봇 응답 시간 5초 초과시 응답 재요청 할 때 사용)
 
-def handler(event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
+def handler(event, context):
     """
-    Description: 아마존 웹서비스 람다 함수(AWS Lambda function) 실행 진입점
-                 람다(Lambda)가 사용자로 부터 실행명령을 받았을 때, 실행되는 메인 함수(handler)이다.
-                 파이썬 또는 C/C++ 프로그래밍 언어에서 main 함수와 같은 역할이다.
+    Description: 
+        아마존 웹서비스 람다 함수(AWS Lambda function) 메인 함수(handler)
+        람다(Lambda)가 사용자로 부터 실행명령을 받았을 때, 실행되는 메인 함수(handler)이다.
+        파이썬 또는 C/C++ 프로그래밍 언어에서 main 함수와 같은 역할을 한다.
 
-    Parameters: event - 카카오톡 채팅방에 사용자가 입력한 채팅 정보 (event['body']: 카카오톡 채팅방 실제 채팅 정보 저장된 변수)
-                context - 아마존 웹서비스 람다 함수 (AWS Lambda function)에 속한 메타데이터 (metadata) 객체
+    Parameters:
+        event (dict): 카카오톡 채팅방에 사용자가 입력한 채팅 정보 (event['body'] - 카카오톡 채팅방 실제 채팅 정보 저장된 변수)
+        context (object): 아마존 웹서비스 람다 함수(AWS Lambda function)에 속한 메타데이터(metadata) 객체 (LambdaContext class)
+
+        참고 URL - https://docs.aws.amazon.com/ko_kr/lambda/latest/dg/python-context.html
+        참고 2 URL - https://jibinary.tistory.com/551
         
-    Returns: 카카오톡 서버로 전송할 json format 형식 데이터
+    Returns:
+        dict: 카카오톡 서버로 전송할 json format 형식 데이터
     """
 
     res_queue = None    # 챗봇 답변 내용 담을 큐(queue) 객체 .put(), .get() 메서드 사용 가능 
     run_flag = False    # 챗봇 응답 시간 5초 초과 여부
-    start_time = time.time()    # 챗봇 응답 시간 계산하기 위해 메인 함수 (handler) 시작하는 시간을 변수 start_time에 저장 
+    start_time = time.time()    # 챗봇 응답 시간 계산하기 위해 메인 함수(handler) 시작하는 시간을 변수 start_time에 저장 
     
     try:
-        # logger.info(f"[테스트] event 클래스 타입 - {type(event)}")
-        # logger.info(f"[테스트] context 클래스 타입 - {type(context)}")
-
-        # 키(key) 누락 체크 - event['body']가 존재하지 않는 경우
-        # 콜드 스타트 (ColdStart)인 경우 제외 
+        # 키(key) 누락 체크
+        # event['body']가 존재하지 않는 경우 - ColdStart(콜드 스타트)인 경우 제외 
         # 참고 URL - https://chatgpt.com/c/687a0180-e2bc-8010-9a19-90695a1bf477
         if chatbot_helper._body not in event: 
             raise KeyError(f"카카오톡 채팅방 실제 채팅 정보 저장된 변수 event['body'] - '{chatbot_helper._body}' 키 값 존재 안 함.")
@@ -82,21 +79,21 @@ def handler(event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
         # logger.info("[테스트] 사용자 입력 채팅 정보 - %s" %event['body'])
         logger.info(f"[테스트] 사용자 입력 채팅 정보 - {event[chatbot_helper._body]}")
 
-        # 아래와 같은 오류 메시지 출력으로 인해 메서드 json.loads 사용해서 json 문자열 -> dict 객체 변환 처리 (2025.07.21 minjae)
+        # TODO: 아래와 같은 오류 메시지 출력으로 인해 메서드 json.loads 사용해서 json 문자열 -> dict 객체 변환 처리 (2025.07.21 minjae)
         # 오류 메시지 - string indices must be integers, not 'str'
         # 참고 URL - https://docs.python.org/ko/3.13/library/json.html
         # 참고 2 URL - https://0pen3r.tistory.com/200
         # 참고 3 URL - https://kim-jong-hyun.tistory.com/148
         # 참고 4 URL - https://chatgpt.com/c/687d89d3-ab18-8010-a0ea-03039b64c94e
         # 참고 5 URL - https://wikidocs.net/126088
-        event_body = json.loads(event[chatbot_helper._body])
+        event_body = json.loads(event[chatbot_helper._body])   
         logger.info(f"[테스트] event_body['action'] - {event_body[chatbot_helper._action]}")
           
-        if chatbot_helper._cold_start in event_body[chatbot_helper._action]:   # 콜드 스타트 (ColdStart)인 경우 - 아마존 웹서비스 람다 함수 (AWS Lambda function) 초기 응답 속도 느림 콜드 스타트 (ColdStart) 현상  
+        if chatbot_helper._cold_start in event_body[chatbot_helper._action]:   # ColdStart(콜드 스타트)인 경우 - 아마존 웹서비스 람다 함수(AWS Lambda function) 초기 응답 속도 느림(Cold Start) 현상  
             logger.info("[ColdStart -> WarmUp] AWS Lambda Function 컨테이너 초기화 - 완료!")
             return
 
-        kakao_request = event_body
+        kakao_request = event_body       
 
         file_name = chatbot_helper._botlog_file_path
         
@@ -118,25 +115,25 @@ def handler(event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
         # logger.critical('[테스트] 시스템 오류 - %s' %sys_error_msg)
         logger.critical(f"[테스트] 시스템 오류 - {sys_error_msg}", exc_info=True)
     finally:
-        if None is res_queue:   # 챗봇 답변 내용 담을 큐(queue) 객체 res_queue 값이 None인 경우
+        if None is res_queue:   # 챗봇 답변 내용 담을 큐(queue) 객체 res_queue 값이 None인 경우 
             logger.info("[테스트] handler - finally 강제 종료 - [사유] 큐(queue) 객체 res_queue 생성 안 함.")
             return
              
         while(time.time() - start_time < chatbot_helper._time_limit):   # 챗봇 응답 시간 3.5초 이내인 경우
             if False == res_queue.empty():
-                response = res_queue.get()  # 큐(queue) 객체 res_queue 에서 데이터 가져오기
+                response = res_queue.get()  # 큐(queue) 객체 res_queue 에서 데이터 가져오기 
                 res_queue.task_done()   # 큐(queue) 객체 res_queue 에서 가져온 데이터에 대한 작업 완료
                 logger.info(f"[테스트] 카카오 json 포맷 기반 챗봇 답변 내용 - {response}")
 
-                run_flag = True
-                break
-            time.sleep(chatbot_helper._polling_interval)
+                run_flag= True   
+                break    
+            time.sleep(chatbot_helper._polling_interval) 
  
         if False == run_flag:   # 챗봇 응답 시간 5초 초과한 경우     
             # response = kakao.timeover_quickReplies(chatbot_helper._done_thinking)
             response = kakaoResponseFormatter.timeover_quickReplies()
 
-        res_msg = json.dumps(response)
+        res_msg = json.dumps(response) 
         # logger.info("[테스트] 챗봇 답변 채팅 정보 - %s" %res_msg)
         logger.info(f"[테스트] 챗봇 답변 채팅 정보 - {res_msg}")
 
@@ -147,20 +144,21 @@ def handler(event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
                 'Access-Control-Allow-Origin': '*',
             }
         }
-
-def chatbot_response(kakao_request: dict[str, Any], res_queue: q.Queue, file_name: str) -> None:
+    
+def chatbot_response(kakao_request, res_queue, file_name):
     """
-    Description: 챗봇 답변 요청 및 큐 (queue) 객체 res_queue 답변 내용 추가
+    Description: 챗봇 답변 요청 및 큐(queue) 객체 res_queue 답변 내용 추가
 
-    Parameters: kakao_request - 카카오톡 채팅방 실제 채팅 정보
-                res_queue - 챗봇 답변 내용 담을 큐(queue) 객체
-                file_name - 아마존 웹서비스 람다 함수(AWS Lambda function) -> 임시 로그 텍스트 파일('/tmp/botlog.txt') 상대 경로
+    Parameters:
+        kakao_request (dict): 카카오톡 채팅방 실제 채팅 정보
+        res_queue (object): 챗봇 답변 내용 담을 큐(queue) 객체 (Queue class)
+        file_name (str): 아마존 웹서비스 람다 함수(AWS Lambda function) -> 임시 로그 텍스트 파일('/tmp/botlog.txt') 상대 경로
 
-                * 참고
-                /tmp 임시 디렉터리(스토리지) - 아마존 웹서비스 람다 함수(AWS Lambda function)에서 파일을 저장할 수 있는 임시 로컬 스토리지 영역
-                실행 결과(Execution results)는 람다 함수(Lambda Function) 콘솔 "테스트" 탭에서 함수 실행 성공 여부, 실행 결과, 임시 로그 확인 가능
-                참고 URL - https://docs.aws.amazon.com/ko_kr/lambda/latest/dg/configuration-ephemeral-storage.html#configuration-ephemeral-storage-use-cases
-                참고 2 URL - https://inpa.tistory.com/entry/AWS-%F0%9F%93%9A-%EB%9E%8C%EB%8B%A4-tmp-%EC%9E%84%EC%8B%9C-%EC%8A%A4%ED%86%A0%EB%A6%AC%EC%A7%80-%EC%82%AC%EC%9A%A9-%EB%B0%A9%EB%B2%95
+        * 참고 
+        /tmp 임시 디렉터리(스토리지) - 아마존 웹서비스 람다 함수(AWS Lambda function)에서 파일을 저장할 수 있는 임시 로컬 스토리지 영역
+        실행 결과(Execution results)는 람다 함수(Lambda Function) 콘솔 "테스트" 탭에서 함수 실행 성공 여부, 실행 결과, 임시 로그 확인 가능
+        참고 URL - https://docs.aws.amazon.com/ko_kr/lambda/latest/dg/configuration-ephemeral-storage.html#configuration-ephemeral-storage-use-cases
+        참고 2 URL - https://inpa.tistory.com/entry/AWS-%F0%9F%93%9A-%EB%9E%8C%EB%8B%A4-tmp-%EC%9E%84%EC%8B%9C-%EC%8A%A4%ED%86%A0%EB%A6%AC%EC%A7%80-%EC%82%AC%EC%9A%A9-%EB%B0%A9%EB%B2%95
 
     Returns: 없음.
     """
@@ -182,10 +180,6 @@ def chatbot_response(kakao_request: dict[str, Any], res_queue: q.Queue, file_nam
     userRequest_msg = kakao_request[chatbot_helper._userRequest][chatbot_helper._utterance]   # 사용자 입력 채팅 메세지 가져오기 
     
     try:
-        # logger.info(f"[테스트] kakao_request 클래스 타입 - {type(kakao_request)}")
-        # logger.info(f"[테스트] res_queue 클래스 타입 - {type(res_queue)}")
-        # logger.info(f"[테스트] file_name 클래스 타입 - {type(file_name)}")
-
         # 챗봇 응답 시간 5초 초과시 응답 재요청 기능 구현 
         # 참고 URL - https://claude.ai/chat/d550ac84-5c0c-4805-a600-9fdfd1236714
         if chatbot_helper._done_thinking in userRequest_msg:   # 시간 5초 초과시 응답 재요청
@@ -277,11 +271,12 @@ def chatbot_response(kakao_request: dict[str, Any], res_queue: q.Queue, file_nam
         res_queue.put(kakaoResponseFormatter.error_text(f"{chatbot_helper._error_title}\n{sys_error_msg}\n{chatbot_helper._error_techSupport}"))
         raise    # raise로 함수 resChatbot의 현재 예외를 다시 발생시켜서 함수 chatbot_response 호출한 상위 코드 블록으로 넘김
 
-def dbReset(file_name: str) -> None:
+def dbReset(file_name):
     """
     Description: 임시 로그 초기화
 
-    Parameters: file_name - 아마존 웹서비스 람다 함수 (AWS Lambda function) -> 임시 로그 텍스트 파일 ('/tmp/botlog.txt') 상대 경로
+    Parameters:
+        file_name (str): 아마존 웹서비스 람다 함수(AWS Lambda function) -> 임시 로그 텍스트 파일('/tmp/botlog.txt') 상대 경로
 
     Returns: 없음.
     """
@@ -289,12 +284,13 @@ def dbReset(file_name: str) -> None:
     with open(file_name, 'w') as f:
         f.write("")
 
-def dbSave(file_name: str, msg: str) -> None:
+def dbSave(file_name, msg):
     """
     Description: 임시 로그 기록
 
-    Parameters: file_name - 아마존 웹서비스 람다 함수 (AWS Lambda function) -> 임시 로그 텍스트 파일 ('/tmp/botlog.txt') 상대 경로
-                msg - 로그 메시지
+    Parameters:
+        file_name (str): 아마존 웹서비스 람다 함수(AWS Lambda function) -> 임시 로그 텍스트 파일('/tmp/botlog.txt') 상대 경로
+        msg (str): 로그 메시지
 
     Returns: 없음.
     """
@@ -302,12 +298,13 @@ def dbSave(file_name: str, msg: str) -> None:
     with open(file_name, 'w') as f:
         f.write(msg)
 
-def saveLog(file_name: str, msg: str) -> None:
+def saveLog(file_name, msg):
     """
     Description: 임시 로그 초기화 및 기록
 
-    Parameters: file_name - 아마존 웹서비스 람다 함수 (AWS Lambda function) -> 임시 로그 텍스트 파일 ('/tmp/botlog.txt') 상대 경로
-                msg - 로그 메시지
+    Parameters:
+        file_name (str): 아마존 웹서비스 람다 함수(AWS Lambda function) -> 임시 로그 텍스트 파일('/tmp/botlog.txt') 상대 경로
+        msg (str): 로그 메시지
 
     Returns: 없음.
     """
@@ -319,12 +316,7 @@ def saveLog(file_name: str, msg: str) -> None:
 """
 *** 참고 ***
 *** 아마존 웹서비스 문서 ***
-* LambdaContext 클래스
-참고 URL - https://docs.aws.amazon.com/powertools/python/latest/utilities/typing/
-참고 2 URL - https://docs.aws.amazon.com/ko_kr/lambda/latest/dg/python-context.html
-참고 3 URL - https://jibinary.tistory.com/551
-
-* 콜드 스타트 (ColdStart)
+* ColdStart(콜드 스타트)
 아마존 웹서비스 람다 함수(AWS Lambda function) 초기 응답 속도 느림(Cold Start) 개선 (2025.07.16 minjae)
 참고 URL - https://docs.aws.amazon.com/ko_kr/lambda/latest/dg/provisioned-concurrency.html
 참고 2 URL - https://jeonghwan-kim.github.io/dev/2021/04/01/aws-lambda-cold-start.html  
@@ -333,7 +325,7 @@ def saveLog(file_name: str, msg: str) -> None:
 참고 5 URL - https://chatgpt.com/c/687872f0-2ad0-8010-9eb3-2b4e8dba2ba8
 참고 6 URL - https://chatgpt.com/c/6878b74a-b478-8010-b277-313b21eeceee
 
-* 아마존 웹서비스 람다 함수 (AWS Lambda function)와 EventBridge 조합으로 일정 시간마다 함수 handler 호출하여 초기 응답 속도 느림(Cold Start) 개선 (2025.07.18 minjae)
+* 아마존 웹서비스 람다 함수(AWS Lambda function)와 EventBridge 조합으로 일정 시간마다 함수 handler 호출하여 초기 응답 속도 느림(Cold Start) 개선 (2025.07.18 minjae)
 참고 URL - https://docs.aws.amazon.com/ko_kr/eventbridge/latest/userguide/eb-run-lambda-schedule.html
 참고 2 URL - https://docs.aws.amazon.com/ko_kr/AmazonCloudWatch/latest/logs/example_cross_LambdaScheduledEvents_section.html
 참고 3 URL - https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/python/example_code/lambda#readme
