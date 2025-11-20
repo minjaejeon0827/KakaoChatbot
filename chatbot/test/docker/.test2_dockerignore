@@ -1,0 +1,10 @@
+chatbot_env
+Dockerfile
+.git
+__pycache__/
+*.log
+*.mp4
+*.pdf
+node_modules/
+large_data/
+env/
