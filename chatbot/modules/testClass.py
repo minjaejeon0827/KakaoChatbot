@@ -1,5 +1,5 @@
 """
-* 테스트 클래스 구현 모듈
+* 테스트 클래스 구현 모듈 (module)
 
 *** 파이썬 문서 ***
 * 1. 클래스
@@ -17,7 +17,7 @@
 참고 URL - https://docs.python.org/ko/dev/library/functools.html
 참고 2 URL - https://sosodev.tistory.com/entry/Python-cachedproperty-%EA%B0%92%EC%9D%84-%EC%9E%AC%EC%82%AC%EC%9A%A9-%ED%95%98%EA%B8%B0
 
-* 4. 패키지, 모듈
+* 4. 패키지 (package), 모듈 (module)
 참고 URL - https://docs.python.org/ko/3.13/tutorial/modules.html
 참고 2 URL - https://wikidocs.net/1418
 참고 3 URL - https://dojang.io/mod/page/view.php?id=2450

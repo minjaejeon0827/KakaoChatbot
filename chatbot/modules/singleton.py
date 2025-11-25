@@ -1,19 +1,19 @@
 """
-* 싱글톤 (singleton) 패턴 전용 모듈
+* 싱글톤 (singleton) 패턴 전용 모듈 (module)
 코드 리뷰 참고 URL - https://chatgpt.com/c/691424a3-8e0c-8327-98b9-cabf6b80cf17
 코드 리뷰 참고 2 URL - https://chatgpt.com/c/691c1cc3-6614-8321-bda2-126705ee5b89
-"""  
+"""
 
-# 1. 공통 모듈 먼저 import
+# 1. 공통 모듈 (module) 먼저 import
 from commons import chatbot_helper   # 챗봇 전용 도움말 텍스트
 
-# 2. 챗봇 커스텀 로그 기록 모듈 import
-from modules import chatbot_logger   # log.py -> 챗봇 전역 로그 객체 (logger) 사용 못하는 경우 import
+# 2. 챗봇 커스텀 로그 기록 모듈 (module) import
+from utils import chatbot_logger   # log.py -> 챗봇 전역 로그 객체 (logger) 사용 못하는 경우 import
 
 # 3. Type Hints class import
 from typing import Any, Self
 
-# 4. 나머지 모듈 import
+# 4. 나머지 모듈 (module) import
 import logging   # 로그 기록
 import asyncio   # 비동기 프로그래밍 (async/await)
 
@@ -53,7 +53,7 @@ class SingletonBase:   # 암시적으로 object 클래스 상속
     Methods: 없음.
 
     Notes: - 싱글톤 (singleton) 패턴으로 구현되어 여러 번 인스턴스 (Instance) 생성해도 동일한 객체 반환
-           - 아마존 웹서비스 람다 함수 (AWS Lambda function) 환경에서는 단일 스레드 (single thread)로 실행되므로 스레드 락 (_lock = threading.Lock()) 불필요
+           - 아마존 웹서비스 람다 함수 (AWS Lambda Function) 환경에서는 단일 스레드 (single thread)로 실행되므로 스레드 락 (_lock = threading.Lock()) 불필요
     """
     
     # _lock = threading.Lock()   # _lock = threading.Lock() 용도 - 일반적인 Python 응용 프로그램 환경에서 여러 스레드가 동시에 싱글톤 (singleton) 클래스 인스턴스 (Instance)를 생성하려 할 때 또는 Race condition으로 인해 여러 인스턴스 (Instance)가 생성될 가능성이 있을 때 사용함.
@@ -134,7 +134,7 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
         Returns: 없음.
         """
 
-        # TODO: 아마존 웹서비스 람다 함수 (AWS Lambda function) 내부에서 이미 event loop 실행 중일 경우 아래와 같은 오류 메시지가 출력되어 asyncio.get_event_loop, loop.create_task 로직 보완 (2025.11.13 minjae)
+        # TODO: 아마존 웹서비스 람다 함수 (AWS Lambda Function) 내부에서 이미 event loop 실행 중일 경우 아래와 같은 오류 메시지가 출력되어 asyncio.get_event_loop, loop.create_task 로직 보완 (2025.11.13 minjae)
         # 오류 메시지 - RuntimeError: asyncio.run() cannot be called from a running event loop
         # 참고 URL - https://docs.python.org/ko/3/library/asyncio-eventloop.html
         # 참고 2 URL - https://docs.python.org/ko/3/library/asyncio-task.html#asyncio.create_task
@@ -153,7 +153,7 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
         loop = asyncio.get_event_loop()   # 이벤트 루프 (event loop) 가져오기 - 현재 실행 중인 이벤트 루프 (event loop) 있으면 이를 반환하고, 그렇지 않으면 set_event_loop() 함수 호출해서 새로운 루프 (loop) 생성 및 반환
             
         if True == loop.is_running():   # 이벤트 루프 (event loop) 현재 실행 중인 경우
-            chatbot_logger.info("[테스트] 아마존 웹서비스 람다 함수 (AWS Lambda function) 내부 이벤트 루프 (event loop) 실행 중!")
+            chatbot_logger.info("[테스트] 아마존 웹서비스 람다 함수 (AWS Lambda Function) 내부 이벤트 루프 (event loop) 실행 중!")
             loop.create_task(self.__initSettingAsync(valid_targets))   # 코루틴(coroutine)을 Task로 감싸고 비동기 메서드 실행 예약 및 Task 객체 반환
         else: asyncio.run(self.__initSettingAsync(valid_targets))   # 이벤트 루프(asyncio.run) 실행하여 비동기 메서드 self.__initSettingAsync(valid_targets) 호출
 
@@ -257,7 +257,7 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
                 raise ValueError("valid_targets - 마스터 데이터 유효성 검사 대상 리스트 데이터 존재 안 함.")
 
             chatbot_logger.info("[테스트] 마스터 데이터 초기 설정 - 시작!")
-            # chatbot_logger.info(f"[테스트] help 함수 호출 및 chatbot_restServer 모듈 전체 docstring 내용 확인 - {help(chatbot_restServer)}")
+            # chatbot_logger.info(f"[테스트] help 함수 호출 및 chatbot_restServer 모듈 (module) 전체 docstring 내용 확인 - {help(chatbot_restServer)}")
             # chatbot_logger.info(f"[테스트] help 함수 호출 및 chatbot_restServer.get_masterDownLoadAsync 함수 docstring 내용 확인 - {help(chatbot_restServer.get_masterDownLoadAsync)}")
             # chatbot_logger.info(f"[테스트] chatbot_restServer.get_masterDownLoadAsync 함수 속성 __doc__ 사용 및 docstring 내용 확인 - {chatbot_restServer.get_masterDownLoadAsync.__doc__}")
 
@@ -466,7 +466,7 @@ class KSTFormatter(SingletonBase, logging.Formatter):   # 명시적으로 Single
 참고 URL - https://docs.python.org/ko/dev/library/functools.html
 참고 2 URL - https://sosodev.tistory.com/entry/Python-cachedproperty-%EA%B0%92%EC%9D%84-%EC%9E%AC%EC%82%AC%EC%9A%A9-%ED%95%98%EA%B8%B0
 
-* 패키지, 모듈
+* 패키지 (package), 모듈 (module)
 참고 URL - https://docs.python.org/ko/3.13/tutorial/modules.html
 참고 2 URL - https://wikidocs.net/1418
 참고 3 URL - https://dojang.io/mod/page/view.php?id=2450

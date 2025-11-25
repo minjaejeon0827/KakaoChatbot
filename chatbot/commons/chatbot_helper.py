@@ -18,23 +18,29 @@ _error_techSupport = '상상진화 기술지원 콜센터 02-3474-2263\n연락 �
 _body = 'body'   # 키 'body'
 _action = 'action'   # 키 'action'
 
-# 콜드 스타트 (ColdStart) - 초기 응답 속도 느림 (Cold Start) 현상 의미
-# 아마존 웹서비스 람다 함수 (AWS Lambda function)가 처음 호출되거나 오랜 시간 동안 호출되지 않다가 다시 호출될 때 발생하는 초기화 과정 의미.(container-WarmUp)
+# ***** 아마존 웹서비스 람다 함수 (AWS Lambda Function) *****
+# 콜드 스타트 (coldstart) - 초기 응답 속도 느림 (coldstart) 현상 의미
+# 아마존 웹서비스 람다 함수 (AWS Lambda Function)가 처음 호출되거나 오랜 시간 동안 호출되지 않다가 다시 호출될 때 발생하는 초기화 과정 의미. (container-warmup)
+# 아마존 웹서비스 Amazon EventBridge -> 항목 "Scheduler" -> 항목 "일정" -> 일정 이름 "test_kakao_health-check" 클릭 -> "test_kakao_health-check" 화면 이동 -> 탭 "대상" 클릭시
+# 아래와 같은 json 페이로드 형식이 구현됨. 
 # json 페이로드 형식
 # {
-#   "body": "{ \"action\": \"aws-lambda_function-container-WarmUp\" }"
+#   "body": "{ \"action\": \"aws-lambda_function-container-warmup\" }"
 # }
-_cold_start = 'aws-lambda_function-container-WarmUp'
-_botlog_file_path = '/tmp/botlog.txt'   # 아마존 웹서비스 람다 함수 (AWS Lambda function) -> 임시 로그 텍스트 파일('/tmp/botlog.txt') 상대 경로
+# _cold_start = 'aws-lambda_function-container-warmup'
+_warmup_request = 'aws-lambda_function-container-warmup'
+_tmp = '/tmp/'                          # 임시 로그 텍스트 파일 상위 폴더
+_chatbot_file_name = 'chatbot.txt'     # 임시 로그 텍스트 파일 이름
+# _botlog_file_path = '/tmp/botlog.txt'   # 임시 로그 텍스트 파일 상대 경로 ('/tmp/botlog.txt') 
 _time_limit = 3.5   # 챗봇 응답 가능 제한 시간
 
 # 큐(res_queue) 폴링(polling) 간격 변수명 짓기
 # 참고 URL - https://claude.ai/chat/f1d34ae8-3e62-4919-92c6-c94277481c76
 _polling_interval = 0.01   # 큐(res_queue) 폴링(polling) 간격
 _done_thinking = '생각 다 끝났나요?'   # 챗봇 응답 시간 5초 초과한 경우 챗봇 응답 메시지 
-_statusCode_success = 200      # 상태코드 성공 
+_statusCode_success = 200      # HTTP 응답 상태 코드 성공 
 _userRequest = 'userRequest'   # 사용자 -> 챗봇 질문 요청
-_utterance = 'utterance'       # 사용자가 카카오 채팅방에 입력한 문자열  
+_utterance = 'utterance'       # 사용자가 카카오 채팅방에 입력한 문자열
 
 # 챗봇 응답 시간 5초 초과시 응답 재요청 기능 구현 
 # 참고 URL - https://claude.ai/chat/d550ac84-5c0c-4805-a600-9fdfd1236714
@@ -51,7 +57,7 @@ _masterEntity_json_file_path = './resources/json/masterEntity.json'   # 전체 �
 # region kakao.py
 
 # 카카오 응답 데이터 
-_format = 'format'         # json format
+_payload = 'payload'         # 카카오톡 서버로 전송할 json 포맷 기반 챗봇 답변 내용 (페이로드)
 _meta_data = 'meta_data'   # 다른 데이터 설명해 주는 데이터 (예) master_data - 특정 마스터 데이터
 
 # 필드명 "action" - 버튼 클릭시 수행될 작업

@@ -23,7 +23,7 @@
 from commons import chatbot_helper   # 챗봇 전용 도움말 텍스트
 
 # 2. log 모듈 import
-from modules.log import logger       # 챗봇 전역 로그 객체(logger)
+from utils.log import logger       # 챗봇 전역 로그 객체(logger)
 
 # 3. Type Hints class Any import
 from typing import Any

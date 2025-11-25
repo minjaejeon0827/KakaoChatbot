@@ -7,7 +7,7 @@
 from commons import chatbot_helper   # 챗봇 전용 도움말 텍스트
 
 # 2. 챗봇 커스텀 로그 기록 모듈 import 처리
-from modules import chatbot_logger   # log.py -> 챗봇 전역 로그 객체 (logger) 사용 못하는 경우 import 처리
+from utils import chatbot_logger   # log.py -> 챗봇 전역 로그 객체 (logger) 사용 못하는 경우 import 처리
 
 # 3. Type Hints class Any import
 from typing import Any, Self
@@ -305,7 +305,7 @@ class MasterEntity:   # 암시적으로 object 클래스 상속
         except Exception as e:     
             error_msg = str(e)           
             chatbot_logger.error(f"[테스트] 오류 - {error_msg}")
-            return False    
+            return False
                 
 class KSTFormatter(logging.Formatter):   # 명시적으로 logging.Formatter 클래스 상속
     """

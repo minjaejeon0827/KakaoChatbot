@@ -37,7 +37,7 @@
 from commons import chatbot_helper   # 챗봇 전용 도움말 텍스트
 
 # 2. 챗봇 커스텀 로그 기록 모듈 import 처리
-from modules import chatbot_logger   # log.py -> 챗봇 전역 로그 객체(logger) 사용 못하는 경우 import 처리
+from utils import chatbot_logger   # log.py -> 챗봇 전역 로그 객체(logger) 사용 못하는 경우 import 처리
 
 # 3. 나머지 모듈 import 처리
 import logging   # 로그 기록 

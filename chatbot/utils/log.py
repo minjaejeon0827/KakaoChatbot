@@ -44,10 +44,11 @@ def init_logger(name: str = "chatbot_logger") -> logging.Logger:
     streamHandler.setFormatter(formatter)   # handler formatter 설정(할당)
     logger.addHandler(streamHandler)   # 전역 로그 객체 (logger)에 handler 추가 (로그 기록시 해당 handler 적용)
 
-    if "true" == os.getenv("ENABLE_FILE_LOG", "false").lower():
-        fileHandler = logging.FileHandler(chatbot_helper._botlog_file_path)   # 파일 기록용 handler 생성 (fileHandler) - 아마존 웹서비스 람다 함수 (AWS Lambda Function)에 로그 기록할 파일 이름(경로) "/tmp/botlog.txt" 지정 (파일 이름은 다른 것으로 변경해도 된다.)
-        fileHandler.setFormatter(formatter)   # handler formatter 설정(할당)
-        logger.addHandler(fileHandler)   # 전역 로그 객체 (logger)에 handler 추가 (로그 기록시 해당 handler 적용)
+    # TODO: 아래 주석친 코드 필요시 참고 (2025.11.25 minjae)
+    # if "true" == os.getenv("ENABLE_FILE_LOG", "false").lower():
+    #     fileHandler = logging.FileHandler(chatbot_helper._tmp + chatbot_helper._chatbot_file_name)   # 파일 기록용 handler 생성 (fileHandler) - 아마존 웹서비스 람다 함수 (AWS Lambda Function)에 로그 기록할 파일 이름(경로) "/tmp/botlog.txt" 지정 (파일 이름은 다른 것으로 변경해도 된다.)
+    #     fileHandler.setFormatter(formatter)   # handler formatter 설정(할당)
+    #     logger.addHandler(fileHandler)   # 전역 로그 객체 (logger)에 handler 추가 (로그 기록시 해당 handler 적용)
 
     return logger
 

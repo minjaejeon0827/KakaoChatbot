@@ -10,7 +10,7 @@
 import asyncio   # 비동기 프로그래밍(async - await) 전용 모듈
 import logging  # 로그 작성 전용 모듈 
 
-from modules import chatbot_logger               # 폴더 "modules" -> 챗봇 로그 작성 모듈 
+from utils import chatbot_logger               # 폴더 "modules" -> 챗봇 로그 작성 모듈 
 from commons import chatbot_helper       # 폴더 "commons" -> 챗봇 전용 도움말 텍스트 
 from restAPI import chatbot_restServer   # 폴더 "restAPI" -> 챗봇 웹서버 Rest API 메서드 
 
@@ -40,7 +40,7 @@ class MasterEntity(object):
         if not hasattr(_class, "_instance"):   # 해당 클래스에 _instance 속성(property - 객체)이 없다면
             chatbot_logger.log_write(chatbot_logger._info, '[테스트] MasterEntity __new__ 메서드', 'Called!')
             _class._instance = super().__new__(_class)  
-        return _class._instance                         
+        return _class._instance                   
 
     def __init__(self, valid_targets):  # 객체 생성 시 전달된 모든 인자(valid_targets는 제외)를 __new__ 메서드가 먼저 받고, 그 다음 __init__ 메서드로 전달
         _class = type(self)

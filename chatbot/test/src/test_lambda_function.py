@@ -17,7 +17,7 @@ from commons import chatbot_helper   # 폴더 "commons" -> 챗봇 전용 도움�
 # 폴더 "modules" 
 from modules import kakao            # 카카오 API 전용 모듈    
 from modules import openAI           # OpenAI 전용 모듈   
-from modules import chatbot_logger           # 챗봇 로그 작성 모듈  
+from utils import chatbot_logger           # 챗봇 로그 작성 모듈  
 from modules import singleton        # 싱글톤(singleton) 패턴 전용 모듈   
 
 # --------------------------------------------------------------------------------------------------------------------------------------
@@ -102,13 +102,13 @@ def handler(event, context):
         # {
         #   "body": "{ \"action\": \"aws-lambda_function-container-WarmUp\" }"
         # }
-        if chatbot_helper._cold_start in event_body[chatbot_helper._action]:
+        if chatbot_helper._warmup_request in event_body[chatbot_helper._action]:
             chatbot_logger.log_write(chatbot_logger._info, "[ColdStart -> WarmUp] AWS Lambda Function 컨테이너 초기화", "OK!")
             return
 
         kakao_request = event_body   
 
-        file_name = chatbot_helper._botlog_file_path
+        file_name = f"{chatbot_helper._tmp}{chatbot_helper._chatbot_file_name}"
         
         if False == os.path.exists(file_name):
             dbReset(file_name)

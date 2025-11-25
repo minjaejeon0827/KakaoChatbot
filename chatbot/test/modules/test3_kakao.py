@@ -26,7 +26,7 @@
 from commons import chatbot_helper   # 챗봇 전용 도움말 텍스트
 
 # 2. log 모듈 import 처리
-from modules.log import logger       # 챗봇 전역 로그 객체(logger)  
+from utils.log import logger       # 챗봇 전역 로그 객체(logger)  
 
 def outputs_json(outputs: list[dict]) -> dict:
     """

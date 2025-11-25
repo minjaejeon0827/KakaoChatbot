@@ -1,4 +1,4 @@
-from modules import chatbot_logger
+from utils import chatbot_logger
 
 def _testDebug(msg: str) -> None:
     """

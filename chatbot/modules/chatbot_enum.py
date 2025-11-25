@@ -1,3 +1,9 @@
+"""
+* 챗봇 Enum 열거형 구조체 클래스 모듈 (module)
+코드 리뷰 참고 URL - https://chatgpt.com/c/691424a3-8e0c-8327-98b9-cabf6b80cf17
+코드 리뷰 참고 2 URL - https://chatgpt.com/c/691c1cc3-6614-8321-bda2-126705ee5b89
+"""
+
 from enum import Enum    # Enum 열거형 구조체
 
 class EnumValidator(Enum):   # 명시적으로 Enum 클래스 상속

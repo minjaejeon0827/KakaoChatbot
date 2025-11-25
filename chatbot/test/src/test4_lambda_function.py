@@ -22,7 +22,7 @@ from modules import test
 from modules.singleton import MasterEntity   # 싱글톤(singleton) 패턴
 
 # 3. singleton 모듈이 먼저 초기화된 후 log 모듈 import 
-from modules.log import logger   # 챗봇 전역 로그 객체(logger)
+from utils.log import logger   # 챗봇 전역 로그 객체(logger)
 
 # 4. 나머지 모듈 import
 from modules.kakao import KakaoResponseFormatter   # 카카오 스킬 응답 템플릿 json 포맷
@@ -89,13 +89,13 @@ def handler(event, context):
         event_body = json.loads(event[chatbot_helper._body])   
         logger.info(f"[테스트] event_body['action'] - {event_body[chatbot_helper._action]}")
           
-        if chatbot_helper._cold_start in event_body[chatbot_helper._action]:   # ColdStart(콜드 스타트)인 경우 - 아마존 웹서비스 람다 함수(AWS Lambda function) 초기 응답 속도 느림(Cold Start) 현상  
+        if chatbot_helper._warmup_request in event_body[chatbot_helper._action]:   # ColdStart(콜드 스타트)인 경우 - 아마존 웹서비스 람다 함수(AWS Lambda function) 초기 응답 속도 느림(Cold Start) 현상  
             logger.info("[ColdStart -> WarmUp] AWS Lambda Function 컨테이너 초기화 - 완료!")
             return
 
         kakao_request = event_body       
 
-        file_name = chatbot_helper._botlog_file_path
+        file_name = chatbot_helper._tmp + chatbot_helper._chatbot_file_name
         
         if False == os.path.exists(file_name): dbReset(file_name)
         else: logger.info("임시 로그 텍스트 파일('/tmp/botlog.txt') 존재 여부 - File Exists!")   
@@ -254,7 +254,7 @@ def chatbot_response(kakao_request, res_queue, file_name):
         # res_queue.put(kakao.error_text(error_msg))
         res_queue.put(kakaoResponseFormatter.error_text(f"{chatbot_helper._error_title}\n{error_msg}\n{chatbot_helper._error_techSupport}"))
         
-        raise    # raise로 함수 resChatbot의 현재 예외를 다시 발생시켜서 함수 chatbot_response 호출한 상위 코드 블록으로 넘김
+        raise    # raise로 함수 chatbot_response의 현재 예외를 다시 발생시켜서 함수 chatbot_response 호출한 상위 코드 블록으로 넘김
 
 def dbReset(file_name):
     """

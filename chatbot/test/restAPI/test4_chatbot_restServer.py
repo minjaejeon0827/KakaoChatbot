@@ -7,7 +7,7 @@
 from commons import chatbot_helper   # 챗봇 전용 도움말 텍스트 
 
 # 2. 챗봇 커스텀 로그 기록 모듈 import
-from modules import chatbot_logger   # log.py -> 챗봇 전역 로그 객체(logger) 사용 못하는 경우 import
+from utils import chatbot_logger   # log.py -> 챗봇 전역 로그 객체(logger) 사용 못하는 경우 import
 
 # 3. Type Hints class Any import
 from typing import Any

@@ -5,7 +5,7 @@
 
 # import logging   # 로그 작성 라이브러리
 
-from modules import chatbot_logger           # 폴더 "modules" -> 챗봇 로그 작성 모듈 
+from utils import chatbot_logger           # 폴더 "modules" -> 챗봇 로그 작성 모듈 
 from commons import chatbot_helper   # 폴더 "commons" -> 챗봇 전용 도움말 텍스트 
 
 # "outputs" json 포맷
