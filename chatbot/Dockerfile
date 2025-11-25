@@ -69,7 +69,7 @@ CMD ["lambda_function.handler"]
 # 4. 명령어 docker build -t test_kakao_repo . 입력 및 엔터
 # 5. 명령어 docker tag test_kakao_repo:latest 980921720325.dkr.ecr.ap-northeast-2.amazonaws.com/test_kakao_repo:latest 입력 및 엔터
 # 6. 명령어 docker push 980921720325.dkr.ecr.ap-northeast-2.amazonaws.com/test_kakao_repo:latest 입력 및 엔터
-# 7. 아마존 웹서비스 람다 함수 (AWS Lambda function) 함수명 (예) test_kakao 콘솔 화면 들어와서 탭 "이미지" 클릭 -> 화면 우측 버튼 "새 이미지 배포" 클릭 
+# 7. 아마존 웹서비스 람다 함수 (AWS Lambda Function) 함수명 (예) test_kakao 콘솔 화면 들어와서 탭 "이미지" 클릭 -> 화면 우측 버튼 "새 이미지 배포" 클릭 
 # 8. 화면 "이미지 선택" 이동 -> 버튼 "이미지 찾아보기" 클릭 -> 팝업화면 "컨테이너 이미지 선택" 출력 
 #    -> 위의 5번~6번 Docker 명령어 입력 후 푸시 된 (push) 이미지 태그 항목 값이 "latest"인 카카오 챗봇 이미지 체크 -> 버튼 "이미지 선택" 클릭 -> 버튼 "저장" 클릭
 # 9. 콘솔 화면 자동 이동 -> 시간 대기 -> 화면 상단 녹색 바 출력되면 카카오 챗봇 이미지 배포 완료
