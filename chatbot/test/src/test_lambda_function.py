@@ -108,7 +108,7 @@ def handler(event, context):
 
         kakao_request = event_body   
 
-        file_name = f"{chatbot_helper._tmp}{chatbot_helper._chatbot_file_name}"
+        file_name = chatbot_helper._tmp + chatbot_helper._chatbot_file_name
         
         if False == os.path.exists(file_name):
             dbReset(file_name)

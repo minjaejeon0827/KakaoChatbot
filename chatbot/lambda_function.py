@@ -26,7 +26,7 @@ from utils.log import logger   # 챗봇 전역 로그 객체 (logger)
 from utils import aws
 
 # 4. Type Hints class Any import
-from typing import Any
+from typing import Any, Callable   # Callable - 함수 자체 타입 지정
 
 # 5. 나머지 모듈 import
 from modules.kakao import KakaoResponseFormatter   # 카카오 스킬 응답 템플릿 json 포맷
@@ -38,7 +38,7 @@ from queue import Queue, Empty   # 자료구조 queue (deque 기반)
 import json         # json 데이터 처리
 import threading    # 멀티쓰레드 패키지
 import time         # 챗봇 답변 시간 계산
-import os           # 답변 결과 임시 로그 텍스트 파일 ('/tmp/botlog.txt') 저장
+import os           # 답변 결과 임시 로그 텍스트 파일 저장
 
 # 마스터 데이터 유효성 검사 대상 리스트
 valid_targets = [ chatbot_helper._buttons,
@@ -57,7 +57,7 @@ valid_targets = [ chatbot_helper._buttons,
 masterEntity = MasterEntity(valid_targets)   # 마스터 데이터 싱글톤(singleton) 클래스 객체
 kakaoResponseFormatter = KakaoResponseFormatter(masterEntity.get_master_datas)   # 스킬 응답 템플릿 json 포맷 클래스 객체
 
-_thread_local = threading.local()   # 쓰레드마다 독립적으로 보관할 값 저장소
+thread_local = threading.local()   # 쓰레드마다 독립적으로 보관할 값 저장소
 
 def handler(event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
     """
@@ -71,25 +71,33 @@ def handler(event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
     Returns: 카카오톡 서버로 전송할 json format 형식 데이터
     """
 
-    res_queue = None    # 챗봇 답변 내용 담을 큐 객체 .put(), .get() 메서드 사용 가능
-    err_queue = None    # 챗봇 오류 내용 담을 큐 객체 .put(), .get() 메서드 사용 가능
-    # run_flag = False    # 챗봇 응답 시간 5초 초과 여부
+    kakao_request = None   # 카카오톡 채팅방 실제 채팅 정보
+    user_id = None         # 카카오톡 채팅 입력 사용자 아이디
+    file_path = None       # 사용자별 (user_id) 임시 로그 파일 상대 경로
+
+    res_queue = None    # 챗봇 답변 내용 포함된 큐 객체
+    err_queue = None    # 챗봇 오류 내용 포함된 큐 객체
+
+    response = None     # 챗봇 답변 내용
+    
     start_time = time.time()    # 메인 핸들러 (handler) 시작 시간 - 챗봇 응답 시간 계산 용도
     
     try:
-        event_body = parse_event(event)   # 1) event[chatbot_helper._body] 저장된 데이터 json 파싱 (parsing)
+        # logger.info(f"[테스트] event 클래스 타입 - {type(event)}")
+        # logger.info(f"[테스트] context 클래스 타입 - {type(context)}")
+
+        kakao_request = parse_event(event)   # 1) event[chatbot_helper._body] 저장된 데이터 json 파싱 (parsing)
         logger.info("event['body'] 저장된 데이터 json 파싱 (parsing) 완료!")
 
-        if True == is_warmup_request(event_body):   # 2) AWS Lambda Function 가상 컨테이너 warmup 요청 시 빠르게 응답 후 종료
+        if True == is_warmup_request(kakao_request):   # 2) AWS Lambda Function 가상 컨테이너 warmup 요청 시 빠르게 응답 후 종료
             logger.info("[coldstart -> WarmUp] AWS Lambda Function 가상 컨테이너 warmup 요청 - 완료!")
             return lambda_response_format({"message": "container-warmup OK!"})
 
-        kakao_request = event_body   # 3) 카카오톡 채팅 입력 사용자 아이디 추출
-        user_id = kakao_request[chatbot_helper._userRequest]['user']['id']
+        user_id = kakao_request[chatbot_helper._userRequest][chatbot_helper._user][chatbot_helper._id]   # 3) 카카오톡 채팅 입력 사용자 아이디 추출
         logger.info(f"채팅 입력 사용자 아이디: {user_id}")
 
-        # 4) /tmp 에 사용자별 임시 로그 파일 준비
-        file_path = f"{chatbot_helper._tmp}user_id-{user_id}_{chatbot_helper._chatbot_file_name}"
+        # 4) /tmp 에 사용자별 (user_id) 임시 로그 파일 상대 경로
+        file_path = f"{chatbot_helper._tmp}{chatbot_helper._user}_{chatbot_helper._id}{user_id}_{chatbot_helper._chatbot_file_name}"
         aws.create_tmp_file(file_path)
 
         # 5) 스레드 간 데이터 전달할 큐 생성
@@ -98,11 +106,9 @@ def handler(event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
 
         start_response_thread(kakao_request, res_queue, err_queue, file_path)   # 6) 응답 생성 작업 스레드 시작
 
-        result = wait_for_response(start_time, res_queue, err_queue)   # 7) 응답 대기 (타임아웃 포함)
+        response = wait_for_response(start_time, res_queue, err_queue)   # 7) 응답 대기 (타임아웃 포함)
 
-        # 8) 타임아웃 발생한 경우 기본 메시지 반환
-        # if result is None:
-        if None is result:
+        if None is response:   # 8) 타임아웃 발생한 경우 기본 메시지 반환
             logger.warning("응답 생성 타임아웃 발생 - 기본 안내 메시지 반환")
             return lambda_response_format(
                 kakaoResponseFormatter.timeover_quickReplies(),
@@ -111,47 +117,7 @@ def handler(event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
 
         # 9) 정상 응답 반환
         logger.info("정상 응답 생성 완료")
-        return lambda_response_format(result)
-
-        # logger.info(f"[테스트] event 클래스 타입 - {type(event)}")
-        # logger.info(f"[테스트] context 클래스 타입 - {type(context)}")
-
-        # 키(key) 누락 체크 - event['body']가 존재하지 않는 경우
-        # 콜드 스타트 (coldstart)인 경우 제외
-        # 참고 URL - https://chatgpt.com/c/687a0180-e2bc-8010-9a19-90695a1bf477
-        # if chatbot_helper._body not in event: 
-        #     raise KeyError(f"카카오톡 채팅방 실제 채팅 정보 저장된 변수 event['body'] - '{chatbot_helper._body}' 키 값 존재 안 함.")
-        
-        # logger.info("[테스트] 사용자 입력 채팅 정보 - %s" %event['body'])
-        # logger.info(f"[테스트] 사용자 입력 채팅 정보 - {event[chatbot_helper._body]}")
-
-        # 아래와 같은 오류 메시지 출력으로 인해 메서드 json.loads 사용해서 json 문자열 -> dict 객체 변환 처리 (2025.07.21 minjae)
-        # 오류 메시지 - string indices must be integers, not 'str'
-        # 참고 URL - https://docs.python.org/ko/3.13/library/json.html
-        # 참고 2 URL - https://0pen3r.tistory.com/200
-        # 참고 3 URL - https://kim-jong-hyun.tistory.com/148
-        # 참고 4 URL - https://chatgpt.com/c/687d89d3-ab18-8010-a0ea-03039b64c94e
-        # 참고 5 URL - https://wikidocs.net/126088
-        # event_body = json.loads(event[chatbot_helper._body])
-        # logger.info(f"[테스트] event_body['action'] - {event_body[chatbot_helper._action]}")
-        
-        # if chatbot_helper._warmup_request in event_body[chatbot_helper._action]:   # 콜드 스타트 (coldstart)인 경우 - 아마존 웹서비스 람다 함수 (AWS Lambda Function) 초기 응답 속도 느림 콜드 스타트 (coldstart) 현상  
-        #     logger.info("[coldstart -> warmup] AWS Lambda Function 컨테이너 초기화 - 완료!")
-        #     return
-
-        # kakao_request = event_body
-
-        # file_path = chatbot_helper._tmp + chatbot_helper._chatbot_file_name
-        
-        # if False == os.path.exists(file_path): dbReset(file_path)
-        # else: logger.info("임시 로그 텍스트 파일('/tmp/botlog.txt') 존재 여부 - File Exists!")   
-
-        # res_queue = Queue()
-
-        # request_respond = threading.Thread(target=chatbot_response,
-        #                                    args=(kakao_request, res_queue, file_path))
-        
-        # request_respond.start()
+        return lambda_response_format(response)
 
     except (KeyError, ValueError, TypeError) as e:
         valid_error_msg = str(e)
@@ -172,8 +138,8 @@ def chatbot_response(kakao_request: dict[str, Any], res_queue: Queue, file_path:
     Description: 챗봇 답변 요청 및 큐 객체 res_queue 답변 내용 추가
 
     Parameters: kakao_request - 카카오톡 채팅방 실제 채팅 정보
-                res_queue - 챗봇 답변 내용 담을 큐 객체
-                file_path - 아마존 웹서비스 람다 함수 (AWS Lambda Function) -> 사용자별 임시 로그 텍스트 파일 상대 경로 ('/tmp/botlog.txt')
+                res_queue - 챗봇 답변 내용 포함된 큐 객체
+                file_path - 아마존 웹서비스 람다 함수 (AWS Lambda Function) -> 사용자별 임시 로그 텍스트 파일 상대 경로 - (예시) '/tmp/user_id-1b2bfc8caf85a5dff8fadd1bf4cc70125b533fea7b665d0cdb0fb493a135e94b4d_chatbot.txt'
 
                 * 참고
                 /tmp 임시 디렉터리(스토리지) - 아마존 웹서비스 람다 함수 (AWS Lambda Function)에서 파일을 저장할 수 있는 임시 로컬 스토리지 영역
@@ -184,7 +150,7 @@ def chatbot_response(kakao_request: dict[str, Any], res_queue: Queue, file_path:
     Returns: 없음.
     """
 
-    if False == hasattr(_thread_local, "prev_userRequest_msg"): _thread_local.prev_userRequest_msg = None   # 이전 사용자 입력 채팅 메세지 (챗봇 응답 시간 5초 초과시 응답 재요청 할 때 사용)
+    if False == hasattr(thread_local, "prev_userRequest_msg"): thread_local.prev_userRequest_msg = None   # 이전 사용자 입력 채팅 메세지 (챗봇 응답 시간 5초 초과시 응답 재요청 할 때 사용)
     userRequest_msg = kakao_request[chatbot_helper._userRequest][chatbot_helper._utterance]   # 사용자 입력 채팅 메세지 가져오기
     
     try:
@@ -198,7 +164,7 @@ def chatbot_response(kakao_request: dict[str, Any], res_queue: Queue, file_path:
             logger.info(f"[테스트] userRequest_msg - {userRequest_msg}")
             last_update = aws.read_tmp_file(file_path)
             logger.info(f"[테스트] 최근 임시 로그 last_update - {last_update}")
-            text = _thread_local.prev_userRequest_msg
+            text = thread_local.prev_userRequest_msg
             # logger.info(f"[테스트] 응답 재요청 채팅 메세지 - {text}")
             res_queue.put(kakaoResponseFormatter.simple_text(text))
             aws.write_tmp_file(file_path, "")
@@ -212,7 +178,7 @@ def chatbot_response(kakao_request: dict[str, Any], res_queue: Queue, file_path:
         
         if EnumValidator.EXISTENCE == masterEntity.get_isValid:   # 마스터 데이터 유효성 검사 결과 - 성공.
             response_data = kakaoResponseFormatter.get_response(userRequest_msg)
-            _thread_local.prev_userRequest_msg = userRequest_msg
+            thread_local.prev_userRequest_msg = userRequest_msg
 
             aws.write_tmp_file(file_path, "")
             
@@ -302,9 +268,9 @@ def is_warmup_request(event_body: dict[str, Any]) -> bool:
     try:
         # 키(key) 누락 체크 - event_body['action']가 존재하지 않는 경우
         # 참고 URL - https://chatgpt.com/c/687a0180-e2bc-8010-9a19-90695a1bf477
-        if chatbot_helper._action not in event_body: 
+        if chatbot_helper._action not in event_body:
             raise KeyError(f"가상 컨테이너 웜업 (warmup) 요청 여부 확인 event_body['action'] - '{chatbot_helper._action}' 키 값 존재 안 함.")
-        return chatbot_helper._warmup_request in event_body[chatbot_helper._action]
+        return chatbot_helper._warmup_request in event_body[chatbot_helper._action]   # 콜드 스타트 (coldstart)인 경우 - 아마존 웹서비스 람다 함수 (AWS Lambda Function) 초기 응답 속도 느림 콜드 스타트 (coldstart) 현상
 
     except (KeyError, ValueError, TypeError) as e:
         valid_error_msg = str(e)
@@ -317,20 +283,22 @@ def is_warmup_request(event_body: dict[str, Any]) -> bool:
 
 # --------------------- 쓰레드 실행 래퍼 ---------------------
 
-def thread_wrapper(target, args: tuple[Any, ...], res_queue: Queue, err_queue: Queue) -> None:
+def thread_wrapper(target: Callable[..., Any], args: tuple[Any, ...], err_queue: Queue) -> None:
     """
     Description: 작업 쓰레드 내부 발생 예외 -> err_queue 전달
 
-    Parameters: target - 작업 쓰레드 대상 함수
-                args - 작업 쓰레드 대상 함수 동작하기 위해 필요한 인자값
-                res_queue - 챗봇 답변 내용 담을 큐 객체
-                err_queue - 챗봇 오류 내용 담을 큐 객체
+    Parameters: target - 작업 쓰레드 실행 대상 함수 (chatbot_response)
+                args - 작업 쓰레드 실행 대상 함수 (chatbot_response) 동작하기 위해 필요한 인자값 - kakao_request: dict[str, Any], res_queue: Queue, file_path: str
+                res_queue - 챗봇 답변 내용 포함된 큐 객체
+                err_queue - 챗봇 오류 내용 포함된 큐 객체
+
+                thread_wrapper 함수의 경우 예외만 err_queue 전달 (err_queue.put(thread_error_msg))
 
     Returns: 없음.
     """
 
     try:
-        target(*args)
+        target(*args)   # chatbot_response(kakao_request, res_queue, file_path) - 작업 쓰레드 실행 대상 함수 호출
 
     except Exception as e:
         thread_error_msg = str(e)
@@ -344,44 +312,51 @@ def start_response_thread(kakao_request: dict[str, Any], res_queue: Queue, err_q
     Description: 챗봇 답변 전용 작업 쓰레드 시작
 
     Parameters: kakao_request - 카카오톡 채팅방 실제 채팅 정보
-                res_queue - 챗봇 답변 내용 담을 큐 객체
-                err_queue - 챗봇 오류 내용 담을 큐 객체
-                file_path - 임시 로그 텍스트 파일 상대 경로 ('/tmp/botlog.txt')
+                res_queue - 챗봇 답변 내용 포함된 큐 객체
+                err_queue - 챗봇 오류 내용 포함된 큐 객체
+                file_path - 임시 로그 텍스트 파일 상대 경로 - (예시) '/tmp/user_id-1b2bfc8caf85a5dff8fadd1bf4cc70125b533fea7b665d0cdb0fb493a135e94b4d_chatbot.txt'
 
     Returns: 챗봇 답변 전용 작업 쓰레드 객체
     """
 
     worker = threading.Thread(target=thread_wrapper,
-                              args=(chatbot_response, (kakao_request, res_queue, file_path), res_queue, err_queue),
-                              daemon=True)   # 작업 쓰레드 함수 연결
+                              args=(
+                                chatbot_response,   # 작업 쓰레드 실행 대상 함수
+                                (kakao_request, res_queue, file_path),   # chatbot_response 함수 실행시 필요 인자
+                                err_queue   # 챗봇 오류 전달 전용 큐
+                              ),
+                              daemon=True)   # 작업 쓰레드 함수 연결 (daemon=True - 데몬 쓰레드 생성)
     worker.start()
     return worker
 
 def wait_for_response(start_time: float, res_queue: Queue, err_queue: Queue) -> dict[str, Any] | None:
     """
-    Description: 챗봇 답변 또는 오류 대기 (응답 제한 시간 3.5초 이내) 
+    Description: 챗봇 답변 또는 오류 대기 (응답 제한 시간 3.5초 이내)
 
     Parameters: start_time - 메인 핸들러 (handler) 시작 시간 (챗봇 응답 시간 계산 용도)
-                res_queue - 챗봇 답변 내용 담을 큐 객체
-                err_queue - 챗봇 오류 내용 담을 큐 객체
-                
+                res_queue - 챗봇 답변 내용 포함된 큐 객체
+                err_queue - 챗봇 오류 내용 포함된 큐 객체
+
+                Blocking - 호출된 함수가 자신이 할 일을 모두 마칠 때까지 제어권을 계속 가지고서 호출한 함수에게 바로 돌려주지 않는 것.
+                Non-Blocking - 호출된 함수가 자신이 할 일을 채 마치지 않았더라도 바로 제어권을 건네주어 (return) 호출한 함수가 다른 일을 진행할 수 있도록 해주는 것.
+
     Returns: response - 챗봇 답변 내용
     """
 
     while(time.time() - start_time < chatbot_helper._time_limit):   # 챗봇 응답 시간 3.5초 이내인 경우
 
         try:   # 오류 큐 우선 확인 (err_queue)
-            err_response = err_queue.get_nowait()
-            err_queue.task_done()
+            err_response = err_queue.get_nowait()   # get(block=False) 함수와 비슷한 기능 수행 - 오류 큐 객체 아이템 없을 때 Non-Blocking 처리 (아이템 즉시 반환 또는 아이템 없을 시 즉시 Empty 예외 처리) 및 즉시 오류 큐 객체 아이템 가져오기 (오류 큐 객체 아이템 없이 비어있는지 확인하고, 비어있는 경우 즉시 다른 작업 수행해야 할 때 사용.)
+            err_queue.task_done()   # 오류 큐 작업 완료
             raise Exception(f"작업 스레드 오류: {err_response}")
-        except Empty:
+        except Empty:   # 오류 큐 객체 err_queue 아이템 없는 경우 즉시 Empty 예외 처리
             pass
 
         try:   # 응답 큐 확인 (res_queue)
-            response = res_queue.get(timeout=chatbot_helper._polling_interval)
-            res_queue.task_done()
+            response = res_queue.get(timeout=chatbot_helper._polling_interval)   # (block=True) - 응답 큐 객체 아이템 없을 때 최대 0.01초 동안 Blocking 처리 (현재 작업 스레드 멈추고, 아이템 추가될 때까지 대기) 및 응답 큐 객체 아이템 가져오기 (응답 큐 객체 아이템 들어올 때까지 안정적으로 처리하고 싶을 때 사용.)
+            res_queue.task_done()   # 응답 큐 작업 완료
             return response
-        except Empty:
+        except Empty:   # 최대 0.01초 초과 후 응답 큐 객체 res_queue 아이템 없는 경우 Empty 예외 처리
             continue
 
     return None
@@ -445,35 +420,44 @@ def error_payload_format(msg: str) -> dict[str, Any]:
 참고 URL - https://docs.aws.amazon.com/ko_kr/apigateway/latest/developerguide/handle-errors-in-lambda-integration.html
 
 * 페이로드 (payload)
------ 참고 URL - https://ssue95.tistory.com/30
+참고 URL - https://ssue95.tistory.com/30
 
 *** 파이썬 문서 ***
-* threading.Thread
------ 참고 URL - https://docs.python.org/ko/3/library/threading.html#thread-objects
------ 참고 2 URL - https://mechacave.tistory.com/2
------ 참고 3 URL - https://pybi.tistory.com/19
+* threading.Thread - daemon=True / target(*args) 의미 파악하기
+참고 URL - https://docs.python.org/ko/3/library/threading.html#thread-objects
+참고 2 URL - https://mechacave.tistory.com/2
+참고 3 URL - https://pybi.tistory.com/19
+
+* 데몬 스레드 (daemon=True)
+참고 URL - https://wikidocs.net/82581
 
 * threading.local()
------ 참고 URL - https://docs.python.org/ko/3.13/library/threading.html#thread-local-data
------ 참고 2 URL - https://soundprovider.tistory.com/entry/python-Thread-Local-Data
+참고 URL - https://docs.python.org/ko/3.13/library/threading.html#thread-local-data
+참고 2 URL - https://soundprovider.tistory.com/entry/python-Thread-Local-Data
 
 * isinstance
------ 참고 URL - https://docs.python.org/ko/3.9/library/functions.html#isinstance
------ 참고 2 URL - https://everywhere-data.tistory.com/entry/Python-isinstance-%ED%95%A8%EC%88%98-%ED%8C%8C%EC%9D%B4%EC%8D%AC-%EC%9E%90%EB%A3%8C%ED%98%95-%ED%99%95%EC%9D%B8%ED%95%98%EB%8A%94-%ED%95%A8%EC%88%98
+참고 URL - https://docs.python.org/ko/3.9/library/functions.html#isinstance
+참고 2 URL - https://everywhere-data.tistory.com/entry/Python-isinstance-%ED%95%A8%EC%88%98-%ED%8C%8C%EC%9D%B4%EC%8D%AC-%EC%9E%90%EB%A3%8C%ED%98%95-%ED%99%95%EC%9D%B8%ED%95%98%EB%8A%94-%ED%95%A8%EC%88%98
 
 * non-default value parameter, default value parameter
------ 참고 URL - https://docs.python.org/ko/3/glossary.html#term-parameter
------ 참고 2 URL - https://docs.python.org/3/faq/programming.html#why-are-default-values-shared-between-objects
+참고 URL - https://docs.python.org/ko/3/glossary.html#term-parameter
+참고 2 URL - https://docs.python.org/3/faq/programming.html#why-are-default-values-shared-between-objects
+
+* Blocking vs Non-Blocking
+Blocking - 호출된 함수가 자신이 할 일을 모두 마칠 때까지 제어권을 계속 가지고서 호출한 함수에게 바로 돌려주지 않는 것.
+Non-Blocking - 호출된 함수가 자신이 할 일을 채 마치지 않았더라도 바로 제어권을 건네주어(return) 호출한 함수가 다른 일을 진행할 수 있도록 해주는 것.
+----- 참고 URL - https://exmemory.tistory.com/78
 
 * 큐 (queue) except Empty:
 ----- 참고 URL - https://docs.python.org/ko/dev/library/queue.html#queue.Empty
 
 * json.loads - json 파싱 (parsing)
 json 파싱 (parsing)은 json 형식의 문자열을 프로그래밍 언어에서 사용할 수 있는 객체로 변환하는 과정이다.
------ 참고 URL - https://docs.python.org/ko/3/library/json.html
------ 참고 2 URL - https://kyeong-hoon.tistory.com/226
+참고 URL - https://docs.python.org/ko/3/library/json.html
+참고 2 URL - https://kyeong-hoon.tistory.com/226
 
 *** 기타 문서 ***
-HTTP 응답 상태 코드
------ 참고 URL - https://namu.wiki/w/HTTP/%EC%9D%91%EB%8B%B5%20%EC%BD%94%EB%93%9C
+* HTTP 응답 상태 코드
+참고 URL - https://developer.mozilla.org/ko/docs/Web/HTTP/Reference/Status
+참고 2 URL - https://namu.wiki/w/HTTP/%EC%9D%91%EB%8B%B5%20%EC%BD%94%EB%93%9C
 """

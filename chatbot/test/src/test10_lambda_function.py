@@ -106,7 +106,7 @@ def handler(event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
         file_path = chatbot_helper._tmp + chatbot_helper._chatbot_file_name
         
         if False == os.path.exists(file_path): dbReset(file_path)
-        else: logger.info("임시 로그 텍스트 파일('/tmp/botlog.txt') 존재 여부 - File Exists!")   
+        else: logger.info("임시 로그 텍스트 파일('/tmp/botlog.txt') 존재 여부 - File Exists!")
 
         res_queue = q.Queue()
 

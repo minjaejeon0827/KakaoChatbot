@@ -11,7 +11,7 @@ def create_tmp_file(file_path: str) -> None:
     """
     Description: 임시 로그 텍스트 파일 없으면 새로 생성
 
-    Parameters: file_path - 임시 로그 텍스트 파일 상대 경로 ('/tmp/botlog.txt')
+    Parameters: file_path - 임시 로그 텍스트 파일 상대 경로 - (예시) '/tmp/user_id-1b2bfc8caf85a5dff8fadd1bf4cc70125b533fea7b665d0cdb0fb493a135e94b4d_chatbot.txt'
 
     Returns: 없음.
     """
@@ -28,6 +28,8 @@ def create_tmp_file(file_path: str) -> None:
             with open(file_path, "w", encoding="utf-8") as f:
                 f.write("")
             logger.info("[테스트] 임시 로그 텍스트 파일 생성 완료: %s", file_path)
+        else: logger.info(f"임시 로그 텍스트 파일 존재함! file_path - {file_path}")
+
     except Exception as e:
         sys_error_msg = str(e)
         logger.critical(f"[테스트] 시스템 오류 - {sys_error_msg}", exc_info=True)
@@ -37,7 +39,7 @@ def write_tmp_file(file_path: str, msg: str) -> None:
     """
     Description: 임시 로그 기록
 
-    Parameters: file_path - 임시 로그 텍스트 파일 상대 경로 ('/tmp/botlog.txt')
+    Parameters: file_path - 임시 로그 텍스트 파일 상대 경로 - (예시) '/tmp/user_id-1b2bfc8caf85a5dff8fadd1bf4cc70125b533fea7b665d0cdb0fb493a135e94b4d_chatbot.txt'
                 msg - 로그 메시지
 
     Returns: 없음.
@@ -56,7 +58,7 @@ def read_tmp_file(file_path: str) -> str:
     """
     Description: 임시 로그 읽기
 
-    Parameters: file_path - 임시 로그 텍스트 파일 상대 경로 ('/tmp/botlog.txt') 
+    Parameters: file_path - 임시 로그 텍스트 파일 상대 경로 - (예시) '/tmp/user_id-1b2bfc8caf85a5dff8fadd1bf4cc70125b533fea7b665d0cdb0fb493a135e94b4d_chatbot.txt' 
 
     Returns: 없음.
     """

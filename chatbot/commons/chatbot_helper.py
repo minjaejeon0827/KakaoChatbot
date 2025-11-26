@@ -31,7 +31,7 @@ _action = 'action'   # 키 'action'
 _warmup_request = 'aws-lambda_function-container-warmup'
 _tmp = '/tmp/'                          # 임시 로그 텍스트 파일 상위 폴더
 _chatbot_file_name = 'chatbot.txt'     # 임시 로그 텍스트 파일 이름
-# _botlog_file_path = '/tmp/botlog.txt'   # 임시 로그 텍스트 파일 상대 경로 ('/tmp/botlog.txt') 
+# _botlog_file_path = '/tmp/botlog.txt'   # 테스트용 임시 로그 텍스트 파일 상대 경로 ('/tmp/botlog.txt') 
 _time_limit = 3.5   # 챗봇 응답 가능 제한 시간
 
 # 큐(res_queue) 폴링(polling) 간격 변수명 짓기
@@ -40,6 +40,8 @@ _polling_interval = 0.01   # 큐(res_queue) 폴링(polling) 간격
 _done_thinking = '생각 다 끝났나요?'   # 챗봇 응답 시간 5초 초과한 경우 챗봇 응답 메시지 
 _statusCode_success = 200      # HTTP 응답 상태 코드 성공 
 _userRequest = 'userRequest'   # 사용자 -> 챗봇 질문 요청
+_user = 'user'                 # 카카오톡 채팅 입력 사용자 정보
+_id = 'id'                     # 카카오톡 채팅 입력 사용자 아이디
 _utterance = 'utterance'       # 사용자가 카카오 채팅방에 입력한 문자열
 
 # 챗봇 응답 시간 5초 초과시 응답 재요청 기능 구현 
