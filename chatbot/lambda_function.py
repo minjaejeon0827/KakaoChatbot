@@ -58,6 +58,8 @@ kakaoResponseFormatter = KakaoResponseFormatter(masterEntity.get_master_datas)  
 
 # thread_local = threading.local()   # 스레드마다 독립적으로 보관할 값 저장소
 
+# --------------------- 메인 핸들러 (handler) ---------------------
+
 def handler(event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
     """
     Description: 아마존 웹서비스 람다 함수(AWS Lambda Function) 실행 진입점
