@@ -144,7 +144,6 @@ def chatbot_response(kakao_request: dict[str, Any], res_queue: Queue, file_path:
     Returns: 없음.
     """
 
-    # TODO: 아래 주석친 코드 필요시 참고 (2025.11.27 minjae)
     # if False == hasattr(thread_local, "prev_userRequest_msg"):
     #     logger.info(f"[테스트] thread_local - prev_userRequest_msg 속성 초기화 완료!")
     #     setattr(thread_local, "prev_userRequest_msg", None)   # 이전 사용자 입력 채팅 메세지 (챗봇 응답 제한 시간 5초 초과시 응답 재요청 할 때 사용)
@@ -162,17 +161,20 @@ def chatbot_response(kakao_request: dict[str, Any], res_queue: Queue, file_path:
         # 참고 URL - https://claude.ai/chat/d550ac84-5c0c-4805-a600-9fdfd1236714
         if chatbot_helper._done_thinking == userRequest_msg:   # 시간 5초 초과시 응답 재요청
             logger.info(f"[테스트] userRequest_msg - {userRequest_msg}")
-
+            # last_update = aws.read_tmp_file(file_path)
+            # logger.info(f"[테스트] 최근 임시 로그 last_update - {last_update}")
             prev_userRequest_msg = aws.read_tmp_file(file_path)
-            
+            # logger.info(f"[테스트] 최근 임시 로그 prev_userRequest_msg - {prev_userRequest_msg}")
+
             if len(prev_userRequest_msg.split()) >= EnumValidator.EXISTENCE.value:
                 # text = getattr(thread_local, "prev_userRequest_msg")
-                logger.info(f"[테스트] 응답 재요청 채팅 메세지 - {prev_userRequest_msg}")
+                # logger.info(f"[테스트] 응답 재요청 채팅 메세지 - {text}")
+                # res_queue.put(kakaoResponseFormatter.simple_text(text))
 
+                logger.info(f"[테스트] 응답 재요청 채팅 메세지 - {prev_userRequest_msg}")
                 response_data = kakaoResponseFormatter.get_response(prev_userRequest_msg)
                 res_queue.put(response_data[chatbot_helper._payload])
                 # res_queue.put(kakaoResponseFormatter.simple_text(prev_userRequest_msg))
-                
                 aws.write_tmp_file(file_path, "")
             return
 
@@ -184,17 +186,21 @@ def chatbot_response(kakao_request: dict[str, Any], res_queue: Queue, file_path:
         
         if EnumValidator.EXISTENCE == masterEntity.get_isValid:   # 마스터 데이터 유효성 검사 결과 - 성공.
             response_data = kakaoResponseFormatter.get_response(userRequest_msg)
+            # thread_local.prev_userRequest_msg = userRequest_msg
             # setattr(thread_local, "prev_userRequest_msg", userRequest_msg)
 
             aws.write_tmp_file(file_path, "")
             
             levelNo = response_data[chatbot_helper._meta_data][chatbot_helper._levelNo]
             displayName = response_data[chatbot_helper._meta_data][chatbot_helper._displayName]
+        
+            # msg = f"({levelNo}: {displayName} - 사용자 입력 채팅 정보: '{userRequest_msg}')"
+            # aws.write_tmp_file(file_path, msg)
             logger.info(f"({levelNo}: {displayName} - 사용자 입력 채팅 정보: '{userRequest_msg}')")
 
             aws.write_tmp_file(file_path, userRequest_msg)
 
-            # time.sleep(5)   # 테스트 - 5초 대기
+            time.sleep(5)   # 테스트 - 5초 대기
             res_queue.put(response_data[chatbot_helper._payload])
             return
 
@@ -441,9 +447,6 @@ def error_payload_format(msg: str) -> dict[str, Any]:
 
 * getattr
 참고 URL - https://docs.python.org/ko/3.10/library/functions.html#getattr
-
-* split
-참고 URL - https://docs.python.org/3.6/library/stdtypes.html#string-methods
 
 * isinstance
 참고 URL - https://docs.python.org/ko/3.9/library/functions.html#isinstance

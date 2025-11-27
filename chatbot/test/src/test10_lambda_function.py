@@ -253,7 +253,7 @@ def chatbot_response(kakao_request: dict[str, Any], res_queue: q.Queue, file_pat
             # else:   # 특정 마스터 데이터 값이 존재하지 않는 경우 (예) 아이템 카드 (basicCard, carousel) or 바로가기 그룹 (quickReplies) 
             #     saveLog(file_path, f"(etc: [기술지원 문의 제외 일반 문의] - 사용자 입력 채팅 정보: '{userRequest_msg}')")
 
-            # time.sleep(5)   # 테스트 - 5초 대기
+            time.sleep(5)   # 테스트 - 5초 대기
             res_queue.put(response_data[chatbot_helper._payload])
             return
 

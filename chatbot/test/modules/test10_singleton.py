@@ -268,10 +268,12 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
             chatbot_logger.info("[테스트] 마스터 데이터 초기 설정 결과 - 완료!")
 
         except (KeyError, ValueError, TypeError) as e:
-            chatbot_logger.error(f"[테스트] 데이터 유효성 오류 - {str(e)}")
+            valid_error_msg = str(e)
+            chatbot_logger.error(f"[테스트] 데이터 유효성 오류 - {valid_error_msg}")
             self.__isValid = EnumValidator.VALIDATION_ERROR
         except Exception as e:
-            chatbot_logger.critical(f"[테스트] 시스템 오류 - {str(e)}")
+            sys_error_msg = str(e)
+            chatbot_logger.critical(f"[테스트] 시스템 오류 - {sys_error_msg}")
             self.__isValid = EnumValidator.NOT_EXISTENCE
 
     # TODO: 추후 필요시 아래 메서드 __isValidator 로직 수정 예정 (2025.09.02 minjae)
@@ -318,10 +320,12 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
             return EnumValidator.EXISTENCE
         
         except (KeyError, ValueError, TypeError) as e:
-            chatbot_logger.error(f"[테스트] 데이터 유효성 오류 - {str(e)}")
+            valid_error_msg = str(e)
+            chatbot_logger.error(f"[테스트] 데이터 유효성 오류 - {valid_error_msg}")
             return EnumValidator.VALIDATION_ERROR
         except Exception as e:
-            chatbot_logger.critical(f"[테스트] 시스템 오류 - {str(e)}")
+            sys_error_msg = str(e)
+            chatbot_logger.critical(f"[테스트] 시스템 오류 - {sys_error_msg}")
             return EnumValidator.NOT_EXISTENCE
         
 class KSTFormatter(SingletonBase, logging.Formatter):   # 명시적으로 SingletonBase, logging.Formatter 클래스 다중 상속
@@ -520,7 +524,4 @@ Attribute (어트리뷰트) - 흔히 점표현식을 사용하는 이름으로 �
 참고 3 URL - https://dojang.io/mod/page/view.php?id=2469
 참고 4 URL - https://wikidocs.net/125092
 참고 5 URL - https://wikidocs.net/252232
-
-* hasattr
-참고 URL - https://docs.python.org/ko/3.10/library/functions.html#hasattr
 """

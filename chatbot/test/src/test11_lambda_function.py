@@ -36,7 +36,7 @@ from aws_lambda_powertools.utilities.typing import LambdaContext
 from queue import Queue, Empty   # 자료구조 queue (deque 기반)
 
 import json         # json 데이터 처리
-import threading    # 멀티스레드 패키지
+import threading    # 멀티쓰레드 패키지
 import time         # 챗봇 답변 시간 계산
 
 # 마스터 데이터 유효성 검사 대상 리스트
@@ -56,7 +56,7 @@ valid_targets = [ chatbot_helper._buttons,
 masterEntity = MasterEntity(valid_targets)   # 마스터 데이터 싱글톤(singleton) 클래스 객체
 kakaoResponseFormatter = KakaoResponseFormatter(masterEntity.get_master_datas)   # 스킬 응답 템플릿 json 포맷 클래스 객체
 
-# thread_local = threading.local()   # 스레드마다 독립적으로 보관할 값 저장소
+thread_local = threading.local()   # 쓰레드마다 독립적으로 보관할 값 저장소
 
 def handler(event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
     """
@@ -144,13 +144,7 @@ def chatbot_response(kakao_request: dict[str, Any], res_queue: Queue, file_path:
     Returns: 없음.
     """
 
-    # TODO: 아래 주석친 코드 필요시 참고 (2025.11.27 minjae)
-    # if False == hasattr(thread_local, "prev_userRequest_msg"):
-    #     logger.info(f"[테스트] thread_local - prev_userRequest_msg 속성 초기화 완료!")
-    #     setattr(thread_local, "prev_userRequest_msg", None)   # 이전 사용자 입력 채팅 메세지 (챗봇 응답 제한 시간 5초 초과시 응답 재요청 할 때 사용)
-    #     thread_local.prev_userRequest_msg = None
-        
-    prev_userRequest_msg = None   # 이전 사용자 입력 채팅 메세지 (챗봇 응답 제한 시간 5초 초과시 응답 재요청 할 때 사용)
+    if False == hasattr(thread_local, "prev_userRequest_msg"): thread_local.prev_userRequest_msg = None   # 이전 사용자 입력 채팅 메세지 (챗봇 응답 제한 시간 5초 초과시 응답 재요청 할 때 사용)
     userRequest_msg = kakao_request[chatbot_helper._userRequest][chatbot_helper._utterance]   # 사용자 입력 채팅 메세지 가져오기
     
     try:
@@ -162,18 +156,12 @@ def chatbot_response(kakao_request: dict[str, Any], res_queue: Queue, file_path:
         # 참고 URL - https://claude.ai/chat/d550ac84-5c0c-4805-a600-9fdfd1236714
         if chatbot_helper._done_thinking == userRequest_msg:   # 시간 5초 초과시 응답 재요청
             logger.info(f"[테스트] userRequest_msg - {userRequest_msg}")
-
-            prev_userRequest_msg = aws.read_tmp_file(file_path)
-            
-            if len(prev_userRequest_msg.split()) >= EnumValidator.EXISTENCE.value:
-                # text = getattr(thread_local, "prev_userRequest_msg")
-                logger.info(f"[테스트] 응답 재요청 채팅 메세지 - {prev_userRequest_msg}")
-
-                response_data = kakaoResponseFormatter.get_response(prev_userRequest_msg)
-                res_queue.put(response_data[chatbot_helper._payload])
-                # res_queue.put(kakaoResponseFormatter.simple_text(prev_userRequest_msg))
-                
-                aws.write_tmp_file(file_path, "")
+            last_update = aws.read_tmp_file(file_path)
+            logger.info(f"[테스트] 최근 임시 로그 last_update - {last_update}")
+            ----- text = thread_local.prev_userRequest_msg
+            # logger.info(f"[테스트] 응답 재요청 채팅 메세지 - {text}")
+            res_queue.put(kakaoResponseFormatter.simple_text(text))
+            aws.write_tmp_file(file_path, "")
             return
 
         if EnumValidator.VALIDATION_ERROR == masterEntity.get_isValid:   # 마스터 데이터 유효성 검사 결과 - 오류.
@@ -184,17 +172,17 @@ def chatbot_response(kakao_request: dict[str, Any], res_queue: Queue, file_path:
         
         if EnumValidator.EXISTENCE == masterEntity.get_isValid:   # 마스터 데이터 유효성 검사 결과 - 성공.
             response_data = kakaoResponseFormatter.get_response(userRequest_msg)
-            # setattr(thread_local, "prev_userRequest_msg", userRequest_msg)
+            thread_local.prev_userRequest_msg = userRequest_msg
 
             aws.write_tmp_file(file_path, "")
             
             levelNo = response_data[chatbot_helper._meta_data][chatbot_helper._levelNo]
             displayName = response_data[chatbot_helper._meta_data][chatbot_helper._displayName]
-            logger.info(f"({levelNo}: {displayName} - 사용자 입력 채팅 정보: '{userRequest_msg}')")
+        
+            msg = f"({levelNo}: {displayName} - 사용자 입력 채팅 정보: '{userRequest_msg}')"
+            aws.write_tmp_file(file_path, msg)
 
-            aws.write_tmp_file(file_path, userRequest_msg)
-
-            # time.sleep(5)   # 테스트 - 5초 대기
+            ----- time.sleep(5)   # 테스트 - 5초 대기
             res_queue.put(response_data[chatbot_helper._payload])
             return
 
@@ -432,18 +420,6 @@ def error_payload_format(msg: str) -> dict[str, Any]:
 * threading.local()
 참고 URL - https://docs.python.org/ko/3.13/library/threading.html#thread-local-data
 참고 2 URL - https://soundprovider.tistory.com/entry/python-Thread-Local-Data
-
-* hasattr
-참고 URL - https://docs.python.org/ko/3.10/library/functions.html#hasattr
-
-* setattr
-참고 URL - https://docs.python.org/ko/3.10/library/functions.html#setattr
-
-* getattr
-참고 URL - https://docs.python.org/ko/3.10/library/functions.html#getattr
-
-* split
-참고 URL - https://docs.python.org/3.6/library/stdtypes.html#string-methods
 
 * isinstance
 참고 URL - https://docs.python.org/ko/3.9/library/functions.html#isinstance

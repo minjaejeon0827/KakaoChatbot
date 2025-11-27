@@ -57,10 +57,12 @@ async def get_masterDownLoadAsync(masterEntity_json_file_path: str | None = None
         return master_datas
 
     except (KeyError, ValueError, TypeError) as e:
-        chatbot_logger.error(f"[테스트] 데이터 유효성 오류 - {str(e)}")
+        valid_error_msg = str(e)
+        chatbot_logger.error(f"[테스트] 데이터 유효성 오류 - {valid_error_msg}")
         raise
     except Exception as e:
-        chatbot_logger.critical(f"[테스트] 시스템 오류 - {str(e)}")
+        sys_error_msg = str(e)
+        chatbot_logger.critical(f"[테스트] 시스템 오류 - {sys_error_msg}")
         raise
 
 """

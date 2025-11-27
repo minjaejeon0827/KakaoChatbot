@@ -31,7 +31,8 @@ def create_tmp_file(file_path: str) -> None:
         else: logger.info(f"임시 로그 텍스트 파일 존재함! file_path - {file_path}")
 
     except Exception as e:
-        logger.critical(f"[테스트] 시스템 오류 - {str(e)}", exc_info=True)
+        sys_error_msg = str(e)
+        logger.critical(f"[테스트] 시스템 오류 - {sys_error_msg}", exc_info=True)
         raise
 
 def write_tmp_file(file_path: str, msg: str) -> None:
@@ -49,7 +50,8 @@ def write_tmp_file(file_path: str, msg: str) -> None:
             logger.info(f"[테스트] 임시 로그 텍스트 파일 ({file_path}) 로그 메시지 - {msg}")
             f.write(msg)
     except Exception as e:
-        logger.critical(f"[테스트] 시스템 오류 - {str(e)}", exc_info=True)
+        sys_error_msg = str(e)
+        logger.critical(f"[테스트] 시스템 오류 - {sys_error_msg}", exc_info=True)
         raise
 
 def read_tmp_file(file_path: str) -> str:
@@ -65,10 +67,12 @@ def read_tmp_file(file_path: str) -> str:
         with open(file_path, "r", encoding="utf-8") as f:
             return f.read()
     except FileNotFoundError as e:
-        logger.error(f"[테스트] 파일 찾기 오류 - {str(e)}", exc_info=True)
+        fileNotFound_error_msg = str(e)
+        logger.error(f"[테스트] 파일 찾기 오류 - {fileNotFound_error_msg}", exc_info=True)
         return ""
     except Exception as e:
-        logger.critical(f"[테스트] 시스템 오류 - {str(e)}", exc_info=True)
+        sys_error_msg = str(e)
+        logger.critical(f"[테스트] 시스템 오류 - {sys_error_msg}", exc_info=True)
         return ""
 
 """

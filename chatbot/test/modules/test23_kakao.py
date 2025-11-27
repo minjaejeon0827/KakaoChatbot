@@ -185,10 +185,12 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
             return self.__empty_response(master_datas[chatbot_helper._emptyResponse])   # 기술지원 문의 제외 일반 문의
 
         except (KeyError, ValueError, TypeError) as e:
-            logger.error(f"[테스트] 데이터 유효성 오류 - {str(e)}", exc_info=True)
+            valid_error_msg = str(e)
+            logger.error(f"[테스트] 데이터 유효성 오류 - {valid_error_msg}", exc_info=True)
             raise
         except Exception as e:
-            logger.critical(f"[테스트] 시스템 오류 - {str(e)}", exc_info=True)
+            sys_error_msg = str(e)
+            logger.critical(f"[테스트] 시스템 오류 - {sys_error_msg}", exc_info=True)
             raise
 
     def __skillResponse_format(self, outputs: list[dict], quickReplies: list[dict] | None = None) -> dict[str, Any]:
