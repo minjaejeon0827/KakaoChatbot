@@ -166,7 +166,7 @@ def chatbot_response(kakao_request: dict[str, Any], res_queue: Queue, file_path:
 
             prev_userRequest_msg = aws.read_tmp_file(file_path)
             
-            if len(prev_userRequest_msg.split()) >= EnumValidator.EXISTENCE:
+            if len(prev_userRequest_msg.split()) >= EnumValidator.EXISTENCE.value:
                 # text = getattr(thread_local, "prev_userRequest_msg")
                 logger.info(f"[테스트] 응답 재요청 채팅 메세지 - {prev_userRequest_msg}")
 
