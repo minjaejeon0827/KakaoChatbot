@@ -105,10 +105,10 @@ def handler(event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
 
         start_response_thread(kakao_request, res_queue, err_queue, file_path)   # 6) 응답 생성 작업 스레드 시작
 
-        response = wait_for_response(start_time, res_queue, err_queue)   # 7) 응답 대기 (챗봇 응답 제한 시간 초과 포함)
+        response = wait_for_response(start_time, res_queue, err_queue)   # 7) 응답 대기 (챗봇 응답 시간 5초 초과 포함)
 
-        if None is response:   # 8) 챗봇 응답 제한 시간 초과한 경우
-            logger.warning("[테스트] 챗봇 응답 제한 시간 5초 초과 발생 - 재요청 응답 메세지 반환")
+        if None is response:   # 8) 챗봇 응답 시간 5초 초과한 경우
+            logger.warning("[테스트] 챗봇 응답 시간 5초 초과 발생 - 재요청 응답 메세지 반환")
             return lambda_response_format(
                 kakaoResponseFormatter.timeover_quickReplies(),
                 status_code=chatbot_helper._statusCode_success,   # 카카오톡 서버로 재요청 응답 메세지 전송하기 위해 HTTP 응답 상태 코드 200 전송
@@ -144,7 +144,7 @@ def chatbot_response(kakao_request: dict[str, Any], res_queue: Queue, file_path:
     Returns: 없음.
     """
 
-    if False == hasattr(thread_local, "prev_userRequest_msg"): thread_local.prev_userRequest_msg = None   # 이전 사용자 입력 채팅 메세지 (챗봇 응답 제한 시간 5초 초과시 응답 재요청 할 때 사용)
+    if False == hasattr(thread_local, "prev_userRequest_msg"): thread_local.prev_userRequest_msg = None   # 이전 사용자 입력 채팅 메세지 (챗봇 응답 시간 5초 초과시 응답 재요청 할 때 사용)
     userRequest_msg = kakao_request[chatbot_helper._userRequest][chatbot_helper._utterance]   # 사용자 입력 채팅 메세지 가져오기
     
     try:
@@ -152,7 +152,7 @@ def chatbot_response(kakao_request: dict[str, Any], res_queue: Queue, file_path:
         # logger.info(f"[테스트] res_queue 클래스 타입 - {type(res_queue)}")
         # logger.info(f"[테스트] file_path 클래스 타입 - {type(file_path)}")
 
-        # 챗봇 응답 제한 시간 5초 초과시 응답 재요청 기능 구현
+        # 챗봇 응답 시간 5초 초과시 응답 재요청 기능 구현
         # 참고 URL - https://claude.ai/chat/d550ac84-5c0c-4805-a600-9fdfd1236714
         if chatbot_helper._done_thinking == userRequest_msg:   # 시간 5초 초과시 응답 재요청
             logger.info(f"[테스트] userRequest_msg - {userRequest_msg}")
@@ -317,7 +317,7 @@ def start_response_thread(kakao_request: dict[str, Any], res_queue: Queue, err_q
 
 def wait_for_response(start_time: float, res_queue: Queue, err_queue: Queue) -> dict[str, Any] | None:
     """
-    Description: 챗봇 답변 또는 오류 대기 (응답 제한 시간 3.5초 이내)
+    Description: 챗봇 답변 또는 오류 대기 (응답 가능 제한 시간 3.5초 이내)
 
     Parameters: start_time - 메인 핸들러 (handler) 시작 시간 (챗봇 응답 시간 계산 용도)
                 res_queue - 챗봇 답변 내용 포함된 큐 객체
