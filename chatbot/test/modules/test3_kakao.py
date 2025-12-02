@@ -268,7 +268,7 @@ def error_text(error_msg: str) -> dict:
         }
     }       
 
-def timeover_quickReplies(requestAgain_msg: str) -> dict:
+def timeOver_quickReplies(requestAgain_msg: str) -> dict:
     """
     Description: 응답 재요청 json 포맷 가져오기
                  챗봇 응답 시간 5초 초과시 응답 재요청 메세지 전송

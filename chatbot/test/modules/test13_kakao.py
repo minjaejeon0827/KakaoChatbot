@@ -76,7 +76,7 @@ class KakaoResponseFormat:   # 암시적으로 object 클래스 상속
              simple_text - 텍스트 메세지 json 포맷
              simple_image - DALLE2 이미지 json 포맷
              error_text - 오류 메세지 json 포맷
-             timeover_quickReplies - 제한 시간 초과 응답 재요청 json 포맷
+             timeOver_quickReplies - 제한 시간 초과 응답 재요청 json 포맷
 
              __quickReplies_format - 바로가기 그룹 json 포맷
              __textCard_format - 텍스트 카드 json 포맷
@@ -330,7 +330,7 @@ class KakaoResponseFormat:   # 암시적으로 object 클래스 상속
 
         return self.__skillTemplate_format(outputs, quickReplies)
 
-    def timeover_quickReplies(self, requestAgain_msg: str) -> dict[str, Any]:
+    def timeOver_quickReplies(self, requestAgain_msg: str) -> dict[str, Any]:
         """
         Description: [public] 제한 시간 초과시 응답 재요청 json 포맷
                      챗봇 응답 시간 5초 초과시 응답 재요청 메세지 전송

@@ -91,23 +91,20 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
                  참고 2 URL - https://wiki1.kr/index.php/%EB%A7%88%EC%8A%A4%ED%84%B0%EB%8D%B0%EC%9D%B4%ED%84%B0#cite_note-masterdata_synopsis-2
                  참고 3 URL - https://claude.ai/chat/5a7fdfc5-6cb8-4286-bb10-a3082e164934
 
-    Attributes: _instance (MasterEntity) - 마스터 데이터 싱글톤 클래스 인스턴스
+    Attributes: _instance (MasterEntity) - 마스터 데이터 싱글톤 클래스 (singleton) (MasterEntity) 인스턴스 (Instance)
                 _init (bool) - 인스턴스 초기화 완료 여부 (True: 완료, False: 실패)
 
                 __master_datas (dict[str, Any]) - 전체 마스터 데이터
-                __messageText_mappings (dict[str, Any]) - 챗봇 버튼 메시지 텍스트 매핑 Dictionary 객체
                 __valid_targets (list[str]) - 마스터 데이터 유효성 검사 대상 리스트
                 __isValid (EnumValidator) - 마스터 데이터 유효성 검사 결과 여부
 
     Parameters: *args (tuple) - SingletonBase 위치 가변 인자
                 **kwargs (dict) - SingletonBase 키워드 가변 인자
 
-                messageText_mappings (dict[str, Any]) - 챗봇 버튼 메시지 텍스트 매핑 Dictionary 객체
                 valid_targets (list[str]) - 마스터 데이터 유효성 검사 대상 리스트
                 (예시) [ "buttons", "items", "autoCADInfos", "revitInfos", "navisworksManageInfos", "infraWorksInfos", "civil3DInfos", "revitBoxInfos", "cadBoxInfos", "energyBoxInfos", "accountInfos", "etcInfos" ]
 
     Properties (읽기 전용): get_master_datas (dict[str, Any]) - 전체 마스터 데이터 가져오기
-                           get_messageText_mappings (list[str]) - 챗봇 버튼 메시지 텍스트 매핑 Dictionary 객체 가져오기
                            get_valid_targets (list[str]) - 마스터 데이터 유효성 검사 대상 리스트 가져오기
                            get_isValid (EnumValidator) - 마스터 데이터 유효성 검사 결과 가져오기
 
@@ -118,11 +115,10 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
     """
 
     __master_datas: dict[str, Any]
-    __messageText_mappings: dict[str, Any]
     __valid_targets: list[str]
     __isValid: EnumValidator
 
-    def __init__(self, messageText_mappings: dict[str, Any], valid_targets: list[str]) -> None:
+    def __init__(self, valid_targets: list[str]) -> None:
         """
         Description: 생성된 객체 초기화
 
@@ -132,8 +128,7 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
 
                      참고 URL - https://docs.python.org/ko/3.6/reference/datamodel.html#object.__init__
 
-        Parameters: self - 마스터 데이터 싱글톤 클래스 인스턴스
-                    messageText_mappings - 챗봇 버튼 메시지 텍스트 매핑 Dictionary 객체
+        Parameters: self - 마스터 데이터 싱글톤 클래스 (singleton) (MasterEntity) 인스턴스 (Instance)
                     valid_targets - 마스터 데이터 유효성 검사 대상 리스트
 
         Returns: 없음.
@@ -159,8 +154,8 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
             
         if True == loop.is_running():   # 이벤트 루프 (event loop) 현재 실행 중인 경우
             chatbot_logger.info("[테스트] 아마존 웹서비스 람다 함수 (AWS Lambda Function) 내부 이벤트 루프 (event loop) 실행 중!")
-            loop.create_task(self.__initSettingAsync(messageText_mappings, valid_targets))   # 코루틴(coroutine)을 Task로 감싸고 비동기 메서드 실행 예약 및 Task 객체 반환
-        else: asyncio.run(self.__initSettingAsync(messageText_mappings, valid_targets))   # 이벤트 루프(asyncio.run) 실행하여 비동기 메서드 self.__initSettingAsync(messageText_mappings, valid_targets) 호출
+            loop.create_task(self.__initSettingAsync(valid_targets))   # 코루틴(coroutine)을 Task로 감싸고 비동기 메서드 실행 예약 및 Task 객체 반환
+        else: asyncio.run(self.__initSettingAsync(valid_targets))   # 이벤트 루프(asyncio.run) 실행하여 비동기 메서드 self.__initSettingAsync(valid_targets) 호출
 
         chatbot_logger.info("[테스트] MasterEntity __init__ 메서드 - 호출 완료!")
         _class._init = True   # 초기화 완료
@@ -170,14 +165,14 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
         """
         Description: 전체 마스터 데이터 가져오기 
 
-        Parameters: self - 마스터 데이터 싱글톤 클래스 인스턴스
+        Parameters: self - 마스터 데이터 싱글톤 클래스 (singleton) (MasterEntity) 인스턴스 (Instance)
 
         Returns: self.__master_datas - 전체 마스터 데이터 
         """
     
-        # TODO: 마스터 데이터 싱글톤 클래스 인스턴스 초기화(__init__) 완료 전 속성 접근 시 AttributeError 발생할 수 있어서 초기화(__init__) 완료 후 접근하도록 로직 보완 (2025.11.13 minjae)
+        # TODO: 마스터 데이터 싱글톤 클래스 (singleton) (MasterEntity) 인스턴스 (Instance) 초기화(__init__) 완료 전 속성 접근 시 AttributeError 발생할 수 있어서 초기화(__init__) 완료 후 접근하도록 로직 보완 (2025.11.13 minjae)
         if False == hasattr(self, "_MasterEntity__master_datas"):  # 인스턴스 (Instance) 초기화(__init__) 완료되지 않은 경우
-            raise RuntimeError("[테스트] 마스터 데이터 싱글톤 클래스 인스턴스 초기화 완료 못함.")
+            raise RuntimeError("[테스트] 마스터 데이터 싱글톤 클래스 (singleton) (MasterEntity) 인스턴스 (Instance) 초기화 완료 못함.")
         
         return self.__master_datas
 
@@ -187,7 +182,7 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
     #     """
     #     Description: 전체 마스터 데이터 설정  
 
-    #     Parameters: self - 마스터 데이터 싱글톤 클래스 인스턴스
+    #     Parameters: self - 마스터 데이터 싱글톤 클래스 (singleton) (MasterEntity) 인스턴스 (Instance)
     #                 master_datas - 전체 마스터 데이터
 
     #     Returns: 없음.
@@ -196,37 +191,11 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
     #     self.__master_datas = master_datas
 
     @cached_property
-    def get_messageText_mappings(self) -> dict[str, Any]:
-        """
-        Description: 챗봇 버튼 메시지 텍스트 매핑 Dictionary 객체 가져오기
-
-        Parameters: self - 마스터 데이터 싱글톤 클래스 인스턴스
-
-        Returns: self.__messageText_mappings - 챗봇 버튼 메시지 텍스트 매핑 Dictionary 객체
-        """
-                
-        return self.__messageText_mappings
-
-    # TODO: setter 메서드 set_messageText_mappings 필요시 사용 예정 (2025.12.02 minjae)
-    # @get_messageText_mappings.setter
-    # def set_messageText_mappings(self, messageText_mappings: dict[str, Any]) -> None:
-    #     """
-    #     Description: 챗봇 버튼 메시지 텍스트 매핑 Dictionary 객체 설정
-
-    #     Parameters: self - 마스터 데이터 싱글톤 클래스 인스턴스
-    #                 messageText_mappings - 챗봇 버튼 메시지 텍스트 매핑 Dictionary 객체
-
-    #     Returns: 없음.
-    #     """
-        
-    #     self.__messageText_mappings = messageText_mappings
-
-    @cached_property
     def get_valid_targets(self) -> list[str]:
         """
         Description: 마스터 데이터 유효성 검사 대상 리스트 가져오기
 
-        Parameters: self - 마스터 데이터 싱글톤 클래스 인스턴스
+        Parameters: self - 마스터 데이터 싱글톤 클래스 (singleton) (MasterEntity) 인스턴스 (Instance)
 
         Returns: self.__valid_targets - 마스터 데이터 유효성 검사 대상 리스트
         """
@@ -239,7 +208,7 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
     #     """
     #     Description: 마스터 데이터 유효성 검사 대상 리스트 설정
 
-    #     Parameters: self - 마스터 데이터 싱글톤 클래스 인스턴스
+    #     Parameters: self - 마스터 데이터 싱글톤 클래스 (singleton) (MasterEntity) 인스턴스 (Instance)
     #                 valid_targets - 마스터 데이터 유효성 검사 대상 리스트
 
     #     Returns: 없음.
@@ -252,7 +221,7 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
         """
         Description: 마스터 데이터 유효성 검사 결과 가져오기
 
-        Parameters: self - 마스터 데이터 싱글톤 클래스 인스턴스
+        Parameters: self - 마스터 데이터 싱글톤 클래스 (singleton) (MasterEntity) 인스턴스 (Instance)
 
         Returns: self.__isValid - 마스터 데이터 유효성 검사 결과
         """
@@ -265,7 +234,7 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
     #     """
     #     Description: 마스터 데이터 유효성 검사 결과 설정 
 
-    #     Parameters: self - 마스터 데이터 싱글톤 클래스 인스턴스
+    #     Parameters: self - 마스터 데이터 싱글톤 클래스 (singleton) (MasterEntity) 인스턴스 (Instance)
     #                 isValid - 마스터 데이터 유효성 검사 결과
 
     #     Returns: 없음.
@@ -273,12 +242,11 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
         
     #     self.__isValid = isValid
 
-    async def __initSettingAsync(self, messageText_mappings: dict[str, Any], valid_targets: list[str] | None = None) -> None:
+    async def __initSettingAsync(self, valid_targets: list[str] | None = None) -> None:
         """
         Description: [private] 마스터 데이터 초기 설정
 
-        Parameters: self - 마스터 데이터 싱글톤 클래스 인스턴스
-                    messageText_mappings - 챗봇 버튼 메시지 텍스트 매핑 Dictionary 객체
+        Parameters: self - 마스터 데이터 싱글톤 클래스 (singleton) (MasterEntity) 인스턴스 (Instance)  
                     valid_targets - 마스터 데이터 유효성 검사 대상 리스트 (non-default value parameter)
 
         Returns: 없음.
@@ -294,7 +262,6 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
             # chatbot_logger.info(f"[테스트] chatbot_restServer.get_masterDownLoadAsync 함수 속성 __doc__ 사용 및 docstring 내용 확인 - {chatbot_restServer.get_masterDownLoadAsync.__doc__}")
 
             self.__master_datas = await chatbot_restServer.get_masterDownLoadAsync(chatbot_helper._masterEntity_json_file_path)   # 전체 마스터 데이터 다운로드
-            self.__messageText_mappings = messageText_mappings
             self.__valid_targets = valid_targets if len(valid_targets) >= EnumValidator.EXISTENCE else None
             self.__isValid = self.__isValidator()
  
@@ -313,7 +280,7 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
         Description: [private] 마스터 데이터 유효성 검사
                      참고 URL - https://chatgpt.com/c/68017acc-672c-8010-8649-7fa39f17d834
 
-        Parameters: self - 마스터 데이터 싱글톤 클래스 인스턴스
+        Parameters: self - 마스터 데이터 싱글톤 클래스 (singleton) (MasterEntity) 인스턴스 (Instance)
 
         Returns: 마스터 데이터 유효성 검사 결과
         """

@@ -52,8 +52,43 @@ valid_targets = [ chatbot_helper._buttons,
                   chatbot_helper._energyBoxInfos,
                   chatbot_helper._etcInfos ]
 
-masterEntity = MasterEntity(valid_targets)   # 마스터 데이터 싱글톤(singleton) 클래스 객체
-kakaoResponseFormatter = KakaoResponseFormatter(masterEntity.get_master_datas)   # 스킬 응답 템플릿 json 포맷 클래스 객체
+messageText_mappings = {   # 챗봇 버튼 메시지 텍스트 매핑 Dictionary 객체
+    # if 조건절 eq 연산자(==) Dictionary key
+    chatbot_helper._start: chatbot_helper._start,   # start - 시작 화면
+    chatbot_helper._beginning: chatbot_helper._beginning,   # start - 처음으로
+
+    chatbot_helper._remote_text: chatbot_helper._remote_text,   # level1 - 원격 지원
+    chatbot_helper._ask_chatbot: chatbot_helper._ask_chatbot,   # level1 - 챗봇 문의
+            
+    chatbot_helper._instSupport_adskProduct: chatbot_helper._instSupport_adskProduct,   # level2 - Autodesk 제품 설치 지원
+    chatbot_helper._instSupport_boxProduct: chatbot_helper._instSupport_boxProduct,   # level2 - 상상진화 BOX 제품 설치 지원
+
+    # level3 - 상상진화 BOX 제품 버전
+    chatbot_helper._revitBox: chatbot_helper._revitBox,
+    chatbot_helper._cadBox: chatbot_helper._cadBox,
+    chatbot_helper._energyBox: chatbot_helper._energyBox,
+
+    # level3 - Autodesk 제품 버전
+    chatbot_helper._autoCAD: chatbot_helper._autoCAD,
+    chatbot_helper._revit: chatbot_helper._revit,
+    chatbot_helper._navisworksManage: chatbot_helper._navisworksManage,
+    chatbot_helper._infraWorks: chatbot_helper._infraWorks,
+    chatbot_helper._civil3D: chatbot_helper._civil3D,
+ 
+    # if 조건절 in 연산자 Dictionary key
+    # end - 텍스트 + basicCard Autodesk or 상상진화 BOX 제품 설치 방법 매핑 Dictionary 객체
+    f"{chatbot_helper._instType} {chatbot_helper._revitBox}": f"{chatbot_helper._instType} {chatbot_helper._revitBox}",
+    f"{chatbot_helper._instType} {chatbot_helper._cadBox}": f"{chatbot_helper._instType} {chatbot_helper._cadBox}",
+    f"{chatbot_helper._instType} {chatbot_helper._energyBox}": f"{chatbot_helper._instType} {chatbot_helper._energyBox}",
+    f"{chatbot_helper._instType} {chatbot_helper._autoCAD}": f"{chatbot_helper._instType} {chatbot_helper._autoCAD}",
+    f"{chatbot_helper._instType} {chatbot_helper._revit}": f"{chatbot_helper._instType} {chatbot_helper._revit}",
+    f"{chatbot_helper._instType} {chatbot_helper._navisworksManage}": f"{chatbot_helper._instType} {chatbot_helper._navisworksManage}",
+    f"{chatbot_helper._instType} {chatbot_helper._infraWorks}": f"{chatbot_helper._instType} {chatbot_helper._infraWorks}",
+    f"{chatbot_helper._instType} {chatbot_helper._civil3D}": f"{chatbot_helper._instType} {chatbot_helper._civil3D}"
+}
+
+masterEntity = MasterEntity(messageText_mappings, valid_targets)   # 마스터 데이터 싱글톤(singleton) 클래스 객체
+kakaoResponseFormatter = KakaoResponseFormatter(masterEntity.get_master_datas, masterEntity.get_messageText_mappings)   # 스킬 응답 템플릿 json 포맷 클래스 객체
 
 # thread_local = threading.local()   # 스레드마다 독립적으로 보관할 값 저장소
 
@@ -78,9 +113,10 @@ def handler(event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
     res_queue = None    # 챗봇 답변 내용 포함된 큐 객체
     err_queue = None    # 챗봇 오류 내용 포함된 큐 객체
 
-    response = None     # 챗봇 답변 내용
+    response = None     # 챗봇 답변 내용 (페이로드)
+    prev_userRequest_msg = None   # 이전 사용자 입력 채팅 메세지 (챗봇 응답 시간 5초 초과시 응답 재요청 할 때 사용)
     
-    start_time = time.time()    # 메인 핸들러 (handler) 시작 시간 - 챗봇 응답 시간 계산 용도
+    start_time = time.time()   # 메인 핸들러 (handler) 시작 시간 - 챗봇 응답 시간 계산 용도
     
     try:
         # logger.info(f"[테스트] event 클래스 타입 - {type(event)}")
@@ -107,11 +143,34 @@ def handler(event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
         start_response_thread(kakao_request, res_queue, err_queue, file_path)   # 6) 응답 생성 작업 스레드 시작
 
         response = wait_for_response(start_time, res_queue, err_queue)   # 7) 응답 대기 (챗봇 응답 시간 5초 초과 포함)
+        logger.info(f"[테스트] response - {response}")
 
         if None is response:   # 8) 챗봇 응답 시간 초과한 경우
-            logger.warning("[테스트] 챗봇 응답 시간 5초 초과 발생 - 재요청 응답 메세지 반환")
+            prev_userRequest_msg = aws.read_tmp_file(file_path)
+            logger.warning(f"[테스트] 챗봇 응답 시간 5초 초과 발생 prev_userRequest_msg - {prev_userRequest_msg}")
+            
+            # 브루트 포스 완전 탐색 알고리즘 (Brute Force Algorithm) - 무차별 대입법이라고 불리며, 문제를 해결하기 위해 가능한 경우의 수를 모두 검사(완전 탐색) 해보는 방법이다.
+            # 참고 URL - https://ko.wikipedia.org/wiki/%EB%AC%B4%EC%B0%A8%EB%B3%84_%EB%8C%80%EC%9E%85_%EA%B2%80%EC%83%89
+            # 참고 2 URL - https://wikidocs.net/233719
+            # 참고 3 URL - https://youtu.be/QhMY4t2xwG0?si=uYsaL7CLHmx-RHV8
+            for key, value in messageText_mappings.items():   # 이전 사용자 입력 채팅 메세지(prev_userRequest_msg)에 맞는 return 문 찾아 실행
+                if chatbot_helper._remote_text == prev_userRequest_msg:
+                    logger.warning(f"[테스트] 재요청 응답 메세지 제외 대상 - {prev_userRequest_msg}")
+                    return lambda_response_format(
+                        kakaoResponseFormatter.timeOver_empty_response(),
+                        status_code=chatbot_helper._statusCode_success,   # 카카오톡 서버로 재요청 응답 메세지 전송하기 위해 HTTP 응답 상태 코드 200 전송
+                    )
+
+                if key in prev_userRequest_msg:
+                    logger.warning("[테스트] 챗봇 응답 시간 5초 초과 발생 - 재요청 응답 메세지 반환")
+                    return lambda_response_format(
+                        kakaoResponseFormatter.timeOver_quickReplies(),
+                        status_code=chatbot_helper._statusCode_success,   # 카카오톡 서버로 재요청 응답 메세지 전송하기 위해 HTTP 응답 상태 코드 200 전송
+                    )
+            
+            logger.warning(f"[테스트] 재요청 응답 메세지 제외 대상 - {prev_userRequest_msg}")
             return lambda_response_format(
-                kakaoResponseFormatter.timeover_quickReplies(),
+                kakaoResponseFormatter.timeOver_empty_response(),
                 status_code=chatbot_helper._statusCode_success,   # 카카오톡 서버로 재요청 응답 메세지 전송하기 위해 HTTP 응답 상태 코드 200 전송
             )
 
@@ -153,6 +212,7 @@ def chatbot_response(kakao_request: dict[str, Any], res_queue: Queue, file_path:
         
     prev_userRequest_msg = None   # 이전 사용자 입력 채팅 메세지 (챗봇 응답 시간 5초 초과시 응답 재요청 할 때 사용)
     userRequest_msg = kakao_request[chatbot_helper._userRequest][chatbot_helper._utterance]   # 사용자 입력 채팅 메세지 가져오기
+    kakao_response = None   # 카카오 json 포맷 기반 응답 데이터
     
     try:
         # logger.info(f"[테스트] kakao_request 클래스 타입 - {type(kakao_request)}")
@@ -170,8 +230,9 @@ def chatbot_response(kakao_request: dict[str, Any], res_queue: Queue, file_path:
                 # text = getattr(thread_local, "prev_userRequest_msg")
                 logger.info(f"[테스트] 응답 재요청 채팅 메세지 - {prev_userRequest_msg}")
 
-                response_data = kakaoResponseFormatter.get_response(prev_userRequest_msg)
-                res_queue.put(response_data[chatbot_helper._payload])
+                kakao_response = kakaoResponseFormatter.get_response(prev_userRequest_msg)
+                res_queue.put(kakao_response[chatbot_helper._payload])
+                
                 # res_queue.put(kakaoResponseFormatter.simple_text(prev_userRequest_msg))
                 
                 aws.write_tmp_file(file_path, "")
@@ -184,19 +245,20 @@ def chatbot_response(kakao_request: dict[str, Any], res_queue: Queue, file_path:
             raise ValueError("마스터 데이터 유효성 검사 결과 - 데이터 존재 안 함.")
         
         if EnumValidator.EXISTENCE == masterEntity.get_isValid:   # 마스터 데이터 유효성 검사 결과 - 성공.
-            response_data = kakaoResponseFormatter.get_response(userRequest_msg)
+            kakao_response = kakaoResponseFormatter.get_response(userRequest_msg)
             # setattr(thread_local, "prev_userRequest_msg", userRequest_msg)
 
             aws.write_tmp_file(file_path, "")
             
-            levelNo = response_data[chatbot_helper._meta_data][chatbot_helper._levelNo]
-            displayName = response_data[chatbot_helper._meta_data][chatbot_helper._displayName]
+            levelNo = kakao_response[chatbot_helper._meta_data][chatbot_helper._levelNo]
+            displayName = kakao_response[chatbot_helper._meta_data][chatbot_helper._displayName]
             logger.info(f"({levelNo}: {displayName} - 사용자 입력 채팅 정보: '{userRequest_msg}')")
 
             aws.write_tmp_file(file_path, userRequest_msg)
 
-            # time.sleep(5)   # 테스트 - 5초 대기
-            res_queue.put(response_data[chatbot_helper._payload])
+            time.sleep(5)   # 테스트 - 5초 대기
+            res_queue.put(kakao_response[chatbot_helper._payload])
+            
             return
 
         raise Exception("시스템 내부 오류!")
@@ -339,7 +401,7 @@ def wait_for_response(start_time: float, res_queue: Queue, err_queue: Queue) -> 
                 Blocking - 호출된 함수가 자신이 할 일을 모두 마칠 때까지 제어권을 계속 가지고서 호출한 함수에게 바로 돌려주지 않는 것.
                 Non-Blocking - 호출된 함수가 자신이 할 일을 채 마치지 않았더라도 바로 제어권을 건네주어 (return) 호출한 함수가 다른 일을 진행할 수 있도록 해주는 것.
 
-    Returns: response - 챗봇 답변 내용
+    Returns: response - 챗봇 답변 내용 (페이로드)
     """
 
     while(time.time() - start_time < chatbot_helper._time_limit):   # 챗봇 응답 시간 3.5초 이내인 경우
@@ -360,11 +422,11 @@ def wait_for_response(start_time: float, res_queue: Queue, err_queue: Queue) -> 
 
     return None
 
-def lambda_response_format(payload: dict[str, Any], status_code: int = chatbot_helper._statusCode_success) -> dict[str, Any]:
+def lambda_response_format(response: dict[str, Any], status_code: int = chatbot_helper._statusCode_success) -> dict[str, Any]:
     """
     Description: 카카오톡 서버로 전송할 API Gateway 규격에 맞는 json format 형식 데이터 리턴
 
-    Parameters: payload - 카카오 json 포맷 기반 챗봇 답변 내용 (페이로드)
+    Parameters: response - 챗봇 답변 내용 (페이로드)
                 status_code - HTTP 응답 상태 코드 값 (예) 2XX - 성공 / 4XX - 클라이언트 오류 / 5XX - 서버 오류 (default value parameter)
 
     Returns: 카카오톡 서버로 전송할 json format 형식 데이터
@@ -372,7 +434,7 @@ def lambda_response_format(payload: dict[str, Any], status_code: int = chatbot_h
 
     return {
         "statusCode": status_code,
-        "body": json.dumps(payload, ensure_ascii=False),
+        "body": json.dumps(response, ensure_ascii=False),
         "headers": { "Access-Control-Allow-Origin": "*" },
     }
 

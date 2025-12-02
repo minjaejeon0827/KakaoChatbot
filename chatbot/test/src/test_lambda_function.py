@@ -144,7 +144,7 @@ def handler(event, context):
             time.sleep(chatbot_helper._polling_interval) 
  
         if False == run_flag:   # 챗봇 응답 시간 5초 초과한 경우     
-            response = kakao.timeover_quickReplies(chatbot_helper._done_thinking)   
+            response = kakao.timeOver_quickReplies(chatbot_helper._done_thinking)   
 
         res_msg = json.dumps(response) 
         # logger._info("[테스트] 챗봇 답변 채팅 정보 - %s" %res_msg)

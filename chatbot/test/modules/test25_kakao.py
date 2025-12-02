@@ -29,8 +29,9 @@ from utils.log import logger       # 챗봇 전역 로그 객체 (logger)
 from typing import Any
 
 # 4. 나머지 모듈 (module) import
-# from functools import cached_property   # 속성(property)의 결과 캐싱하여 속성(property)이 여러 번 호출될 때마다 매번 계산하지 않고 처음 계산된 값 재사용
+from functools import cached_property   # 속성(property)의 결과 캐싱하여 속성(property)이 여러 번 호출될 때마다 매번 계산하지 않고 처음 계산된 값 재사용
 
+# TODO: 카카오 스킬 응답 json 포맷 클래스 (KakaoResponseFormatter) 싱글톤 클래스 (singleton) 필요시 구현 예정 (2025.09.15 minjae)
 # class KakaoResponseFormatter(object):  # 명시적으로 object 클래스 상속
 class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
     """
@@ -47,7 +48,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
 
     Parameters: master_datas (dict[str, Any]) - 전체 마스터 데이터
 
-    Properties (읽기 전용): 없음. (추후 필요시 구현 예정!)
+    Properties (읽기 전용): get_isEmpty_response (bool) - 비어있는 응답 메세지 카카오톡 채팅방 전송 여부 가져오기 (기술지원 문의 제외 일반 문의 또는 응답 메시지 출력하고 싶지 않은 경우 모두 해당)
 
     Methods: get_response - 카카오 json 포맷 가져오기
 
@@ -61,7 +62,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
              __basicCard_format - 기본형 카드 (basicCard) json 포맷
              __carousel_format - 아이템형 케로셀 (carousel) json 포맷
 
-             __empty_response - 비어있는 메세지 카카오톡 채팅방 전송 (기술지원 문의 제외 일반 문의 또는 응답 메시지 출력하고 싶지 않은 경우 모두 해당)
+             __empty_response - 비어있는 응답 메세지 카카오톡 채팅방 전송 (기술지원 문의 제외 일반 문의 또는 응답 메시지 출력하고 싶지 않은 경우 모두 해당)
              __create_buttons - [공통] 버튼 리스트 생성
              __create_quickReplies - [공통] 바로가기 그룹 (quickReplies) 버튼 리스트 생성
              __common_basicCard - [공통] 기본형 카드 (basicCard) 카카오톡 채팅방 전송
@@ -72,8 +73,10 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
              __end_basicCard - 마지막화면 기본형 카드 (basicCard) 카카오톡 채팅방 전송
 
     Notes: 없음. (추후 필요시 작성 예정!)
-
     """
+
+    __master_datas: dict[str, Any]
+    __isEmpty_response: bool
 
     def __init__(self, master_datas: dict[str, Any]) -> None:
         """
@@ -94,7 +97,34 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
         """
 
         self.__master_datas = master_datas
-        
+        self.__isEmpty_response = False
+
+    @cached_property
+    def get_isEmpty_response(self) -> bool:
+        """
+        Description: 비어있는 응답 메세지 카카오톡 채팅방 전송 여부 가져오기 (기술지원 문의 제외 일반 문의 또는 응답 메시지 출력하고 싶지 않은 경우 모두 해당)
+
+        Parameters: self - 카카오 스킬 응답 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
+
+        Returns: self.__isEmpty_response - 비어있는 응답 메세지 카카오톡 채팅방 전송 여부
+        """
+
+        return self.__isEmpty_response
+
+    # TODO: setter 메서드 set_isEmpty_response 필요시 사용 예정 (2025.12.01 minjae)
+    # @get_isEmpty_response.setter
+    # def set_isEmpty_response(self, isEmpty_response: bool) -> None:
+    #     """
+    #     Description: 비어있는 응답 메세지 카카오톡 채팅방 전송 여부 설정 (기술지원 문의 제외 일반 문의 또는 응답 메시지 출력하고 싶지 않은 경우 모두 해당)
+
+    #     Parameters: self - 카카오 스킬 응답 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
+    #                 isEmpty_response - 비어있는 응답 메세지 카카오톡 채팅방 전송 여부
+
+    #     Returns: 없음.
+    #     """
+
+    #     self.__isEmpty_response = isEmpty_response
+
     def get_response(self, userRequest_msg: str) -> dict[str, Any]:
         """
         Description: [public] 카카오 json 포맷 가져오기
@@ -107,6 +137,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
         """
 
         master_datas = self.__master_datas   # 전체 마스터 데이터
+        self.__isEmpty_response = False   # 비어있는 응답 메세지 카카오톡 채팅방 전송 여부 초기화
 
         # 파이썬 람다 표현식
         # 참고 URL - https://docs.python.org/ko/2/tutorial/controlflow.html#lambda-expressions
@@ -185,12 +216,10 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
             return self.__empty_response(master_datas[chatbot_helper._emptyResponse])   # 기술지원 문의 제외 일반 문의
 
         except (KeyError, ValueError, TypeError) as e:
-            valid_error_msg = str(e)
-            logger.error(f"[테스트] 데이터 유효성 오류 - {valid_error_msg}", exc_info=True)
+            logger.error(f"[테스트] 데이터 유효성 오류 - {str(e)}", exc_info=True)
             raise
         except Exception as e:
-            sys_error_msg = str(e)
-            logger.critical(f"[테스트] 시스템 오류 - {sys_error_msg}", exc_info=True)
+            logger.critical(f"[테스트] 시스템 오류 - {str(e)}", exc_info=True)
             raise
 
     def __skillResponse_format(self, outputs: list[dict], quickReplies: list[dict] | None = None) -> dict[str, Any]:
@@ -441,17 +470,18 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
 
     def __empty_response(self, master_data: dict[str, Any]) -> dict[str, Any]:
         """
-        Description: [private] 비어있는 메세지 카카오톡 채팅방 전송 (기술지원 문의 제외 일반 문의 또는 응답 메시지 출력하고 싶지 않은 경우 모두 해당)
+        Description: [private] 비어있는 응답 메세지 카카오톡 채팅방 전송 (기술지원 문의 제외 일반 문의 또는 응답 메시지 출력하고 싶지 않은 경우 모두 해당)
 
         Parameters: self - 카카오 스킬 응답 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
                     master_data - 특정 마스터 데이터
 
-        Returns: self.__skillResponse_format(outputs) - 비어있는 메세지 json 포맷
+        Returns: self.__skillResponse_format(outputs) - 비어있는 응답 메세지 json 포맷
                  master_data - 특정 마스터 데이터
         """
 
-        logger.info(f"[테스트] 비어있는 메세지 master_data: '{master_data}'")
+        logger.info(f"[테스트] 비어있는 응답 메세지 master_data: '{master_data}'")
 
+        self.__isEmpty_response = True   # 비어있는 응답 메세지 카카오톡 채팅방 전송 처리
         outputs = []
 
         return { "payload": self.__skillResponse_format(outputs), "meta_data": master_data }

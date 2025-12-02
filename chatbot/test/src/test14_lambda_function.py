@@ -166,8 +166,11 @@ def chatbot_response(kakao_request: dict[str, Any], res_queue: Queue, file_path:
 
             prev_userRequest_msg = aws.read_tmp_file(file_path)
             
-            if len(prev_userRequest_msg.split()) >= EnumValidator.EXISTENCE.value:
+            # 비어있는 응답 메세지 카카오톡 채팅방 전송 처리 안 하고 이전 사용자 입력 채팅 메세지 존재하는 경우
+            if (False == kakaoResponseFormatter.get_isEmpty_response and len(prev_userRequest_msg.split()) >= EnumValidator.EXISTENCE):
+            # if (len(prev_userRequest_msg.split()) >= EnumValidator.EXISTENCE):
                 # text = getattr(thread_local, "prev_userRequest_msg")
+                logger.info(f"[테스트] 비어있는 응답 메세지 카카오톡 채팅방 전송 여부 kakaoResponseFormatter.get_isEmpty_response: '{kakaoResponseFormatter.get_isEmpty_response}'")
                 logger.info(f"[테스트] 응답 재요청 채팅 메세지 - {prev_userRequest_msg}")
 
                 response_data = kakaoResponseFormatter.get_response(prev_userRequest_msg)
@@ -195,7 +198,7 @@ def chatbot_response(kakao_request: dict[str, Any], res_queue: Queue, file_path:
 
             aws.write_tmp_file(file_path, userRequest_msg)
 
-            # time.sleep(5)   # 테스트 - 5초 대기
+            time.sleep(5)   # 테스트 - 5초 대기
             res_queue.put(response_data[chatbot_helper._payload])
             return
 

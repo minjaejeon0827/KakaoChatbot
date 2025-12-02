@@ -28,12 +28,29 @@ WARNING = 'WARNING'
 ERROR = 'ERROR'
 CRITICAL = 'CRITICAL'
 
-_kst = None   # ZoneInfo 클래스 전역변수 객체 (global) 
+_kst = None   # ZoneInfo 클래스 (global) 전역변수 객체
+
+# def _test(level: str, msg: str) -> None:
+#     """
+#     Description: 로그 오류 테스트 함수
+
+#     Parameters: level - 로그 레벨
+#                 msg - 로그 메시지
+
+#     Returns: 없음.
+#     """
+    
+#     current_frame = inspect.currentframe()   # 현재 실행 중인 프레임 의미
+#     file_name = os.path.basename(current_frame.f_code.co_filename)
+#     function_name = current_frame.f_code.co_name
+#     lineno = current_frame.f_lineno
+#     print("[%s] [%s] [%s | %s - L%d]: %s" %(ERROR, datetime.now(_kst).strftime(chatbot_helper._datefmt), file_name, function_name, lineno, "로그 오류 테스트"))
+#     _logWrite(level, msg)
 
 def _initZoneInfo() -> None:
     """
-    Description: ZoneInfo 클래스 전역변수 객체 (global)  초기화 (1회만 실행)
-                 한국 표준 시간대 ("Asia/Seoul") 변경되지 않기 때문에 1회만 실행.
+    Description: ZoneInfo 클래스 (global) 전역변수 객체 초기화 (1회만 실행)
+                 한국 표준 시간대("Asia/Seoul") 변경되지 않기 때문에 1회만 실행.
 
     Parameters: 없음.
 
@@ -42,17 +59,17 @@ def _initZoneInfo() -> None:
 
     global _kst
  
-    if None is _kst:   # 전역변수 객체 (global) _kst 할당된 값이 존재하지 않은 경우
+    if None is _kst:   # (global) 전역변수 객체(_kst)에 할당된 값이 존재하지 않은 경우
         # zoneinfo 파이썬 라이브러리 사용하여 로그 출력시 대한민국 표준시로 출력 (2025.06.13 minjae)
         # 참고 URL - https://docs.python.org/ko/3.9/library/zoneinfo.html#module-zoneinfo
         # 참고 2 URL - https://wikidocs.net/236273
         # 참고 3 URL - https://chatgpt.com/c/684b79a8-8c20-8010-9d14-41ab28f12747
-        _kst = ZoneInfo("Asia/Seoul")   # 대한민국 표준시로 설정할 수 있도록 ZoneInfo 클래스 전역변수 객체 (global) _kst 생성 
+        _kst = ZoneInfo("Asia/Seoul")   # 대한민국 표준시로 설정할 수 있도록 ZoneInfo 클래스 (global) 전역변수 객체 _kst 생성 
         current_frame = inspect.currentframe()   # 현재 실행 중인 프레임 의미
         file_name = os.path.basename(current_frame.f_code.co_filename)
         function_name = current_frame.f_code.co_name
         lineno = current_frame.f_lineno        
-        print("[%s] [%s] [%s | %s - L%d]: %s" %(INFO, datetime.now(_kst).strftime(chatbot_helper._datefmt), file_name, function_name, lineno, "[테스트] ZoneInfo 클래스 전역변수 객체 (global) _kst - 생성 완료!"))   # 현재 시간 새로 생성 및 반환
+        print("[%s] [%s] [%s | %s - L%d]: %s" %(INFO, datetime.now(_kst).strftime(chatbot_helper._datefmt), file_name, function_name, lineno, "[테스트] ZoneInfo 클래스 (global) 전역변수 객체 _kst - 생성 완료!"))   # 현재 시간 새로 생성 및 반환
 
 def _callerInfo() -> tuple[str, str, int]:
     """
@@ -69,7 +86,7 @@ def _callerInfo() -> tuple[str, str, int]:
              lineno - 라인 번호
     """
 
-    # 상위 호출자 파일명, 함수명, 라인 번호 가져오기
+    # 상위 호출자 파일명, 함수명, 라인 번호 가져오기 
     # 참고 URL - https://docs.python.org/ko/3.8/library/inspect.html
     # 참고 2 URL - https://louky0714.tistory.com/144
     # 참고 3 URL - https://wikidocs.net/3717

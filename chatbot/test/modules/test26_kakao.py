@@ -61,7 +61,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
              __basicCard_format - 기본형 카드 (basicCard) json 포맷
              __carousel_format - 아이템형 케로셀 (carousel) json 포맷
 
-             __empty_response - 비어있는 메세지 카카오톡 채팅방 전송 (기술지원 문의 제외 일반 문의 또는 응답 메시지 출력하고 싶지 않은 경우 모두 해당)
+             __empty_response - 비어있는 응답 메세지 카카오톡 채팅방 전송 (기술지원 문의 제외 일반 문의 또는 응답 메시지 출력하고 싶지 않은 경우 모두 해당)
              __create_buttons - [공통] 버튼 리스트 생성
              __create_quickReplies - [공통] 바로가기 그룹 (quickReplies) 버튼 리스트 생성
              __common_basicCard - [공통] 기본형 카드 (basicCard) 카카오톡 채팅방 전송
@@ -102,8 +102,10 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
         Parameters: self - 카카오 스킬 응답 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
                     userRequest_msg - 사용자 입력 채팅 메세지
 
-        Returns: dict[str, Any] key "payload" - 카카오톡 서버로 전송할 json 포맷 기반 챗봇 답변 내용 (페이로드),
-                 dict[str, Any] key "meta_data" - 특정 마스터 데이터 (예) 아이템 카드 (basicCard, carousel) or 바로가기 그룹 (quickReplies)
+        Returns: dict[str, Any] key 
+                 1. "payload" - 카카오톡 서버로 전송할 json 포맷 기반 챗봇 답변 내용 (페이로드),
+                 2. "meta_data" - 특정 마스터 데이터 (예) 아이템 카드 (basicCard, carousel) or 바로가기 그룹 (quickReplies)
+                 3. "is_empty_response" - 비어있는 응답 메세지 카카오톡 채팅방 전송 여부 (True: 비어있는 응답 메세지 전송 처리 / False: 기술지원 문의 포함 일반 문의 응답 메시지 전송 처리)
         """
 
         master_datas = self.__master_datas   # 전체 마스터 데이터
@@ -185,12 +187,10 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
             return self.__empty_response(master_datas[chatbot_helper._emptyResponse])   # 기술지원 문의 제외 일반 문의
 
         except (KeyError, ValueError, TypeError) as e:
-            valid_error_msg = str(e)
-            logger.error(f"[테스트] 데이터 유효성 오류 - {valid_error_msg}", exc_info=True)
+            logger.error(f"[테스트] 데이터 유효성 오류 - {str(e)}", exc_info=True)
             raise
         except Exception as e:
-            sys_error_msg = str(e)
-            logger.critical(f"[테스트] 시스템 오류 - {sys_error_msg}", exc_info=True)
+            logger.critical(f"[테스트] 시스템 오류 - {str(e)}", exc_info=True)
             raise
 
     def __skillResponse_format(self, outputs: list[dict], quickReplies: list[dict] | None = None) -> dict[str, Any]:
@@ -441,20 +441,21 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
 
     def __empty_response(self, master_data: dict[str, Any]) -> dict[str, Any]:
         """
-        Description: [private] 비어있는 메세지 카카오톡 채팅방 전송 (기술지원 문의 제외 일반 문의 또는 응답 메시지 출력하고 싶지 않은 경우 모두 해당)
+        Description: [private] 비어있는 응답 메세지 카카오톡 채팅방 전송 (기술지원 문의 제외 일반 문의 또는 응답 메시지 출력하고 싶지 않은 경우 모두 해당)
 
         Parameters: self - 카카오 스킬 응답 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
                     master_data - 특정 마스터 데이터
 
-        Returns: self.__skillResponse_format(outputs) - 비어있는 메세지 json 포맷
+        Returns: self.__skillResponse_format(outputs) - 비어있는 응답 메세지 json 포맷
                  master_data - 특정 마스터 데이터
+                 비어있는 응답 메세지 전송 처리
         """
 
-        logger.info(f"[테스트] 비어있는 메세지 master_data: '{master_data}'")
+        logger.info(f"[테스트] 비어있는 응답 메세지 master_data: '{master_data}'")
 
         outputs = []
 
-        return { "payload": self.__skillResponse_format(outputs), "meta_data": master_data }
+        return { "payload": self.__skillResponse_format(outputs), "meta_data": master_data, "is_empty_response": True }
 
     def __create_buttons(self, master_data: dict[str, Any], message_prefix: str | None = None) -> list[dict]:
         """
@@ -531,13 +532,14 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
 
         Returns: self.__basicCard_format(master_data, buttons) - [공통] 기본형 카드 json 포맷
                  master_data - 특정 마스터 데이터
+                 기술지원 문의 포함 일반 문의 응답 메시지 전송 처리
         """
     
         logger.info(f"[테스트] [공통] 기본형 카드 master_data: '{master_data}'")
 
         buttons = self.__create_buttons(master_data)   # [공통] 버튼 리스트 생성
 
-        return { "payload": self.__basicCard_format(master_data, buttons), "meta_data": master_data }
+        return { "payload": self.__basicCard_format(master_data, buttons), "meta_data": master_data, "is_empty_response": False }
 
     def __common_quickReplies(self, master_data: dict[str, Any]) -> dict[str, Any]:
         """
@@ -548,13 +550,14 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
 
         Returns: self.__quickReplies_format(master_data, quickReplies) - [공통] Autodesk or 상상진화 BOX 제품 설치 지원 바로가기 그룹 json 포맷
                  master_data - 특정 마스터 데이터
+                 기술지원 문의 포함 일반 문의 응답 메시지 전송 처리
         """
 
         logger.info(f"[테스트] [공통] Autodesk or 상상진화 BOX 제품 설치 지원 바로가기 그룹 master_data: '{master_data}'")
 
         quickReplies = self.__create_quickReplies(master_data)
 
-        return { "payload": self.__quickReplies_format(master_data, quickReplies), "meta_data": master_data }
+        return { "payload": self.__quickReplies_format(master_data, quickReplies), "meta_data": master_data, "is_empty_response": False }
 
     def __common_ver_quickReplies(self, userRequest_msg: str, master_data: dict[str, Any]) -> dict[str, Any]:
         """
@@ -566,6 +569,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
 
         Returns: self.__quickReplies_format(master_data, quickReplies) - [공통] Autodesk or 상상진화 BOX 제품 버전 바로가기 그룹 json 포맷
                  master_data - 특정 마스터 데이터
+                 기술지원 문의 포함 일반 문의 응답 메시지 전송 처리
         """
 
         logger.info(f"[테스트] [공통] Autodesk or 상상진화 BOX 제품 버전 바로가기 그룹 userRequest_msg: '{userRequest_msg}', master_data: '{master_data}'")
@@ -573,7 +577,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
         message_prefix = f"{chatbot_helper._instType} {userRequest_msg}"
         quickReplies = self.__create_quickReplies(master_data, message_prefix)
 
-        return { "payload": self.__quickReplies_format(master_data, quickReplies), "meta_data": master_data }
+        return { "payload": self.__quickReplies_format(master_data, quickReplies), "meta_data": master_data, "is_empty_response": False }
 
     def __chatbot_carousel(self, master_data: dict[str, Any]) -> dict[str, Any]:
         """
@@ -584,6 +588,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
 
         Returns: self.__carousel_format(master_data, chatbot_items) - 챗봇 문의 아이템형 케로셀 json 포맷
                  master_data - 특정 마스터 데이터
+                 기술지원 문의 포함 일반 문의 응답 메시지 전송 처리
         """
 
         logger.info(f"[테스트] 챗봇 문의 아이템형 케로셀 master_data: '{master_data}'")
@@ -612,7 +617,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
             "buttonLayout": "vertical"
         })
 
-        return { "payload": self.__carousel_format(master_data, chatbot_items), "meta_data": master_data }
+        return { "payload": self.__carousel_format(master_data, chatbot_items), "meta_data": master_data, "is_empty_response": False }
 
     # TODO: 아래 함수 __end_basicCard 필요시 로직 수정 예정 (2025.09.05 minjae)
     def __end_basicCard(self, userRequest_msg: str, master_data: dict[str, Any], endInfos: list[dict]) -> dict[str, Any]:
@@ -626,6 +631,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
 
         Returns: self.__skillResponse_format(outputs) - 마지막화면 기본형 카드 json 포맷
                  master_data - 특정 마스터 데이터
+                 기술지원 문의 포함 일반 문의 응답 메시지 전송 처리
         """
 
         logger.info(f"[테스트] 마지막화면 기본형 카드 master_data: '{master_data}', endInfos: '{endInfos}'")
@@ -674,7 +680,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
             }
         })
 
-        return { "payload": self.__skillResponse_format(outputs), "meta_data": master_data }
+        return { "payload": self.__skillResponse_format(outputs), "meta_data": master_data, "is_empty_response": False }
     
 """
 *** 참고 ***

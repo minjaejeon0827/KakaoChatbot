@@ -3,9 +3,8 @@
 코드 리뷰 참고 URL - https://chatgpt.com/c/691e9f6e-3940-832a-afda-92c53ae4b49a
 """
 
-from utils.log import logger   # 챗봇 전역 로그 객체 (logger)
-
 import os
+from utils.log import logger   # 챗봇 전역 로그 객체 (logger)
 
 def create_tmp_file(file_path: str) -> None:
     """
@@ -27,8 +26,8 @@ def create_tmp_file(file_path: str) -> None:
         if False == os.path.exists(file_path):   # 해당 파일 존재하지 않는 경우
             with open(file_path, "w", encoding="utf-8") as f:
                 f.write("")
-            logger.info("[테스트] 임시 로그 텍스트 파일 생성 완료: %s", file_path)
-        else: logger.info(f"임시 로그 텍스트 파일 존재함! file_path - {file_path}")
+            logger.info(f"[테스트] 임시 로그 텍스트 파일 생성 완료: {file_path}")
+        else: logger.info(f"[테스트] 임시 로그 텍스트 파일 존재함! file_path - {file_path}")
 
     except Exception as e:
         logger.critical(f"[테스트] 시스템 오류 - {str(e)}", exc_info=True)
@@ -46,7 +45,7 @@ def write_tmp_file(file_path: str, msg: str) -> None:
 
     try:
         with open(file_path, "w", encoding="utf-8") as f:
-            logger.info(f"[테스트] 임시 로그 텍스트 파일 ({file_path}) 로그 메시지 - {msg}")
+            logger.info(f"[테스트] 임시 로그 텍스트 파일 file_path - ({file_path}) / 로그 메시지 기록 - {msg}")
             f.write(msg)
     except Exception as e:
         logger.critical(f"[테스트] 시스템 오류 - {str(e)}", exc_info=True)

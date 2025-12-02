@@ -2,15 +2,15 @@
 * 챗봇 전역 로그 유틸 (util)
 코드 리뷰 참고 URL - https://chatgpt.com/c/69118414-a588-8323-be5b-b0362b312cfa
 
-파이썬 logging 라이브러리 사용해서 전역 로그 객체(logger) 및 로그 기록 기능 구현 (2025.09.18 minjae)
+파이썬 logging 라이브러리 사용해서 전역 로그 객체 (logger) 및 로그 기록 기능 구현 (2025.09.18 minjae)
 참고 URL - https://claude.ai/chat/8fc1ceeb-fe95-4d1b-8517-ecec83beb3f2
 """
 
 # 1. 공통 모듈 먼저 import
-from commons import chatbot_helper   # 챗봇 전용 도움말 텍스트
+# from commons import chatbot_helper   # 챗봇 전용 도움말 텍스트
 
 # 2. singleton 모듈 import
-from modules.singleton import KSTFormatter   # 싱글톤(singleton) 패턴
+from modules.singleton import KSTFormatter   # 싱글톤 패턴 (singleton)
 
 # 3. 나머지 모듈 import
 import logging, os, sys
@@ -32,7 +32,7 @@ def init_logger(name: str = "chatbot_logger") -> logging.Logger:
     log_level = os.getenv("LOG_LEVEL", "INFO").upper()   # 아마존 웹서비스 람다 함수 (AWS Lambda Function) 환경 변수 key ("LOG_LEVEL")의 값이 존재하면 문자열 (영어 대문자)로 반환하고, 없으면 기본값 ("INFO") 반환
     # logger.setLevel(logging.INFO)   # 로그 레벨 INFO 레벨 이상으로 고정
     logger.setLevel(getattr(logging, log_level, logging.INFO))   # getattr 함수 사용해서 logging.log_level 속성 값 반환 (해당 속성 값이 없는 경우 default 속성 값 logging.INFO 반환)
-    logger.propagate = False   # 아마존 웹서비스 람다 함수 (AWS Lambda Function)의 최상위 로그 객체 (root)와 분리하기 위해 propagate 속성(property) 값을 False로 설정 (False일 경우, chatbot_logger의 로깅 메시지가 최상위 로그 객체(root)의 처리기로 전달되지 않는다.)
+    logger.propagate = False   # 아마존 웹서비스 람다 함수 (AWS Lambda Function)의 최상위 로그 객체 (root)와 분리하기 위해 propagate 속성 (property) 값을 False로 설정 (False일 경우, chatbot_logger의 로깅 메시지가 최상위 로그 객체 (root)의 처리기로 전달되지 않는다.)
 
     for handler in logger.handlers[:]:
         logger.removeHandler(handler)   # 기존 핸들러 모두 제거
@@ -52,7 +52,7 @@ def init_logger(name: str = "chatbot_logger") -> logging.Logger:
 
     return logger
 
-logger = init_logger()   # 챗봇 전역 로그 객체 생성 및 초기화
+logger = init_logger()   # 챗봇 전역 로그 객체 (logger) 생성 및 초기화
 
 """
 *** 참고 ***
@@ -85,18 +85,18 @@ logger = init_logger()   # 챗봇 전역 로그 객체 생성 및 초기화
 참고 URL - https://docs.python.org/ko/3.7/library/logging.html
 참고 2 URL - https://tjlog-tistory.tistory.com/82
 
-챗봇 전역 로그 모듈 구현 순서 및 로그 기록 방법
-​1. instance 설정 - log(로그) instance 설정
+* 챗봇 전역 로그 모듈 구현 순서 및 로그 기록 방법
+​1. instance 설정 - log (로그) instance 설정
 2. 기록할 log level 지정 - 로그 레벨 지정 (DEBUG, INFO, WARNING, ERROR, CRICTICAL)
-3. formatter 생성 - log(로그)를 저장(기록)할 포맷(format) 지정 
-4. handler 생성 - log(로그)를 담을 수 있는 핸들러(handler) 생성 -> log(로그)를 콘솔창에 출력 할건지? 아니면 파일에 저장 할건지? 이런 저장하는 핸들러(handler) 생성하기
-5. handler에 formatter 설정(할당) - 3번에서 지정한 포맷(format)을 핸들러(handler)에 설정(할당)
-6. 입력받는 instance에 handler 추가 - 3번에서 지정한 포맷(format)을 핸들러(handler)에 설정(할당)한 이후 해당 핸들러(handler)를 log(로그) instance에 추가하여 사용자를 통해 "입력받는 값"을 핸들러(콘솔 또는 파일)로 가져올 수 있도록 또 설정하기 
-7. 다른 파이썬 스크립트 파일에서 챗봇 전역 로그 모듈 import 처리 - from modules.log import logger   # 챗봇 전역 로그 객체 (logger)  
+3. formatter 생성 - log (로그)를 저장(기록)할 포맷 (format) 지정
+4. handler 생성 - log (로그)를 담을 수 있는 핸들러 (handler) 생성 -> log (로그)를 콘솔창에 출력 할건지? 아니면 파일에 저장 할건지? 이런 저장하는 핸들러(handler) 생성하기
+5. handler에 formatter 설정(할당) - 3번에서 지정한 포맷 (format)을 핸들러(handler)에 설정(할당)
+6. 입력받는 instance에 handler 추가 - 3번에서 지정한 포맷 (format)을 핸들러(handler)에 설정(할당)한 이후 해당 핸들러(handler)를 log (로그) instance에 추가하여 사용자를 통해 "입력받는 값"을 핸들러(콘솔 또는 파일)로 가져올 수 있도록 또 설정하기 
+7. 다른 파이썬 스크립트 파일에서 챗봇 전역 로그 모듈 import - from modules.log import logger   # 챗봇 전역 로그 객체 (logger)
 8. 원하는 지점에 로그 기록하기 (예) logger.info("[테스트] ~~~"), logger.error(f"[테스트] 오류 - {error_msg}") 등등...
 
-* 로그 포맷(format) formatter
-|     이름    |   포멧           |   설명   |
+* 로그 포맷 (format) formatter
+|     이름    |   포멧           |   설명
 | asctime     | %(asctime)s     | 날짜 시간, ex) 2021.04.10 11:21:48,162
 | created     | %(created)f     | 생성 시간 출력
 | filename    | %(filename)s    | 파일명
@@ -114,11 +114,11 @@ logger = init_logger()   # 챗봇 전역 로그 객체 생성 및 초기화
 | thread      | %(thread)d      | Thread ID
 | threadName  | %(threadName)s  | Thread Name
 
-* 로그 레벨 종류 
+* 로그 레벨 종류
 |   Level   |   Value   |   When to use
 |   DEBUG   |     10    | (주로 문제 해결을 할때 필요한) 자세한 정보. - 개발 과정에서 오류 원인 파악하고자 할 때 사용
-|   INFO    |     20    | 작업이 정상적으로 작동하고 있다는 메시지. 
+|   INFO    |     20    | 작업이 정상적으로 작동하고 있다는 메시지.
 |  WARNING  |     30    | 예상하지 못한 일이 발생하거나, 발생 가능한 문제점을 명시. (e.g 'disk space low') 작업은 정상적으로 진행.
 |   ERROR   |     40    | 프로그램이 함수를 실행하지 못 할 정도의 심각한 문제.
-| CRICTICAL |     50    | 프로그램이 동작할 수 없을 정도의 심각한 문제. 
+| CRICTICAL |     50    | 프로그램이 동작할 수 없을 정도의 심각한 문제.
 """

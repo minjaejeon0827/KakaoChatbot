@@ -310,7 +310,7 @@ def error_text(error_msg: str) -> dict[str, Any]:
 
     # return { "format": error_format, "meta_data": master_data }
 
-def timeover_quickReplies(requestAgain_msg: str) -> dict[str, Any]:
+def timeOver_quickReplies(requestAgain_msg: str) -> dict[str, Any]:
     """
     Description: 응답 재요청 json 포맷 가져오기
                  챗봇 응답 시간 5초 초과시 응답 재요청 메세지 전송

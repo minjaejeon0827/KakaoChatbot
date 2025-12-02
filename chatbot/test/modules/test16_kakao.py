@@ -54,7 +54,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
              simple_text - 텍스트 메시지 (text) 카카오톡 채팅방 전송
              simple_image - DALLE2 이미지 (imageUrl) 카카오톡 채팅방 전송
              error_text - 오류 메세지 (error_msg) 카카오톡 채팅방 전송
-             timeover_quickReplies - 챗봇 응답 제한 시간 5초 초과시 응답 재요청 메세지 (requestAgain_msg) 카카오톡 채팅방 전송
+             timeOver_quickReplies - 챗봇 응답 제한 시간 5초 초과시 응답 재요청 메세지 (requestAgain_msg) 카카오톡 채팅방 전송
 
              __quickReplies_format - 바로가기 그룹 (quickReplies) json 포맷
              __textCard_format - 텍스트 카드 (textCard) json 포맷
@@ -306,7 +306,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
 
         return self.__skillTemplate_format(outputs, quickReplies)
 
-    def timeover_quickReplies(self, requestAgain_msg: str) -> dict[str, Any]:
+    def timeOver_quickReplies(self, requestAgain_msg: str) -> dict[str, Any]:
         """
         Description: [public] 챗봇 응답 제한 시간 5초 초과시 응답 재요청 메세지 (requestAgain_msg) 카카오톡 채팅방 전송
 

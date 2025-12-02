@@ -110,7 +110,7 @@ def handler(event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
         if None is response:   # 8) 챗봇 응답 시간 초과한 경우
             logger.warning("[테스트] 챗봇 응답 시간 5초 초과 발생 - 재요청 응답 메세지 반환")
             return lambda_response_format(
-                kakaoResponseFormatter.timeover_quickReplies(),
+                kakaoResponseFormatter.timeOver_quickReplies(),
                 status_code=chatbot_helper._statusCode_success,   # 카카오톡 서버로 재요청 응답 메세지 전송하기 위해 HTTP 응답 상태 코드 200 전송
             )
 

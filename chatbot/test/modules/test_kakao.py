@@ -186,7 +186,7 @@ def error_text(error_msg):
     }    
 
 # 시간 5초 초과시 응답 (바로가기 그룹 전송)
-def timeover_quickReplies(requestAgain_msg):
+def timeOver_quickReplies(requestAgain_msg):
     return {
         "version":"2.0",
         "template": {
