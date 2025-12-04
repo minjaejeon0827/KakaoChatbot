@@ -19,7 +19,7 @@ import asyncio   # 비동기 프로그래밍 (async/await)
 # TODO: 추후 테스트 웹서버 구축 후 마스터 데이터 다운로드 Rest API 함수 get_masterDownLoadAsync 로직 수정 예정 (2025.09.11 minjae)
 async def get_masterDownLoadAsync(masterEntity_json_file_path: str | None = None) -> dict[str, Any]:
     """
-    Description: 전체 마스터 데이터 다운로드
+    Description: 전체 마스터 데이터 다운로드 및 데이터 가져오기
 
     Parameters: masterEntity_json_file_path - 전체 마스터 데이터 json 파일 상대 경로 (non-default value parameter)
 
@@ -77,18 +77,18 @@ async def get_masterDownLoadAsync(masterEntity_json_file_path: str | None = None
 참고 URL - https://peps.python.org/pep-0765/
 참고 2 URL - https://stackoverflow.com/questions/19805654/python-try-finally-block-returns
 
-TODO: 추후 필요시 전체 마스터 데이터 다운로드 함수 로직 수정 예정 (2025.05.26 minjae)
+TODO: 필요시 전체 마스터 데이터 다운로드 함수 로직 추후 수정 예정 (2025.05.26 minjae)
 참고 URL - https://wikidocs.net/28
 ***** 테스트 기능 구현 순서 *****
 1. masterEntity.json 파일 읽어와서 2차원 리스트 변환 및 변수 master_datas에 값 할당
 2. 변수 master_datas 리턴
 3. 2번에서 리턴 받은 master_datas 가지고 싱글톤 (singleton) 패턴 전용 모듈 (module) (singleton.py) -> 데이터 유효성 검사 (self.__isValidator()) 진행
 
-TODO: 추후 필요시 전체 마스터 데이터 json 파일 (masterEntity.json) json 구조 수정 진행 (2025.08.29 minjae)
+TODO: 필요시 전체 마스터 데이터 json 파일 (masterEntity.json) json 구조 수정 진행 (2025.08.29 minjae)
 참고 URL - https://claude.ai/chat/6df9cfce-001d-4da4-8150-25fb984cee4f
 참고 2 URL - https://claude.ai/chat/72631fb7-ae64-4538-a9a8-f136e59f3207
 
-TODO: 테스트용 전체 마스터 데이터 json 파일 (test_masterEntity.json) json 양식 작성 (2025.07.24 minjae)
+TODO: 테스트용 전체 마스터 데이터 json 파일 (test_masterEntity.json) json 양식 작성 (2025.07.24 minjae) 
 참고 URL - https://chatgpt.com/c/68819688-4654-8010-b1a2-ff5a0bd71816
 참고 2 URL - https://chatgpt.com/c/6882d4e2-f8ac-8010-afb9-9934c123cb32
 {

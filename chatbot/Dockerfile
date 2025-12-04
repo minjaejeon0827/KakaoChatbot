@@ -57,7 +57,7 @@ CMD ["lambda_function.handler"]
 #    -> 명령어 aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 980921720325.dkr.ecr.ap-northeast-2.amazonaws.com 입력 및 엔터
 #    -> 아래처럼 로그인 성공 출력
 #       Login Succeeded
-#    -> 자격증명 명령어 aws sts get-caller-identity 입력 및 엔터 
+#    -> 자격증명 명령어 aws sts get-caller-identity 입력 및 엔터
 #    -> 아래처럼 자격증명 결과 출력
 #       {
 #           "UserId": "AIDA6IY35TYC7JM4K6R5E",

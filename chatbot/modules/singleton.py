@@ -1,7 +1,8 @@
 """
-* 싱글톤 (singleton) 패턴 전용 모듈 (module)
-코드 리뷰 참고 URL - https://chatgpt.com/c/691424a3-8e0c-8327-98b9-cabf6b80cf17
-코드 리뷰 참고 2 URL - https://chatgpt.com/c/691c1cc3-6614-8321-bda2-126705ee5b89
+* 싱글톤 패턴 (singleton) 전용 모듈 (module)
+코드 리뷰 
+참고 URL - https://chatgpt.com/c/691424a3-8e0c-8327-98b9-cabf6b80cf17
+참고 2 URL - https://chatgpt.com/c/691c1cc3-6614-8321-bda2-126705ee5b89
 """
 
 # 1. 공통 모듈 (module) 먼저 import
@@ -21,19 +22,19 @@ from functools import cached_property   # 속성(property)의 결과 캐싱하�
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo    # 대한민국 표준시 설정
 
-# TODO: 순환 임포트 (circular import) 문제 (modules.singleton.py → modules.log import 처리 <-> modules.log.py → modules.singleton.KSTFormatter import 처리)로 인해 아래와 같은 오류 발생하여 챗봇 전역 로그 객체(logger) import 처리문 주석 처리 진행 (2025.09.19 minjae)
+# TODO: 순환 임포트 (circular import) 문제 (modules.singleton.py → modules.log import 처리 <-> modules.log.py → modules.singleton.KSTFormatter import 처리)로 인해 아래와 같은 오류 발생하여 챗봇 전역 로그 객체 (logger) import 처리문 주석 처리 진행 (2025.09.19 minjae)
 # 참고 URL - https://claude.ai/chat/b9d2cade-0c63-4549-98cb-6a35f03c86c9
 # 오류 메시지
 # 1. [ERROR] Runtime.ImportModuleError: Unable to import module 'lambda_function': cannot import name 'logger' from partially initialized module 'modules.log' (most likely due to a circular import) (/var/task/modules/log.py)Traceback (most recent call last):
 # 2. [ERROR] Runtime.ImportModuleError: Unable to import module 'lambda_function': cannot import name 'KSTFormatter' from partially initialized module 'modules.singleton' (most likely due to a circular import) (/var/task/modules/singleton.py)Traceback (most recent call last):
-# from modules.log import logger   # 챗봇 전역 로그 객체(logger)
+# from modules.log import logger   # 챗봇 전역 로그 객체 (logger)
 from restAPI import chatbot_restServer   # 챗봇 웹서버 Rest API 메서드
 from modules.chatbot_enum import EnumValidator   # 데이터 유효성 검사
 
 # class SingletonBase(object):   # 명시적으로 object 클래스 상속
 class SingletonBase:   # 암시적으로 object 클래스 상속
     """
-    Description: 싱글톤 (singleton) 패턴 기본 클래스
+    Description: 싱글톤 패턴 기본 클래스
 
                  * 참고
                  class Docstring 작성 가이드라인
@@ -42,9 +43,9 @@ class SingletonBase:   # 암시적으로 object 클래스 상속
                  Properties Docstring 작성 가이드라인
                  참고 URL - https://claude.ai/chat/37ddea1f-89db-470b-b789-1781893801b7
 
-    Attributes: _instance - 싱글톤 클래스 (singleton) 인스턴스 (Instance)
+    Attributes: _instance - 싱글톤 클래스 인스턴스
 
-    Parameters: _class - 싱글톤 클래스 (singleton)
+    Parameters: _class - 싱글톤 클래스
                 *args (tuple) - object 위치 가변 인자
                 **kwargs (dict) - object 키워드 가변 인자
 
@@ -52,38 +53,38 @@ class SingletonBase:   # 암시적으로 object 클래스 상속
 
     Methods: 없음.
 
-    Notes: - 싱글톤 (singleton) 패턴으로 구현되어 여러 번 인스턴스 (Instance) 생성해도 동일한 객체 반환
-           - 아마존 웹서비스 람다 함수 (AWS Lambda Function) 환경에서는 단일 스레드 (single thread)로 실행되므로 스레드 락 (_lock = threading.Lock()) 불필요
+    Notes: 1. 싱글톤 패턴으로 구현되어 여러 번 인스턴스 생성해도 동일한 객체 반환
+           2. 아마존 웹서비스 람다 함수 (AWS Lambda Function) 환경에서는 단일 스레드 (single thread)로 실행되므로 스레드 락 (_lock = threading.Lock()) 불필요
     """
     
-    # _lock = threading.Lock()   # _lock = threading.Lock() 용도 - 일반적인 Python 응용 프로그램 환경에서 여러 스레드가 동시에 싱글톤 클래스 (singleton) 인스턴스 (Instance)를 생성하려 할 때 또는 Race condition으로 인해 여러 인스턴스 (Instance)가 생성될 가능성이 있을 때 사용함.
+    # _lock = threading.Lock()   # _lock = threading.Lock() 용도 - 일반적인 Python 응용 프로그램 환경에서 여러 스레드가 동시에 싱글톤 클래스 인스턴스를 생성하려 할 때 또는 Race condition으로 인해 여러 인스턴스가 생성될 가능성이 있을 때 사용함.
     def __new__(_class, *args: tuple, **kwargs: dict) -> Self:
         """
         Description: 객체 생성자 - 부모 클래스 (object) 상속 받아 재정의된 생성자 (__new__) 
                      
                      *** 주요 특징 ***
-                     1. __new__ 메서드는 해당 싱글톤 클래스 (singleton)에 정의되어 있지 않으면 알아서 부모 클래스 (object)의 __new__ 메서드가 호출되어 객체 생성
+                     1. __new__ 메서드는 해당 싱글톤 클래스에 정의되어 있지 않으면 알아서 부모 클래스 (object)의 __new__ 메서드가 호출되어 객체 생성
                      2. 해당 클래스 정의할 때, __new__ 메서드를 개발자가 작성할 수도 있는데 이 경우 부모 클래스 (object)의 __new__ 메서드가 아니라 
                         해당 클래스에 정의된 __new__ 메서드가 호출되는데 이를 오버라이드 (override) 했다고 표현   
 
                      참고 URL - https://docs.python.org/ko/3.6/reference/datamodel.html#object.__new__
 
-        Parameters: _class - 싱글톤 클래스 (singleton)
+        Parameters: _class - 싱글톤 클래스
                     *args - 위치 가변 인자
                     **kwargs - 키워드 가변 인자
 
-        Returns: _class._instance - 싱글톤 클래스 (singleton) 인스턴스 (Instance)
+        Returns: _class._instance - 싱글톤 클래스 인스턴스
         """
 
         if False == hasattr(_class, "_instance"):   # 해당 클래스에 _instance 속성 (property) 없다면
             _class._instance = super().__new__(_class)
-            chatbot_logger.info("[테스트] 싱글톤 클래스 (singleton) __new__ 메서드 - 호출 완료!")
+            chatbot_logger.info("[테스트] 싱글톤 클래스 __new__ 메서드 - 호출 완료!")
 
         return _class._instance
 
 class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명시적으로 SingletonBase 클래스 상속
     """
-    Description: 마스터 데이터 싱글톤 클래스 (singleton)
+    Description: 마스터 데이터 싱글톤 클래스
 
                  *** 참고 ***
                  마스터 데이터 - SW 프로그램을 실행하기 위해 사용되는 기준 데이터 의미. (특정 기업의 업무지식 및 비즈니스 운영의 핵심 정보 반영 필수!) 
@@ -95,19 +96,19 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
                 _init (bool) - 인스턴스 초기화 완료 여부 (True: 완료, False: 실패)
 
                 __master_datas (dict[str, Any]) - 전체 마스터 데이터
-                __messageText_mappings (dict[str, Any]) - 챗봇 버튼 메시지 텍스트 매핑 Dictionary 객체
+                __messageText_mappings (dict[str, Any]) - 챗봇 버튼 메시지 텍스트 매핑 딕셔너리
                 __valid_targets (list[str]) - 마스터 데이터 유효성 검사 대상 리스트
                 __isValid (EnumValidator) - 마스터 데이터 유효성 검사 결과 여부
 
     Parameters: *args (tuple) - SingletonBase 위치 가변 인자
                 **kwargs (dict) - SingletonBase 키워드 가변 인자
 
-                messageText_mappings (dict[str, Any]) - 챗봇 버튼 메시지 텍스트 매핑 Dictionary 객체
+                messageText_mappings (dict[str, Any]) - 챗봇 버튼 메시지 텍스트 매핑 딕셔너리
                 valid_targets (list[str]) - 마스터 데이터 유효성 검사 대상 리스트
                 (예시) [ "buttons", "items", "autoCADInfos", "revitInfos", "navisworksManageInfos", "infraWorksInfos", "civil3DInfos", "revitBoxInfos", "cadBoxInfos", "energyBoxInfos", "accountInfos", "etcInfos" ]
 
     Properties (읽기 전용): get_master_datas (dict[str, Any]) - 전체 마스터 데이터 가져오기
-                           get_messageText_mappings (list[str]) - 챗봇 버튼 메시지 텍스트 매핑 Dictionary 객체 가져오기
+                           get_messageText_mappings (dict[str, Any]) - 챗봇 버튼 메시지 텍스트 매핑 딕셔너리 가져오기
                            get_valid_targets (list[str]) - 마스터 데이터 유효성 검사 대상 리스트 가져오기
                            get_isValid (EnumValidator) - 마스터 데이터 유효성 검사 결과 가져오기
 
@@ -127,13 +128,13 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
         Description: 생성된 객체 초기화
 
                      *** 주요 특징 ***
-                     1. 객체 생성 시 전달된 모든 인자 (valid_targets 제외)를 __new__ 메서드가 먼저 받고, 그 다음 __init__ 메서드로 전달
+                     1. 객체 생성 시 전달된 모든 인자 (messageText_mappings, valid_targets 제외)를 __new__ 메서드가 먼저 받고, 그 다음 __init__ 메서드로 전달
                      2. 생성된 객체에 속성 (property) 추가 및 값 할당
 
                      참고 URL - https://docs.python.org/ko/3.6/reference/datamodel.html#object.__init__
 
         Parameters: self - 마스터 데이터 싱글톤 클래스 인스턴스
-                    messageText_mappings - 챗봇 버튼 메시지 텍스트 매핑 Dictionary 객체
+                    messageText_mappings - 챗봇 버튼 메시지 텍스트 매핑 딕셔너리
                     valid_targets - 마스터 데이터 유효성 검사 대상 리스트
 
         Returns: 없음.
@@ -146,7 +147,7 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
         # 참고 3 URL - https://stackoverflow.com/questions/55409641/asyncio-run-cannot-be-called-from-a-running-event-loop-when-using-jupyter-no
         # 참고 4 URL - https://brownbears.tistory.com/540
 
-        # 코루틴(coroutine) - 루틴이 서브루틴을 호출하는 방식이 아닌 여러 일을 동시에 하면서도 각각의 task가 서로 독립적으로 할 수 있도록 하는 방법 (즉, 메인 루틴과 서브 루틴처럼 종속된 관계가 아니라 서로 독립적인 관계로 특정 시점에 상대방의 코드를 실행)
+        # 코루틴(coroutine) - 루틴이 서브루틴을 호출하는 방식이 아닌 여러 일을 동시에 하면서도 각각의 task가 서로 독립적으로 할 수 있도록 하는 방법 (즉, 메인 루틴과 서브 루틴처럼 종속된 관계가 아니라 서로 독립적인 관계로 특정 시점에 상대방 코드 실행)
         # 참고 URL - https://wikidocs.net/234355
 
         _class = type(self)
@@ -160,6 +161,7 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
         if True == loop.is_running():   # 이벤트 루프 (event loop) 현재 실행 중인 경우
             chatbot_logger.info("[테스트] 아마존 웹서비스 람다 함수 (AWS Lambda Function) 내부 이벤트 루프 (event loop) 실행 중!")
             loop.create_task(self.__initSettingAsync(messageText_mappings, valid_targets))   # 코루틴(coroutine)을 Task로 감싸고 비동기 메서드 실행 예약 및 Task 객체 반환
+
         else: asyncio.run(self.__initSettingAsync(messageText_mappings, valid_targets))   # 이벤트 루프(asyncio.run) 실행하여 비동기 메서드 self.__initSettingAsync(messageText_mappings, valid_targets) 호출
 
         chatbot_logger.info("[테스트] MasterEntity __init__ 메서드 - 호출 완료!")
@@ -175,9 +177,9 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
         Returns: self.__master_datas - 전체 마스터 데이터 
         """
     
-        # TODO: 마스터 데이터 싱글톤 클래스 인스턴스 초기화(__init__) 완료 전 속성 접근 시 AttributeError 발생할 수 있어서 초기화(__init__) 완료 후 접근하도록 로직 보완 (2025.11.13 minjae)
-        if False == hasattr(self, "_MasterEntity__master_datas"):  # 인스턴스 (Instance) 초기화(__init__) 완료되지 않은 경우
-            raise RuntimeError("[테스트] 마스터 데이터 싱글톤 클래스 인스턴스 초기화 완료 못함.")
+        # TODO: 마스터 데이터 싱글톤 클래스 인스턴스(self) 초기화(__init__) 완료 전 속성 접근 시 AttributeError 발생할 수 있어서 초기화(__init__) 완료 후 접근하도록 로직 보완 (2025.11.13 minjae)
+        if False == hasattr(self, "_MasterEntity__master_datas"):  # 인스턴스(self) 초기화(__init__) 완료되지 않은 경우
+            raise RuntimeError("[테스트] 마스터 데이터 싱글톤 클래스 인스턴스(self) 초기화 완료 못함.")
         
         return self.__master_datas
 
@@ -198,11 +200,11 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
     @cached_property
     def get_messageText_mappings(self) -> dict[str, Any]:
         """
-        Description: 챗봇 버튼 메시지 텍스트 매핑 Dictionary 객체 가져오기
+        Description: 챗봇 버튼 메시지 텍스트 매핑 딕셔너리 가져오기
 
         Parameters: self - 마스터 데이터 싱글톤 클래스 인스턴스
 
-        Returns: self.__messageText_mappings - 챗봇 버튼 메시지 텍스트 매핑 Dictionary 객체
+        Returns: self.__messageText_mappings - 챗봇 버튼 메시지 텍스트 매핑 딕셔너리
         """
                 
         return self.__messageText_mappings
@@ -211,14 +213,14 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
     # @get_messageText_mappings.setter
     # def set_messageText_mappings(self, messageText_mappings: dict[str, Any]) -> None:
     #     """
-    #     Description: 챗봇 버튼 메시지 텍스트 매핑 Dictionary 객체 설정
+    #     Description: 챗봇 버튼 메시지 텍스트 매핑 딕셔너리 설정
 
     #     Parameters: self - 마스터 데이터 싱글톤 클래스 인스턴스
-    #                 messageText_mappings - 챗봇 버튼 메시지 텍스트 매핑 Dictionary 객체
+    #                 messageText_mappings - 챗봇 버튼 메시지 텍스트 매핑 딕셔너리
 
     #     Returns: 없음.
     #     """
-        
+
     #     self.__messageText_mappings = messageText_mappings
 
     @cached_property
@@ -278,7 +280,7 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
         Description: [private] 마스터 데이터 초기 설정
 
         Parameters: self - 마스터 데이터 싱글톤 클래스 인스턴스
-                    messageText_mappings - 챗봇 버튼 메시지 텍스트 매핑 Dictionary 객체
+                    messageText_mappings - 챗봇 버튼 메시지 텍스트 매핑 딕셔너리
                     valid_targets - 마스터 데이터 유효성 검사 대상 리스트 (non-default value parameter)
 
         Returns: 없음.
@@ -289,12 +291,12 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
                 raise ValueError("valid_targets - 마스터 데이터 유효성 검사 대상 리스트 데이터 존재 안 함.")
 
             chatbot_logger.info("[테스트] 마스터 데이터 초기 설정 - 시작!")
-            # chatbot_logger.info(f"[테스트] help 함수 호출 및 chatbot_restServer 모듈 (module) 전체 docstring 내용 확인 - {help(chatbot_restServer)}")
-            # chatbot_logger.info(f"[테스트] help 함수 호출 및 chatbot_restServer.get_masterDownLoadAsync 함수 docstring 내용 확인 - {help(chatbot_restServer.get_masterDownLoadAsync)}")
-            # chatbot_logger.info(f"[테스트] chatbot_restServer.get_masterDownLoadAsync 함수 속성 __doc__ 사용 및 docstring 내용 확인 - {chatbot_restServer.get_masterDownLoadAsync.__doc__}")
+            # chatbot_logger.info(f"[테스트] help 함수 호출 및 chatbot_restServer 모듈 (module) 전체 Docstring 내용 확인 - {help(chatbot_restServer)}")
+            # chatbot_logger.info(f"[테스트] help 함수 호출 및 chatbot_restServer.get_masterDownLoadAsync 함수 Docstring 내용 확인 - {help(chatbot_restServer.get_masterDownLoadAsync)}")
+            # chatbot_logger.info(f"[테스트] chatbot_restServer.get_masterDownLoadAsync 함수 속성 __doc__ 사용 및 Docstring 내용 확인 - {chatbot_restServer.get_masterDownLoadAsync.__doc__}")
 
             self.__master_datas = await chatbot_restServer.get_masterDownLoadAsync(chatbot_helper._masterEntity_json_file_path)   # 전체 마스터 데이터 다운로드
-            self.__messageText_mappings = messageText_mappings
+            self.__messageText_mappings = messageText_mappings if len(messageText_mappings) >= EnumValidator.EXISTENCE else None
             self.__valid_targets = valid_targets if len(valid_targets) >= EnumValidator.EXISTENCE else None
             self.__isValid = self.__isValidator()
  
@@ -333,7 +335,7 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
             # 참고 2 URL - https://wikidocs.net/233719
             # 참고 3 URL - https://youtu.be/QhMY4t2xwG0?si=uYsaL7CLHmx-RHV8
 
-            # dict 객체 master_datas를 for문으로 루핑하기 위해 items() 메서드 호출 (2025.09.02 minjae)
+            # 딕셔너리 master_datas for문으로 루핑하기 위해 items() 메서드 호출 (2025.09.02 minjae)
             # 참고 URL - https://docs.python.org/ko/3.13/tutorial/datastructures.html#looping-techniques
             for (parent_key, parent_value) in master_datas.items():
                 chatbot_logger.info(f"[테스트] master_datas - parent_key: {parent_key} / parent_value: {parent_value}")
@@ -341,8 +343,8 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
                 for (child_key, child_value) in master_data.items():
                     if child_key in valid_targets:   # 유효성 검사 대상 키들만 확인
                         chatbot_logger.info(f"[테스트] master_data - child_key: {child_key} / child_value: {child_value}")
-                        # 파이썬 함수 len 사용하여 문자열, 리스트 객체 길이 구하기
-                        # 참고 URL - https://docs.python.org/ko/3/library/functions.html#len                      
+                        # 파이썬 함수 len 사용하여 문자열 또는 리스트 길이 구하기
+                        # 참고 URL - https://docs.python.org/ko/3/library/functions.html#len
                         if (None is child_value or EnumValidator.NOT_EXISTENCE >= len(child_value)):   # child_value 값이 존재하지 않거나(None) 길이가 0보다 작거나 같은 경우
                             chatbot_logger.info("[테스트] 마스터 데이터 존재 안 함.")
                             return EnumValidator.NOT_EXISTENCE
@@ -359,7 +361,7 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
         
 class KSTFormatter(SingletonBase, logging.Formatter):   # 명시적으로 SingletonBase, logging.Formatter 클래스 다중 상속
     """
-    Description: 대한민국 표준시 설정 싱글톤 클래스 (singleton) (pytz 라이브러리 사용 안 함.)
+    Description: 대한민국 표준시 설정 싱글톤 클래스 (pytz 라이브러리 사용 안 함.)
                  참고 URL - https://claude.ai/chat/8fc1ceeb-fe95-4d1b-8517-ecec83beb3f2
 
                  *** 참고 ***
@@ -376,7 +378,7 @@ class KSTFormatter(SingletonBase, logging.Formatter):   # 명시적으로 Single
                  - datetime + zoneinfo
                  참고 URL - https://wikidocs.net/299600
 
-    Attributes: _instance (KSTFormatter) - 대한민국 표준시 설정 싱글톤 클래스 (singleton) (KSTFormatter) 인스턴스 (Instance)
+    Attributes: _instance (KSTFormatter) - 대한민국 표준시 설정 싱글톤 클래스 인스턴스
                 _init (bool) - 인스턴스 초기화 완료 여부 (True: 완료, False: 실패)
 
     Parameters: *args (tuple) - SingletonBase, logging.Formatter 위치 가변 인자 (fmt, datefmt 등)
@@ -400,7 +402,7 @@ class KSTFormatter(SingletonBase, logging.Formatter):   # 명시적으로 Single
 
                      참고 URL - https://docs.python.org/ko/3.6/reference/datamodel.html#object.__init__
 
-        Parameters: self - 대한민국 표준시 설정 싱글톤 클래스 (singleton) (KSTFormatter) 인스턴스 (Instance)
+        Parameters: self - 대한민국 표준시 설정 싱글톤 클래스 인스턴스
                     *args - SingletonBase, logging.Formatter 위치 가변 인자
                     **kwargs - SingletonBase, logging.Formatter 키워드 가변 인자
 
@@ -413,32 +415,32 @@ class KSTFormatter(SingletonBase, logging.Formatter):   # 명시적으로 Single
             return   # 이미 초기화된 경우 재실행 방지 - 해당 클래스에 _init 속성 (property) 있는 경우
 
         # 아래와 같은 오류 메시지 출력되어 부모 클래스 (logging.Formatter) __init__ 메서드 (super().__init__(*args, **kwargs)) 호출 (2025.09.18 minjae)
-        # 오류 메시지: AttributeError: 'KSTFormatter' object has no attribute '_style'
-        super().__init__(*args, **kwargs)   # 싱글톤 클래스 (singleton) (KSTFormatter)의 부모 클래스 (logging.Formatter) 초기화자 super().__init__(*args, **kwargs) 실행 시 파라미터 datefmt 전달 인자 값이 None일 경우 로그 기록 형식 기본 값 할당 (default_time_format = '%Y-%m-%d %H:%M:%S')
+        # 오류 메시지 - AttributeError: 'KSTFormatter' object has no attribute '_style'
+        super().__init__(*args, **kwargs)   # 싱글톤 클래스 (KSTFormatter)의 부모 클래스 (logging.Formatter) 초기화자 super().__init__(*args, **kwargs) 실행 시 파라미터 datefmt 전달 인자 값이 None일 경우 로그 기록 형식 기본 값 할당 (default_time_format = '%Y-%m-%d %H:%M:%S')
 
         chatbot_logger.info("[테스트] KSTFormatter __init__ 메서드 - 호출 완료!")
         _class._init = True   # 초기화 완료
 
     def __converter(self, time_stamp: float) -> datetime:
         """
-        Description: [private] UTC time_stamp -> 대한민국 표준시 datetime 변환
+        Description: [private] UTC LogRecord 생성 시간 (time_stamp) -> 대한민국 표준시 datetime 변환
 
-        Parameters: self - 대한민국 표준시 설정 싱글톤 클래스 (singleton) (KSTFormatter) 인스턴스 (Instance)
-                    time_stamp - LogRecord 생성된 시간 (time.time() 반환 시간)
+        Parameters: self - 대한민국 표준시 설정 싱글톤 클래스 인스턴스
+                    time_stamp - LogRecord 생성 시간 (record.created)
 
-        Returns: datetime.fromtimestamp(time_stamp, timezone.utc).astimezone(ZoneInfo("Asia/Seoul")) - LogRecord 생성된 대한민국 표준시 datetime
+        Returns: datetime.fromtimestamp(time_stamp, timezone.utc).astimezone(ZoneInfo("Asia/Seoul")) - 대한민국 표준시 datetime
         """
 
         # zoneinfo 파이썬 라이브러리 사용하여 로그 출력시 대한민국 표준시 출력 기능 구현 (2025.11.18 minjae)
         # 참고 URL - https://docs.python.org/ko/3.9/library/zoneinfo.html#module-zoneinfo
         # 참고 2 URL - https://wikidocs.net/236273
         # 참고 3 URL - https://chatgpt.com/c/684b79a8-8c20-8010-9d14-41ab28f12747
-        # time_stamp = datetime.fromtimestamp(record.created, tz=self.__kst)   # LogRecord (record)의 생성 시간을 KST (self.__kst)로 변환
+        # time_stamp = datetime.fromtimestamp(record.created, tz=self.__kst)   # (기존) UTC LogRecord 생성 시간 (record.created) -> (변경) 대한민국 표준시 datetime (self.__kst)
         return datetime.fromtimestamp(time_stamp, timezone.utc).astimezone(ZoneInfo("Asia/Seoul"))
 
     def formatTime(self, record: logging.LogRecord, datefmt: str | None = None) -> str:
         """
-        Description: [public] LogRecord (record)의 생성 시간 (현재 날짜 및 시간)을 대한민국 표준시로 변환하여 포맷된 문자열 가져오기
+        Description: [public] UTC LogRecord 생성 시간 (record.created) -> 대한민국 표준시 datetime 변환 및 포맷된 문자열 가져오기
         
                      아래 코드처럼 매개변수 record 생략하고 구현시 오류 발생하여 매개변수 record 작성 필수! (2025.09.18 minjae)
                      def formatTime(self, datefmt=None):
@@ -453,15 +455,15 @@ class KSTFormatter(SingletonBase, logging.Formatter):   # 명시적으로 Single
                      - LogRecord attributes
                      참고 URL - https://docs.python.org/ko/3/library/logging.html#logrecord-attributes  
 
-        Parameters: self - 대한민국 표준시 설정 싱글톤 클래스 (singleton) (KSTFormatter) 인스턴스 (Instance)
-                    record - 지정된 LogRecord (record) 클래스 (logging.LogRecord) 인스턴스 (Instance)
+        Parameters: self - 대한민국 표준시 설정 싱글톤 클래스 인스턴스
+                    record - 지정된 logging.LogRecord 클래스 인스턴스
                     datefmt - 날짜 출력 형식 문자열. (non-default value parameter)
                               datefmt 값이 None일 경우 기본 값 사용 (예) self.default_time_format = '%Y-%m-%d %H:%M:%S'.
 
-        Returns: dt.strftime(datefmt) / dt.strftime(chatbot_helper._datefmt) - 지정된 LogRecord (record)의 생성 시간 (현재 날짜 및 시간)을 대한민국 표준시 포맷된 문자열
+        Returns: dt.strftime(datefmt) / dt.strftime(chatbot_helper._datefmt) - LogRecord 생성 시간 (record.created) -> 대한민국 표준시 datetime 변환 및 포맷된 문자열
         """
     
-        dt = self.__converter(record.created)   # UTC time_stamp -> 대한민국 표준시 datetime 변환
+        dt = self.__converter(record.created)   # UTC LogRecord 생성 시간 (record.created) -> 대한민국 표준시 datetime 변환
     
         # 대한민국 현재 날짜와 시간을 특정 포맷으로 변환하기 구현 (2025.11.18 minjae)
         # 참고 URL - https://wikidocs.net/269063
@@ -470,10 +472,6 @@ class KSTFormatter(SingletonBase, logging.Formatter):   # 명시적으로 Single
 
 """
 *** 참고 ***
-싱글톤 (singleton) 패턴 - 개발자가 여러 번 객체 생성을 하더라도 클래스로부터 오직 하나의 객체 (유일한 객체)만 생성되도록 하는 디자인 패턴 의미.
-참고 URL - https://wikidocs.net/69361
-참고 2 URL - https://wikidocs.net/3693  
-
 *** 파이썬 문서 ***
 * 클래스
 참고 URL - https://docs.python.org/ko/3/tutorial/classes.html
@@ -539,7 +537,7 @@ Attribute (어트리뷰트) - 흔히 점표현식을 사용하는 이름으로 �
 *args - 위치 가변 인자라고 불리며, 함수를 정의할 때 인자값의 개수를 가변적으로 정의해주는 기능이며, 함수 호출부에서 서로 다른 개수의 인자를 전달하고자 할 때 가변 인자 (Variable argument) 사용함. (예) foo(1, 2, 3), foo(1, 2, 3, 4) 
         함수 호출시 args라는 변수는 여러 개의 입력에 대해 튜플 (tuple)로 저장한 후 이 튜플 (tuple) 객체를 바인딩한다. (예) (1, 2, 3), (1, 2, 3, 4)
 **kwargs - 키워드 가변 인자라고 불리며, keyword arguments의 약어(kwargs)이다. 예를들어 함수 호출부에서 a=1, b=2, c=3과 어떤 키워드와 해당 키워드에 값을 전달힌다. (예) foo(a=1, b=2, c=3)
-           함수의 결과를 살펴보면 kwargs라는 변수가 딕셔너리 (dict) 객체를 바인딩함을 알 수 있다. 이때 딕셔너리 (dict)에는 함수 호출부에서 전달한 키워드와 값이 저장된다. (예) {'a': 1, 'b': 2, 'c': 3}
+           함수의 결과를 살펴보면 kwargs라는 변수가 딕셔너리(dict) 객체를 바인딩함을 알 수 있다. 이때 딕셔너리 (dict) 객체에는 함수 호출부에서 전달한 키워드와 값이 저장된다. (예) {'a': 1, 'b': 2, 'c': 3}
 참고 URL - https://wikidocs.net/69363
 참고 2 URL - https://claude.ai/chat/601e10e4-39ad-48fe-aa73-7070ba600f3d
 
@@ -556,4 +554,19 @@ Attribute (어트리뷰트) - 흔히 점표현식을 사용하는 이름으로 �
 
 * hasattr
 참고 URL - https://docs.python.org/ko/3.10/library/functions.html#hasattr
+
+*** 기타 문서 ***
+* 싱글톤 패턴 (singleton) - 개발자가 여러 번 객체 생성을 하더라도 클래스로부터 오직 하나의 객체 (유일한 객체)만 생성되도록 하는 디자인 패턴 의미.
+참고 URL - https://wikidocs.net/69361
+참고 2 URL - https://wikidocs.net/3693  
+
+* 객체 vs 인스턴스 차이
+객체 - 데이터와 기능을 포함한 모든 실체 (모든 인스턴스 포함)
+인스턴스 - 객체 중 특정 클래스에서 생성된 것
+예) ray = car() 
+    1. ray는 객체(object)이다.
+    2. ray 객체(object)는 car 클래스(class)의 인스턴스(instance) 이다.
+참고 URL - https://wikidocs.net/85
+참고 2 URL - https://www.kim2kie.com/res/html/0_formula/00%20Python/B%20%ED%81%B4%EB%9E%98%EC%8A%A4%EC%99%80%20%EA%B0%9D%EC%B2%B4_%EC%9D%B8%EC%8A%A4%ED%84%B4%EC%8A%A4.html
+참고 3 URL - https://kingnamji.tistory.com/6
 """

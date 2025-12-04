@@ -94,5 +94,4 @@ https://efulfillment.autodesk.com/NetSWDLD/2023/RVT/B4E35F04-D559-35E9-AB70-E013
 
 - 라이센스 정보가 리디렉션 되면서 인증이 완료됩니다. Revit의 라이선스 인증이 이루어집니다.  
 
-* 상상플렉스 커뮤니티(기술지원 문의)
-https://www.ssflex.co.kr/community/open
+* 상상진화 기술지원 콜센터: 02-3474-2263

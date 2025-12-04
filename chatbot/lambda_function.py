@@ -9,6 +9,8 @@
 참고 URL - https://claude.ai/chat/786c45b9-f744-4fcf-950a-bcc178417e1c
 
 * Race Condition
+- 두 개 이상의 프로세스가 공통 자원(데이터)을 병행적으로 (concurrently) 읽거나 쓰는 동작을 할 때, 공통 자원(데이터)에 대한 접근이 어떤 순서에 따라 이루어졌는지에 따라 그 실행 결과가 같지 않고 달라지는 상황을 말한다.
+Race의 뜻 그대로, 간단히 말하면 경쟁하는 상태, 즉 두 개의 스레드가 하나의 자원 (공통 자원(데이터))을 놓고 서로 사용하려고 경쟁하는 상황을 말한다.
 참고 URL - https://en.wikipedia.org/wiki/Race_condition
 참고 2 URL - https://namu.wiki/w/%EA%B2%BD%EC%9F%81%20%EC%83%81%ED%83%9C
 참고 3 URL - https://lake0989.tistory.com/121
@@ -52,7 +54,8 @@ valid_targets = [ chatbot_helper._buttons,
                   chatbot_helper._energyBoxInfos,
                   chatbot_helper._etcInfos ]
 
-messageText_mappings = {   # 챗봇 버튼 메시지 텍스트 매핑 Dictionary 객체
+# TODO: 추후 필요시 아래 딕셔너리 messageText_mappings 참고하여 json 파일 및 chatbot_restServer.py 비동기 메서드 (async/await) 구현 예정 (2025.12.02 minjae)
+messageText_mappings = {   # 챗봇 버튼 메시지 텍스트 매핑 딕셔너리
     # if 조건절 eq 연산자(==) Dictionary key
     chatbot_helper._start: chatbot_helper._start,   # start - 시작 화면
     chatbot_helper._beginning: chatbot_helper._beginning,   # start - 처음으로
@@ -76,7 +79,7 @@ messageText_mappings = {   # 챗봇 버튼 메시지 텍스트 매핑 Dictionary
     chatbot_helper._civil3D: chatbot_helper._civil3D,
  
     # if 조건절 in 연산자 Dictionary key
-    # end - 텍스트 + basicCard Autodesk or 상상진화 BOX 제품 설치 방법 매핑 Dictionary 객체
+    # end - 텍스트 + basicCard Autodesk or 상상진화 BOX 제품 설치 방법 매핑 딕셔너리
     f"{chatbot_helper._instType} {chatbot_helper._revitBox}": f"{chatbot_helper._instType} {chatbot_helper._revitBox}",
     f"{chatbot_helper._instType} {chatbot_helper._cadBox}": f"{chatbot_helper._instType} {chatbot_helper._cadBox}",
     f"{chatbot_helper._instType} {chatbot_helper._energyBox}": f"{chatbot_helper._instType} {chatbot_helper._energyBox}",
@@ -153,7 +156,7 @@ def handler(event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
             # 참고 URL - https://ko.wikipedia.org/wiki/%EB%AC%B4%EC%B0%A8%EB%B3%84_%EB%8C%80%EC%9E%85_%EA%B2%80%EC%83%89
             # 참고 2 URL - https://wikidocs.net/233719
             # 참고 3 URL - https://youtu.be/QhMY4t2xwG0?si=uYsaL7CLHmx-RHV8
-            for key, value in messageText_mappings.items():   # 이전 사용자 입력 채팅 메세지(prev_userRequest_msg)에 맞는 return 문 찾아 실행
+            ----- for key, value in messageText_mappings.items():   # 이전 사용자 입력 채팅 메세지(prev_userRequest_msg)에 맞는 return 문 찾아 실행
                 if chatbot_helper._remote_text == prev_userRequest_msg:
                     logger.warning(f"[테스트] 재요청 응답 메세지 제외 대상 - {prev_userRequest_msg}")
                     return lambda_response_format(
@@ -256,7 +259,7 @@ def chatbot_response(kakao_request: dict[str, Any], res_queue: Queue, file_path:
 
             aws.write_tmp_file(file_path, userRequest_msg)
 
-            time.sleep(5)   # 테스트 - 5초 대기
+            ----- time.sleep(5)   # 테스트 - 5초 대기
             res_queue.put(kakao_response[chatbot_helper._payload])
             
             return
@@ -422,7 +425,8 @@ def wait_for_response(start_time: float, res_queue: Queue, err_queue: Queue) -> 
 
     return None
 
-def lambda_response_format(response: dict[str, Any], status_code: int = chatbot_helper._statusCode_success) -> dict[str, Any]:
+# TODO: 추후 필요시 아래 함수 lambda_response_format 입력 파라미터 status_code default value 값 (기존) chatbot_helper._statusCode_success -> (변경) chatbot_helper._statusCode_not_found 처리 진행 (2025.12.04 minjae)
+----- def lambda_response_format(response: dict[str, Any], status_code: int = chatbot_helper._statusCode_success) -> dict[str, Any]:
     """
     Description: 카카오톡 서버로 전송할 API Gateway 규격에 맞는 json format 형식 데이터 리턴
 

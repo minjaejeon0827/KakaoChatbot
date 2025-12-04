@@ -1,19 +1,22 @@
 """
 * [카카오톡 서버 전송 용도] 스킬 응답 json 포맷 전용 모듈 (module)
-코드 리뷰 참고 URL - https://chatgpt.com/c/69002b43-44c0-8322-8298-e7871b39da2a
-코드 리뷰 참고 2 URL - https://chatgpt.com/c/691c1cc3-6614-8321-bda2-126705ee5b89
+코드 리뷰 
+참고 URL - https://chatgpt.com/c/69002b43-44c0-8322-8298-e7871b39da2a
+참고 2 URL - https://chatgpt.com/c/691c1cc3-6614-8321-bda2-126705ee5b89
 
 * 챗봇 응답 타입별 json 포맷
 참고 URL - https://kakaobusiness.gitbook.io/main/tool/chatbot/skill_guide/answer_json_format
 
 * 카카오 응답 json 포맷 "buttons" VS "quickReplies" 차이점
-"quickReplies"의 경우 "action": "webLink" 기능 실행 불가.
+- "quickReplies"의 경우 "action": "webLink" 기능 실행 불가.
 
 * 메타 데이터 (meta_data)
 참고 URL - https://namu.wiki/w/%EB%A9%94%ED%83%80%EB%8D%B0%EC%9D%B4%ED%84%B0
 참고 2 URL - https://ko.wikipedia.org/wiki/%EB%A9%94%ED%83%80%EB%8D%B0%EC%9D%B4%ED%84%B0#cite_note-NISO-22
 
 * Race Condition
+- 두 개 이상의 프로세스가 공통 자원(데이터)을 병행적으로 (concurrently) 읽거나 쓰는 동작을 할 때, 공통 자원(데이터)에 대한 접근이 어떤 순서에 따라 이루어졌는지에 따라 그 실행 결과가 같지 않고 달라지는 상황을 말한다.
+Race의 뜻 그대로, 간단히 말하면 경쟁하는 상태, 즉 두 개의 스레드가 하나의 자원 (공통 자원(데이터))을 놓고 서로 사용하려고 경쟁하는 상황을 말한다.
 참고 URL - https://en.wikipedia.org/wiki/Race_condition
 참고 2 URL - https://namu.wiki/w/%EA%B2%BD%EC%9F%81%20%EC%83%81%ED%83%9C
 참고 3 URL - https://lake0989.tistory.com/121
@@ -23,15 +26,15 @@
 from commons import chatbot_helper   # 챗봇 전용 도움말 텍스트
 
 # 2. log 모듈 (module) import
-from utils.log import logger       # 챗봇 전역 로그 객체 (logger)
+from utils.log import logger   # 챗봇 전역 로그 객체 (logger)
 
 # 3. Type Hints class Any import
 from typing import Any
 
 # 4. 나머지 모듈 (module) import
-# from functools import cached_property   # 속성(property)의 결과 캐싱하여 속성(property)이 여러 번 호출될 때마다 매번 계산하지 않고 처음 계산된 값 재사용
+# from functools import cached_property   # 속성 (property)의 결과 캐싱하여 속성 (property)이 여러 번 호출될 때마다 매번 계산하지 않고 처음 계산된 값 재사용
 
-# class KakaoResponseFormatter(object):  # 명시적으로 object 클래스 상속
+# class KakaoResponseFormatter(object):   # 명시적으로 object 클래스 상속
 class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
     """
     Description: 카카오 스킬 응답 json 포맷 클래스
@@ -44,10 +47,10 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
                  참고 URL - https://claude.ai/chat/37ddea1f-89db-470b-b789-1781893801b7
 
     Attributes: __master_datas (dict[str, Any]) - 전체 마스터 데이터
-                __messageText_mappings (dict[str, Any]) - 챗봇 버튼 메시지 텍스트 매핑 Dictionary 객체
+                __messageText_mappings (dict[str, Any]) - 챗봇 버튼 메시지 텍스트 매핑 Dictionary 타입 객체
 
     Parameters: master_datas (dict[str, Any]) - 전체 마스터 데이터
-                messageText_mappings (dict[str, Any]) - 챗봇 버튼 메시지 텍스트 매핑 Dictionary 객체
+                messageText_mappings (dict[str, Any]) - 챗봇 버튼 메시지 텍스트 매핑 Dictionary 타입 객체
 
     Properties (읽기 전용): 없음. (추후 필요시 구현 예정!)
 
@@ -56,6 +59,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
              __skillResponse_format - 스킬 응답 json 포맷
              simple_text - 텍스트 메시지 (text) 카카오톡 채팅방 전송
              error_text - 오류 메세지 (error_msg) 카카오톡 채팅방 전송
+             timeOver_empty_response - 챗봇 응답 시간 5초 초과시 비어있는 응답 메세지 카카오톡 채팅방 전송 (기술지원 문의 제외 일반 문의 또는 응답 메시지 출력하고 싶지 않은 경우 모두 해당)
              timeOver_quickReplies - 챗봇 응답 시간 5초 초과시 응답 재요청 메세지 (requestAgain_msg) 카카오톡 채팅방 전송
 
              __quickReplies_format - 바로가기 그룹 (quickReplies) json 포맷
@@ -93,7 +97,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
 
         Parameters: self - 카카오 스킬 응답 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
                     master_datas - 전체 마스터 데이터
-                    messageText_mappings - 챗봇 버튼 메시지 텍스트 매핑 Dictionary 객체
+                    messageText_mappings - 챗봇 버튼 메시지 텍스트 매핑 Dictionary 타입 객체
 
         Returns: 없음.
         """
@@ -114,12 +118,11 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
         """
 
         master_datas = self.__master_datas   # 전체 마스터 데이터
-        messageText_mappings = self.__messageText_mappings   # 챗봇 버튼 메시지 텍스트 매핑 Dictionary 객체
+        messageText_mappings = self.__messageText_mappings   # 챗봇 버튼 메시지 텍스트 매핑 Dictionary 타입 객체
 
         # 파이썬 람다 표현식
         # 참고 URL - https://docs.python.org/ko/2/tutorial/controlflow.html#lambda-expressions
-
-        eq_operator_mappings = {   # if 조건절 eq 연산자(==) 매핑 Dictionary 객체
+        eq_operator_mappings = {   # if 조건절 eq 연산자(==) 매핑 Dictionary 타입 객체
             messageText_mappings[chatbot_helper._start]: lambda: self.__common_basicCard(master_datas[chatbot_helper._startCard]),   # start - 시작 화면
             messageText_mappings[chatbot_helper._beginning]: lambda: self.__common_basicCard(master_datas[chatbot_helper._startCard]),   # start - 처음으로
 
@@ -142,8 +145,8 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
             messageText_mappings[chatbot_helper._civil3D]: lambda: self.__common_ver_quickReplies(userRequest_msg, master_datas[chatbot_helper._adskVerReplies]) 
         }
 
-        in_operator_mappings = {   # if 조건절 in 연산자 매핑 Dictionary 객체
-            # end - 텍스트 + basicCard Autodesk or 상상진화 BOX 제품 설치 방법 매핑 Dictionary 객체
+        in_operator_mappings = {   # if 조건절 in 연산자 매핑 Dictionary 타입 객체
+            # end - 텍스트 + basicCard Autodesk or 상상진화 BOX 제품 설치 방법 매핑 Dictionary 타입 객체
             messageText_mappings[f"{chatbot_helper._instType} {chatbot_helper._revitBox}"]: lambda: self.__end_basicCard(userRequest_msg, master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._revitBoxInfos]),
             messageText_mappings[f"{chatbot_helper._instType} {chatbot_helper._cadBox}"]: lambda: self.__end_basicCard(userRequest_msg, master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._cadBoxInfos]),
             messageText_mappings[f"{chatbot_helper._instType} {chatbot_helper._energyBox}"]: lambda: self.__end_basicCard(userRequest_msg, master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._energyBoxInfos]),
@@ -156,8 +159,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
 
         try:
             logger.info("[테스트] 카카오 json 포맷 가져오기 - 시작!")
-            # logger.debug("[테스트] 카카오 json 포맷 가져오기 - 시작!")
-
+            
             # TODO: 아래 주석친 코드 필요시 참고 (2025.10.30 minjae)
             # raise Exception(chatbot_helper._error_title + 
             #                 '사유: 카카오 json 포맷 가져오기 오류 발생!!!\n'+
@@ -168,7 +170,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
             # 참고 2 URL - https://wikidocs.net/233719
             # 참고 3 URL - https://youtu.be/QhMY4t2xwG0?si=uYsaL7CLHmx-RHV8
 
-            # TODO: eq_operator_mappings, in_operator_mappings Dictionary 타입 객체들을 for문으로 루핑하기 위해 items() 메서드 사용 구현 (2025.10.29 minjae)
+            # eq_operator_mappings, in_operator_mappings Dictionary 타입 객체들을 for문으로 루핑하기 위해 items() 메서드 사용 (2025.10.29 minjae)
             # 참고 URL - https://docs.python.org/ko/3.13/tutorial/datastructures.html#looping-techniques
             # 조기 종료(return) 통해 불필요한 후속 탐색을 줄이는 최적화된 브루트 포스 완전 탐색 알고리즘 (Brute Force Algorithm) - "브루트 포스(Brute Force) 완전 탐색 알고리즘 기반 탐색 구조 + 그리디(Greedy) 알고리즘 방식 조기 종료" 혼합형
             for key, handler in eq_operator_mappings.items():   # 사용자 입력(userRequest_msg)에 맞는 핸들러 함수(handler) 찾아 실행
@@ -181,12 +183,12 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
                     logger.info(f"[테스트] [in_operator_mappings] key: '{key}', userRequest_msg: '{userRequest_msg}'")
                     return handler()
 
-            # TODO: 오류 메시지 "TypeError: cannot unpack non-iterable NoneType object" 출력 원인 파악 (2025.10.30 minjae)
-            # 오류 원인 - 함수나 메서드가 None 값을 반환했을 때, 해당 None 값을 언패킹(unpacking) 하려고 시도할 경우 발생. 즉, Python에서 None 객체는 반복(iteration)이 불가능하므로, 언패킹(unpacking) 불가.
+            # 오류 메시지 "TypeError: cannot unpack non-iterable NoneType object" 출력 원인 파악 (2025.10.30 minjae)
+            # 오류 원인 - 함수나 메서드가 None 값을 반환했을 때, 해당 None 값을 언패킹 (unpacking) 하려고 시도할 경우 발생. 즉, Python에서 None 객체는 반복 (iteration)이 불가능하므로, 언패킹 (unpacking) 불가.
             # 참고 URL - https://python.realjourney.co.kr/entry/Pytorch-TypeError-cannot-unpack-non-iterable-NoneType-object
 
             # 사용자가 카카오 챗봇 버튼이 아닌 일반 메시지를 채팅창에 입력시 아래처럼 오류 메시지가 출력되어 원인 파악하니 함수 실행 결과 None으로 반환되고
-            # lambda_function.py 소스파일 -> chatbot_response 함수에서 res_queue.put(response) 실행할 때 발생하는 오류로 확인 되어 아래처럼 else 절 코드 추가 (2025.10.30 minjae)
+            # lambda_function.py 소스파일 -> chatbot_response 함수에서 res_queue.put(kakao_response[chatbot_helper._payload]) 실행할 때 발생하는 오류로 확인 되어 아래처럼 else 절 코드 추가 (2025.10.30 minjae)
             # 참고 URL - https://claude.ai/chat/2035baf1-0f86-4d08-af37-0091c8358dbb
             # 오류 메시지 - "TypeError: 'NoneType' object is not subscriptable"
             logger.info("[테스트] [기술지원 문의 제외 일반 문의] 카카오 json 포맷 가져오기 - 완료!")
@@ -436,7 +438,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
                     master_data - 특정 마스터 데이터
                     items - 아이템 리스트 (imageTitle + thumbnail + itemList 등등 ...)
 
-        Returns: self.__skillResponse_format(outputs) - 아이템형 케로셀 json 포맷 
+        Returns: self.__skillResponse_format(outputs) - 아이템형 케로셀 json 포맷
         """
 
         logger.info(f"[테스트] 아이템형 케로셀 master_data: '{master_data}', items: '{items}'")

@@ -32,7 +32,7 @@ _kst = None   # ZoneInfo 클래스 전역변수 객체 (global)
 
 def _initZoneInfo() -> None:
     """
-    Description: ZoneInfo 클래스 전역변수 객체 (global)  초기화 (1회만 실행)
+    Description: ZoneInfo 클래스 전역변수 객체 (global) _kst 초기화 (1회만 실행)
                  한국 표준 시간대 ("Asia/Seoul") 변경되지 않기 때문에 1회만 실행.
 
     Parameters: 없음.
@@ -47,7 +47,7 @@ def _initZoneInfo() -> None:
         # 참고 URL - https://docs.python.org/ko/3.9/library/zoneinfo.html#module-zoneinfo
         # 참고 2 URL - https://wikidocs.net/236273
         # 참고 3 URL - https://chatgpt.com/c/684b79a8-8c20-8010-9d14-41ab28f12747
-        _kst = ZoneInfo("Asia/Seoul")   # 대한민국 표준시로 설정할 수 있도록 ZoneInfo 클래스 전역변수 객체 (global) _kst 생성 
+        _kst = ZoneInfo("Asia/Seoul")   # 대한민국 표준시로 설정할 수 있도록 ZoneInfo 클래스 전역변수 객체 (global) _kst 생성
         current_frame = inspect.currentframe()   # 현재 실행 중인 프레임 의미
         file_name = os.path.basename(current_frame.f_code.co_filename)
         function_name = current_frame.f_code.co_name
@@ -57,7 +57,7 @@ def _initZoneInfo() -> None:
 def _callerInfo() -> tuple[str, str, int]:
     """
     Description: 상위 호출자 파일명 (file_name), 함수명 (function_name), 라인 번호 (lineno) 가져오기
-                 튜플(tuple) 객체 사용하여 값 반환
+                 튜플 (tuple) 객체 사용하여 값 반환
                  참고 URL - https://dojang.io/mod/page/view.php?id=2340
                  참고 2 URL - https://wikidocs.net/3133
                  참고 3 URL - https://wikidocs.net/92538
@@ -78,7 +78,7 @@ def _callerInfo() -> tuple[str, str, int]:
     # frame = inspect.currentframe().f_back.f_back.f_back   # 3단계 위 상위 호출자 정보 가져오기
     stack = inspect.stack()   # 현재 stack 전체 가져오기
 
-    # stack 구조 예시(인덱스 번호 기준): [3]번째 프레임이 상위 호출자이다.
+    # stack 구조 예시 (인덱스 번호 기준): [3]번째 프레임이 상위 호출자이다.
     # stack[0] _callerInfo
     # stack[1] _logWrite
     # stack[2] debug / info / warning / error / critical
@@ -89,22 +89,22 @@ def _callerInfo() -> tuple[str, str, int]:
     # 참고 2 URL - https://youtu.be/_TG0hVYJ6D8?si=j85mnzUabJeClsoQ
 
     for frame_info in stack:   # 호출 stack 역순으로 순회 및 chatbot_logger.py 모듈 (module) 밖 상위 호출자 자동 탐색.
-        module = inspect.getmodule(frame_info.frame)  # 해당 프레임 객체가(frame_info.frame) 어느 모듈 (module)에서 생성되었는지 추적
+        module = inspect.getmodule(frame_info.frame)   # 해당 프레임 객체가 (frame_info.frame) 어느 모듈 (module)에서 생성되었는지 추적
         file_name = os.path.basename(frame_info.filename)   # 상위 호출자 함수가 속한 파일 이름
-        cur_file_name = os.path.basename(__file__)   # 현재 실행 중인 함수(_callerInfo) 코드가 속한 파일 이름 변수(어트리뷰트) (chatbot_logger.py)
+        cur_file_name = os.path.basename(__file__)   # 현재 실행 중인 함수 (_callerInfo) 코드가 속한 파일 이름 변수 (속성 - Attribute) (chatbot_logger.py)
 
-        # [테스트] [오류 케이스] chatbot_logger.py 모듈 (module) 밖 상위 호출자 찾기 불가! 
-        # module = None 
-        # cur_file_name = os.path.basename(__file__)   # 현재 실행 중인 함수(_callerInfo) 코드가 속한 파일 이름 변수(어트리뷰트) (chatbot_logger.py)
-        # file_name = cur_file_name  # 상위 호출자 함수가 속한 파일 이름 == 현재 실행 중인 함수(_callerInfo) 코드가 속한 파일 이름
+        # [테스트] [오류 케이스] chatbot_logger.py 모듈 (module) 밖 상위 호출자 찾기 불가!
+        # module = None
+        # cur_file_name = os.path.basename(__file__)   # 현재 실행 중인 함수 (_callerInfo) 코드가 속한 파일 이름 변수 (속성 - Attribute) (chatbot_logger.py)
+        # file_name = cur_file_name  # 상위 호출자 함수가 속한 파일 이름 == 현재 실행 중인 함수 (_callerInfo) 코드가 속한 파일 이름
         
-        # 파이썬 __name__ 변수(어트리뷰트) - 현재 모듈 (module)의 이름을 담고 있는 내장 변수(어트리뷰트)
+        # 파이썬 __name__ 변수 (속성 - Attribute) - 현재 모듈 (module)의 이름을 담고 있는 내장 변수 (속성 - Attribute)
         # 참고 URL - https://docs.python.org/ko/3.7/reference/import.html?highlight=__name__#__name__
         # 참고 2 URL - https://wikidocs.net/195615
         
-        # ***** 핵심 조건 ***** 
-        # (1) module 존재하고 module 이름(module.__name__) chatbot_logger 아님
-        # (2) module None 이고 파일명 chatbot_logger.py 아님
+        # ***** 핵심 조건 *****
+        # (1) module 값 존재하고 module 이름 (module.__name__) chatbot_logger 아님
+        # (2) module 값 None 이고 파일명 chatbot_logger.py 아님
         if (module and module.__name__ != __name__) or (None is module and file_name != cur_file_name):   # chatbot_logger.py 내부 호출 건너띄기.
             return (
                 file_name,
@@ -129,12 +129,12 @@ def _formatTime() -> str:
  
     # 현재 날짜와 시간을 특정 포맷으로 변환 (2025.03.27 minjae)
     # 참고 URL - https://wikidocs.net/269063
-    return datetime.now(_kst).strftime(chatbot_helper._datefmt)   # 매번 현재 시간 새로 생성 및 반환 
+    return datetime.now(_kst).strftime(chatbot_helper._datefmt)   # 매번 현재 시간 새로 생성 및 반환
  
 def _logWrite(level: str, msg: str) -> None:
     """
-    Description: 레벨별 공통 로그 기록 출력 
-                 공통 로그 출력 함수 기능 구현 (2025.09.22 minjae) 
+    Description: 레벨별 공통 로그 기록 출력
+                 공통 로그 출력 함수 기능 구현 (2025.09.22 minjae)
                  참고 URL - https://chatgpt.com/c/6847d34f-9700-8010-92fb-2d063eff183a
 
     Parameters: level - 로그 레벨
@@ -146,7 +146,7 @@ def _logWrite(level: str, msg: str) -> None:
     time_stamp = _formatTime()
     (file_name, function_name, lineno) = _callerInfo()
 
-    # 파이썬 문자열 포맷팅(String Formatting)
+    # 파이썬 문자열 포맷팅 (String Formatting)
     # 참고 URL - https://docs.python.org/ko/3/library/string.html#format-string-syntax
     # 참고 2 URL - https://wikidocs.net/78952
     # 참고 3 URL - https://wikidocs.net/13
@@ -160,14 +160,13 @@ def _logWrite(level: str, msg: str) -> None:
 
 def debug(msg: str) -> None:
     """
-    Description: DEBUG 로그 기록 출력 
+    Description: DEBUG 로그 기록 출력
 
-    Parameters: msg - 로그 메시지 
+    Parameters: msg - 로그 메시지
 
-    Returns: 없음.     
+    Returns: 없음.
     """
 
-    # _test(DEBUG, msg)
     _logWrite(DEBUG, msg)
 
 def info(msg: str) -> None:
@@ -223,7 +222,7 @@ def critical(msg: str) -> None:
 참고 3 URL - https://devpouch.tistory.com/189
 참고 4 URL - https://supermemi.tistory.com/entry/Python-3-%ED%8C%8C%EC%9D%B4%EC%8D%AC%EC%97%90%EC%84%9C-%EC%9D%98%EB%AF%B8%EB%8A%94-%EB%AC%B4%EC%97%87%EC%9D%BC%EA%B9%8C-%EC%A3%BC%EC%84%9D
 
-* 패키지, 모듈 (module) 
+* 패키지, 모듈 (module)
 참고 URL - https://docs.python.org/ko/3.13/tutorial/modules.html
 참고 2 URL - https://wikidocs.net/1418
 참고 3 URL - https://dojang.io/mod/page/view.php?id=2450
