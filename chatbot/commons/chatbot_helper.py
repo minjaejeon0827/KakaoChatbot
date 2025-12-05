@@ -50,7 +50,7 @@ _utterance = 'utterance'       # 사용자가 카카오톡 채팅방에 입력�
 # region kakao.py
 
 # 카카오 응답 데이터
-_payload = 'payload'       # 카카오톡 서버로 전송할 json 포맷 기반 챗봇 답변 내용 (페이로드)
+_payload = 'payload'       # 카카오톡 서버로 전송할 json 포맷 기반 챗봇 답변 메시지 (페이로드)
 _meta_data = 'meta_data'   # 다른 데이터 설명해 주는 데이터 (예) master_data - 특정 마스터 데이터
 
 # 필드명 "action" - 버튼 클릭시 수행될 작업

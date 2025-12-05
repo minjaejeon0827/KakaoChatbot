@@ -113,7 +113,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
                     userRequest_msg - 사용자 입력 채팅 메세지
 
         Returns: dict[str, Any] key 
-                 "payload" - 카카오톡 서버로 전송할 json 포맷 기반 챗봇 답변 내용 (페이로드),
+                 "payload" - 카카오톡 서버로 전송할 json 포맷 기반 챗봇 답변 메시지 (페이로드),
                  "meta_data" - 특정 마스터 데이터 (예) 아이템 카드 (basicCard, carousel) or 바로가기 그룹 (quickReplies)
         """
 
@@ -239,7 +239,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
         Description: [public] 텍스트 메시지 (text) 카카오톡 채팅방 전송
 
         Parameters: self - 카카오 스킬 응답 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
-                    text - 챗봇 답변 내용
+                    text - 챗봇 답변 메시지
 
         Returns: self.__skillResponse_format(outputs) - 텍스트 메시지 json 포맷
         """

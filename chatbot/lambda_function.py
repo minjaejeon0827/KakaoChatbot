@@ -114,10 +114,10 @@ def handler(event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
     user_id = None         # 카카오톡 채팅 입력 사용자 아이디
     file_path = None       # 사용자별 (user_id) 임시 로그 파일 상대 경로
 
-    res_queue = None   # 챗봇 답변 내용 포함된 큐
-    err_queue = None   # 챗봇 오류 내용 포함된 큐
+    res_queue = None   # 챗봇 답변 메시지 포함된 큐
+    err_queue = None   # 챗봇 오류 메시지 포함된 큐
 
-    response = None    # 챗봇 답변 내용 (페이로드)
+    response = None    # 챗봇 답변 메시지 (페이로드)
     prev_userRequest_msg = None   # 이전 사용자 입력 채팅 메세지 (챗봇 응답 시간 5초 초과시 응답 재요청 할 때 사용)
     
     start_time = time.time()   # 메인 핸들러 (handler) 시작 시간 - 챗봇 응답 시간 계산 용도
@@ -184,10 +184,10 @@ def handler(event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
 
 def chatbot_response(kakao_request: dict[str, Any], res_queue: Queue, file_path: str) -> None:
     """
-    Description: 챗봇 답변 요청 및 큐 res_queue 답변 내용 추가
+    Description: 챗봇 답변 요청 및 큐 res_queue 답변 메시지 추가
 
     Parameters: kakao_request - 카카오톡 채팅방 실제 채팅 정보
-                res_queue - 챗봇 답변 내용 포함된 큐
+                res_queue - 챗봇 답변 메시지 포함된 큐
                 file_path - 아마존 웹서비스 람다 함수 (AWS Lambda Function) -> 사용자별 (user_id) 임시 로그 텍스트 파일 상대 경로 - (예시) '/tmp/user_id-1b2bfc8caf85a5dff8fadd1bf4cc70125b533fea7b665d0cdb0fb493a135e94b4d_chatbot.txt'
 
                 * 참고
@@ -346,8 +346,8 @@ def thread_wrapper(target: Callable[..., Any], args: tuple[Any, ...], err_queue:
 
     Parameters: target - 작업 스레드 실행 대상 함수 (chatbot_response)
                 args - 작업 스레드 실행 대상 함수 (chatbot_response) 동작하기 위해 필요한 인자값 - kakao_request: dict[str, Any], res_queue: Queue, file_path: str
-                res_queue - 챗봇 답변 내용 포함된 큐
-                err_queue - 챗봇 오류 내용 포함된 큐
+                res_queue - 챗봇 답변 메시지 포함된 큐
+                err_queue - 챗봇 오류 메시지 포함된 큐
 
                 thread_wrapper 함수의 경우 예외만 err_queue 전달 - err_queue.put(str(e))
 
@@ -368,8 +368,8 @@ def start_response_thread(kakao_request: dict[str, Any], res_queue: Queue, err_q
     Description: 챗봇 답변 전용 작업 스레드 시작
 
     Parameters: kakao_request - 카카오톡 채팅방 실제 채팅 정보
-                res_queue - 챗봇 답변 내용 포함된 큐
-                err_queue - 챗봇 오류 내용 포함된 큐
+                res_queue - 챗봇 답변 메시지 포함된 큐
+                err_queue - 챗봇 오류 메시지 포함된 큐
                 file_path - 아마존 웹서비스 람다 함수 (AWS Lambda Function) -> 사용자별 (user_id) 임시 로그 텍스트 파일 상대 경로 - (예시) '/tmp/user_id-1b2bfc8caf85a5dff8fadd1bf4cc70125b533fea7b665d0cdb0fb493a135e94b4d_chatbot.txt'
 
     Returns: 챗봇 답변 전용 작업 스레드 객체
@@ -379,7 +379,7 @@ def start_response_thread(kakao_request: dict[str, Any], res_queue: Queue, err_q
                               args=(
                                 chatbot_response,   # 작업 스레드 실행 대상 함수
                                 (kakao_request, res_queue, file_path),   # chatbot_response 함수 실행시 필요 인자
-                                err_queue   # 챗봇 오류 내용 포함된 큐
+                                err_queue   # 챗봇 오류 메시지 포함된 큐
                               ),
                               daemon=True)   # 작업 스레드 함수 연결 (daemon=True - 데몬 스레드 생성)
     worker.start()
@@ -390,13 +390,13 @@ def wait_for_response(start_time: float, res_queue: Queue, err_queue: Queue) -> 
     Description: 챗봇 답변 또는 오류 대기 (응답 제한 시간 3.5초 이내)
 
     Parameters: start_time - 메인 핸들러 (handler) 시작 시간 (챗봇 응답 시간 계산 용도)
-                res_queue - 챗봇 답변 내용 포함된 큐
-                err_queue - 챗봇 오류 내용 포함된 큐
+                res_queue - 챗봇 답변 메시지 포함된 큐
+                err_queue - 챗봇 오류 메시지 포함된 큐
 
                 Blocking - 호출된 함수가 자신이 할 일을 모두 마칠 때까지 제어권을 계속 가지고서 호출한 함수에게 바로 돌려주지 않는 것.
                 Non-Blocking - 호출된 함수가 자신이 할 일을 채 마치지 않았더라도 바로 제어권을 건네주어 (return) 호출한 함수가 다른 일을 진행할 수 있도록 해주는 것.
 
-    Returns: response - 챗봇 답변 내용 (페이로드)
+    Returns: response - 챗봇 답변 메시지 (페이로드)
     """
 
     while(time.time() - start_time < chatbot_helper._time_limit):   # 챗봇 응답 시간 3.5초 이내인 경우
@@ -422,7 +422,7 @@ def lambda_response_format(response: dict[str, Any], status_code: int = chatbot_
     """
     Description: 카카오톡 서버로 전송할 API Gateway 규격에 맞는 json format 형식 데이터 리턴
 
-    Parameters: response - 챗봇 답변 내용 (페이로드)
+    Parameters: response - 챗봇 답변 메시지 (페이로드)
                 status_code - HTTP 응답 상태 코드 값 (예) 2XX - 성공 / 4XX - 클라이언트 오류 / 5XX - 서버 오류 (default value parameter)
                               해당 파라미터에 값 전달하지 않으면 카카오톡 서버로 응답 메세지 전송하기 위해 미리 설정된 기본값 사용 (chatbot_helper._statusCode_success - HTTP 응답 상태 코드 200)
 
