@@ -16,7 +16,7 @@ from typing import Any, Self
 
 # 4. 나머지 모듈 (module) import
 import logging   # 로그 기록
-import asyncio   # 비동기 프로그래밍 (async/await)
+import asyncio   # 비동기 프로그래밍 (async / await)
 
 from functools import cached_property   # 속성(property)의 결과 캐싱하여 속성(property)이 여러 번 호출될 때마다 매번 계산하지 않고 처음 계산된 값 재사용
 from datetime import datetime, timezone
@@ -28,7 +28,7 @@ from zoneinfo import ZoneInfo    # 대한민국 표준시 설정
 # 1. [ERROR] Runtime.ImportModuleError: Unable to import module 'lambda_function': cannot import name 'logger' from partially initialized module 'modules.log' (most likely due to a circular import) (/var/task/modules/log.py)Traceback (most recent call last):
 # 2. [ERROR] Runtime.ImportModuleError: Unable to import module 'lambda_function': cannot import name 'KSTFormatter' from partially initialized module 'modules.singleton' (most likely due to a circular import) (/var/task/modules/singleton.py)Traceback (most recent call last):
 # from modules.log import logger   # 챗봇 전역 로그 객체 (logger)
-from restAPI import chatbot_restServer   # 챗봇 웹서버 Rest API 메서드
+from restAPI import chatbot_restServer   # 챗봇 웹서버 Rest API 함수
 from modules.chatbot_enum import EnumValidator   # 데이터 유효성 검사
 
 # class SingletonBase(object):   # 명시적으로 object 클래스 상속
@@ -105,7 +105,7 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
 
                 messageText_mappings (dict[str, Any]) - 챗봇 버튼 메시지 텍스트 매핑 딕셔너리
                 valid_targets (list[str]) - 마스터 데이터 유효성 검사 대상 리스트
-                (예시) [ "buttons", "items", "autoCADInfos", "revitInfos", "navisworksManageInfos", "infraWorksInfos", "civil3DInfos", "revitBoxInfos", "cadBoxInfos", "energyBoxInfos", "accountInfos", "etcInfos" ]
+                (예시) [ "buttons", "items", "autoCADInfos", "revitInfos", "navisworksManageInfos", "infraWorksInfos", "civil3DInfos", "revitBoxInfos", "cadBoxInfos", "energyBoxInfos", "etcInfos" ]
 
     Properties (읽기 전용): get_master_datas (dict[str, Any]) - 전체 마스터 데이터 가져오기
                            get_messageText_mappings (dict[str, Any]) - 챗봇 버튼 메시지 텍스트 매핑 딕셔너리 가져오기
@@ -140,7 +140,7 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
         Returns: 없음.
         """
 
-        # TODO: 아마존 웹서비스 람다 함수 (AWS Lambda Function) 내부에서 이미 event loop 실행 중일 경우 아래와 같은 오류 메시지가 출력되어 asyncio.get_event_loop, loop.create_task 로직 보완 (2025.11.13 minjae)
+        # 아마존 웹서비스 람다 함수 (AWS Lambda Function) 내부에서 이미 event loop 실행 중일 경우 아래와 같은 오류 메시지가 출력되어 asyncio.get_event_loop, loop.create_task 로직 보완 (2025.11.13 minjae)
         # 오류 메시지 - RuntimeError: asyncio.run() cannot be called from a running event loop
         # 참고 URL - https://docs.python.org/ko/3/library/asyncio-eventloop.html
         # 참고 2 URL - https://docs.python.org/ko/3/library/asyncio-task.html#asyncio.create_task
@@ -177,8 +177,8 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
         Returns: self.__master_datas - 전체 마스터 데이터 
         """
     
-        # TODO: 마스터 데이터 싱글톤 클래스 인스턴스(self) 초기화(__init__) 완료 전 속성 접근 시 AttributeError 발생할 수 있어서 초기화(__init__) 완료 후 접근하도록 로직 보완 (2025.11.13 minjae)
-        if False == hasattr(self, "_MasterEntity__master_datas"):  # 인스턴스(self) 초기화(__init__) 완료되지 않은 경우
+        # 마스터 데이터 싱글톤 클래스 인스턴스(self) 초기화(__init__) 완료 전 속성 접근 시 AttributeError 발생할 수 있어서 초기화(__init__) 완료 후 접근하도록 로직 보완 (2025.11.13 minjae)
+        if False == hasattr(self, "_MasterEntity__master_datas"):   # 인스턴스(self) 초기화(__init__) 완료되지 않은 경우
             raise RuntimeError("[테스트] 마스터 데이터 싱글톤 클래스 인스턴스(self) 초기화 완료 못함.")
         
         return self.__master_datas
@@ -275,20 +275,20 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
         
     #     self.__isValid = isValid
 
-    async def __initSettingAsync(self, messageText_mappings: dict[str, Any], valid_targets: list[str] | None = None) -> None:
+    async def __initSettingAsync(self, messageText_mappings: dict[str, Any] | None = None, valid_targets: list[str] | None = None) -> None:
         """
         Description: [private] 마스터 데이터 초기 설정
 
         Parameters: self - 마스터 데이터 싱글톤 클래스 인스턴스
                     messageText_mappings - 챗봇 버튼 메시지 텍스트 매핑 딕셔너리
-                    valid_targets - 마스터 데이터 유효성 검사 대상 리스트 (non-default value parameter)
+                    valid_targets - 마스터 데이터 유효성 검사 대상 리스트
 
         Returns: 없음.
         """
 
         try:
             if None is valid_targets:
-                raise ValueError("valid_targets - 마스터 데이터 유효성 검사 대상 리스트 데이터 존재 안 함.")
+                raise ValueError("valid_targets - 마스터 데이터 유효성 검사 대상 리스트 데이터 없음.")
 
             chatbot_logger.info("[테스트] 마스터 데이터 초기 설정 - 시작!")
             # chatbot_logger.info(f"[테스트] help 함수 호출 및 chatbot_restServer 모듈 (module) 전체 Docstring 내용 확인 - {help(chatbot_restServer)}")
@@ -346,7 +346,7 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
                         # 파이썬 함수 len 사용하여 문자열 또는 리스트 길이 구하기
                         # 참고 URL - https://docs.python.org/ko/3/library/functions.html#len
                         if (None is child_value or EnumValidator.NOT_EXISTENCE >= len(child_value)):   # child_value 값이 존재하지 않거나(None) 길이가 0보다 작거나 같은 경우
-                            chatbot_logger.info("[테스트] 마스터 데이터 존재 안 함.")
+                            chatbot_logger.info("[테스트] 마스터 데이터 없음.")
                             return EnumValidator.NOT_EXISTENCE
 
             chatbot_logger.info("[테스트] 마스터 데이터 유효성 검사 결과 - 완료!")
@@ -386,8 +386,8 @@ class KSTFormatter(SingletonBase, logging.Formatter):   # 명시적으로 Single
 
     Properties (읽기 전용): 없음.
     
-    Methods: __converter - UTC time_stamp -> 대한민국 표준시 datetime 변환
-             formatTime - LogRecord(record)의 생성 시간(현재 날짜 및 시간)을 대한민국 표준시로 변환하여 포맷된 문자열 가져오기
+    Methods: __converter - UTC LogRecord 생성 시간 (time_stamp) -> 대한민국 표준시 datetime 변환
+             formatTime - UTC LogRecord 생성 시간 (record.created) -> 대한민국 표준시 datetime 변환 및 포맷된 문자열 가져오기
 
     Notes: 사용 예시 - formatter = KSTFormatter('[%(levelname)s] [%(asctime)s] [%(filename)s | %(funcName)s - L%(lineno)d]: %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
     """
@@ -453,11 +453,11 @@ class KSTFormatter(SingletonBase, logging.Formatter):   # 명시적으로 Single
                      참고 URL - https://docs.python.org/ko/3/library/logging.html#logrecord-objects
 
                      - LogRecord attributes
-                     참고 URL - https://docs.python.org/ko/3/library/logging.html#logrecord-attributes  
+                     참고 URL - https://docs.python.org/ko/3/library/logging.html#logrecord-attributes
 
         Parameters: self - 대한민국 표준시 설정 싱글톤 클래스 인스턴스
                     record - 지정된 logging.LogRecord 클래스 인스턴스
-                    datefmt - 날짜 출력 형식 문자열. (non-default value parameter)
+                    datefmt - 날짜 출력 형식 문자열.
                               datefmt 값이 None일 경우 기본 값 사용 (예) self.default_time_format = '%Y-%m-%d %H:%M:%S'.
 
         Returns: dt.strftime(datefmt) / dt.strftime(chatbot_helper._datefmt) - LogRecord 생성 시간 (record.created) -> 대한민국 표준시 datetime 변환 및 포맷된 문자열
@@ -510,9 +510,13 @@ class KSTFormatter(SingletonBase, logging.Formatter):   # 명시적으로 Single
 * Union Type
 참고 URL - https://docs.python.org/ko/3.11/library/stdtypes.html#types-union
 
-* non-default value parameter, default value parameter
+* non-default value parameter (필수 매개변수), default value parameter (기본값 매개변수)
+non-default value parameter - 함수를 호출할 때 반드시 값을 전달해야 하는 매개변수
+default value parameter - 함수를 호출할 때 값을 전달하지 않으면 미리 설정된 기본값을 사용하는 매개변수
 참고 URL - https://docs.python.org/ko/3/glossary.html#term-parameter
 참고 2 URL - https://docs.python.org/3/faq/programming.html#why-are-default-values-shared-between-objects
+참고 3 URL - https://fierycoding.tistory.com/58
+참고 4 URL - https://claude.ai/chat/e9803e84-1f2c-4fff-9f22-3603392000ad
 
 * ValueError
 참고 URL - https://docs.python.org/ko/3.13/library/exceptions.html#ValueError
@@ -537,7 +541,7 @@ Attribute (어트리뷰트) - 흔히 점표현식을 사용하는 이름으로 �
 *args - 위치 가변 인자라고 불리며, 함수를 정의할 때 인자값의 개수를 가변적으로 정의해주는 기능이며, 함수 호출부에서 서로 다른 개수의 인자를 전달하고자 할 때 가변 인자 (Variable argument) 사용함. (예) foo(1, 2, 3), foo(1, 2, 3, 4) 
         함수 호출시 args라는 변수는 여러 개의 입력에 대해 튜플 (tuple)로 저장한 후 이 튜플 (tuple) 객체를 바인딩한다. (예) (1, 2, 3), (1, 2, 3, 4)
 **kwargs - 키워드 가변 인자라고 불리며, keyword arguments의 약어(kwargs)이다. 예를들어 함수 호출부에서 a=1, b=2, c=3과 어떤 키워드와 해당 키워드에 값을 전달힌다. (예) foo(a=1, b=2, c=3)
-           함수의 결과를 살펴보면 kwargs라는 변수가 딕셔너리(dict) 객체를 바인딩함을 알 수 있다. 이때 딕셔너리 (dict) 객체에는 함수 호출부에서 전달한 키워드와 값이 저장된다. (예) {'a': 1, 'b': 2, 'c': 3}
+           함수의 결과를 살펴보면 kwargs라는 변수가 딕셔너리 (dict)를 바인딩함을 알 수 있다. 이때 딕셔너리 (dict)에는 함수 호출부에서 전달한 키워드와 값이 저장된다. (예) {'a': 1, 'b': 2, 'c': 3}
 참고 URL - https://wikidocs.net/69363
 참고 2 URL - https://claude.ai/chat/601e10e4-39ad-48fe-aa73-7070ba600f3d
 
@@ -560,8 +564,8 @@ Attribute (어트리뷰트) - 흔히 점표현식을 사용하는 이름으로 �
 참고 URL - https://wikidocs.net/69361
 참고 2 URL - https://wikidocs.net/3693  
 
-* 객체 vs 인스턴스 차이
-객체 - 데이터와 기능을 포함한 모든 실체 (모든 인스턴스 포함)
+* 객체 VS 인스턴스 차이
+객체 - 데이터(속성)와 기능(메서드)을 포함한 모든 실체 (모든 인스턴스 포함)
 인스턴스 - 객체 중 특정 클래스에서 생성된 것
 예) ray = car() 
     1. ray는 객체(object)이다.

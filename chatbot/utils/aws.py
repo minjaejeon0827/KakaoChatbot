@@ -85,9 +85,13 @@ def read_tmp_file(file_path: str) -> str:
 * Union Type
 참고 URL - https://docs.python.org/ko/3.11/library/stdtypes.html#types-union
 
-* non-default value parameter, default value parameter
+* non-default value parameter (필수 매개변수), default value parameter (기본값 매개변수)
+non-default value parameter - 함수를 호출할 때 반드시 값을 전달해야 하는 매개변수
+default value parameter - 함수를 호출할 때 값을 전달하지 않으면 미리 설정된 기본값을 사용하는 매개변수
 참고 URL - https://docs.python.org/ko/3/glossary.html#term-parameter
 참고 2 URL - https://docs.python.org/3/faq/programming.html#why-are-default-values-shared-between-objects
+참고 3 URL - https://fierycoding.tistory.com/58
+참고 4 URL - https://claude.ai/chat/e9803e84-1f2c-4fff-9f22-3603392000ad
 
 * ValueError
 참고 URL - https://docs.python.org/ko/3.13/library/exceptions.html#ValueError

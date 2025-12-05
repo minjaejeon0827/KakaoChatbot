@@ -14,14 +14,14 @@ from typing import Any
 
 # 4. 나머지 모듈 (module) import
 import json      # json 데이터 처리
-import asyncio   # 비동기 프로그래밍 (async/await)
+import asyncio   # 비동기 프로그래밍 (async / await)
 
 # TODO: 추후 테스트 웹서버 구축 후 마스터 데이터 다운로드 Rest API 함수 get_masterDownLoadAsync 로직 수정 예정 (2025.09.11 minjae)
 async def get_masterDownLoadAsync(masterEntity_json_file_path: str | None = None) -> dict[str, Any]:
     """
     Description: 전체 마스터 데이터 다운로드
 
-    Parameters: masterEntity_json_file_path - 전체 마스터 데이터 json 파일 상대 경로 (non-default value parameter)
+    Parameters: masterEntity_json_file_path - 전체 마스터 데이터 json 파일 상대 경로
 
     Returns: master_datas - 전체 마스터 데이터
     """
@@ -30,7 +30,7 @@ async def get_masterDownLoadAsync(masterEntity_json_file_path: str | None = None
 
     try:
         if not masterEntity_json_file_path:   # masterEntity_json_file_path에 할당된 값이 None 또는 공백("")인 경우 (None or Empty String Check)
-            raise ValueError("전체 마스터 데이터 json 파일 상대 경로 존재 안 함.")
+            raise ValueError("전체 마스터 데이터 json 파일 상대 경로 없음.")
         
         chatbot_logger.info("[테스트] 전체 마스터 데이터 다운로드 - 시작!")
         
@@ -42,7 +42,7 @@ async def get_masterDownLoadAsync(masterEntity_json_file_path: str | None = None
             response = json.load(json_file)
 
             if chatbot_helper._masterEntity not in response:   # 키(key) 누락 체크 - response['masterEntity']가 존재하지 않는 경우   
-                raise KeyError(f"전체 마스터 데이터 response['masterEntity'] - '{chatbot_helper._masterEntity}' 키 값 존재 안 함.")
+                raise KeyError(f"전체 마스터 데이터 response['masterEntity'] - '{chatbot_helper._masterEntity}' 키 값 없음.")
 
             # 챗봇 프로그램 오류 발생 및 로그 "[테스트] 오류 - 'startCard'" 출력되어 코드 아래처럼 변경 (2025.08.18 minjae)
             # (기존) master_datas = json.loads(response['masterEntity']) -> (변경) master_datas = response['masterEntity']
@@ -76,6 +76,14 @@ async def get_masterDownLoadAsync(masterEntity_json_file_path: str | None = None
 (예) finally: return master_datas
 참고 URL - https://peps.python.org/pep-0765/
 참고 2 URL - https://stackoverflow.com/questions/19805654/python-try-finally-block-returns
+
+* non-default value parameter (필수 매개변수), default value parameter (기본값 매개변수)
+non-default value parameter - 함수를 호출할 때 반드시 값을 전달해야 하는 매개변수
+default value parameter - 함수를 호출할 때 값을 전달하지 않으면 미리 설정된 기본값을 사용하는 매개변수
+참고 URL - https://docs.python.org/ko/3/glossary.html#term-parameter
+참고 2 URL - https://docs.python.org/3/faq/programming.html#why-are-default-values-shared-between-objects
+참고 3 URL - https://fierycoding.tistory.com/58
+참고 4 URL - https://claude.ai/chat/e9803e84-1f2c-4fff-9f22-3603392000ad
 
 TODO: 추후 필요시 전체 마스터 데이터 다운로드 함수 로직 수정 예정 (2025.05.26 minjae)
 참고 URL - https://wikidocs.net/28

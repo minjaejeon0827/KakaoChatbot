@@ -114,10 +114,10 @@ def handler(event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
     user_id = None         # 카카오톡 채팅 입력 사용자 아이디
     file_path = None       # 사용자별 (user_id) 임시 로그 파일 상대 경로
 
-    res_queue = None   # 챗봇 답변 내용 포함된 큐
-    err_queue = None   # 챗봇 오류 내용 포함된 큐
+    res_queue = None    # 챗봇 답변 내용 포함된 큐 객체
+    err_queue = None    # 챗봇 오류 내용 포함된 큐 객체
 
-    response = None    # 챗봇 답변 내용 (페이로드)
+    response = None     # 챗봇 답변 내용 (페이로드)
     prev_userRequest_msg = None   # 이전 사용자 입력 채팅 메세지 (챗봇 응답 시간 5초 초과시 응답 재요청 할 때 사용)
     
     start_time = time.time()   # 메인 핸들러 (handler) 시작 시간 - 챗봇 응답 시간 계산 용도
@@ -151,23 +151,32 @@ def handler(event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
 
         if None is response:   # 8) 챗봇 응답 시간 초과한 경우
             prev_userRequest_msg = aws.read_tmp_file(file_path)
-            logger.warning(f"[테스트] 챗봇 응답 시간 5초 초과 발생! 이전 사용자 입력 채팅 메세지 (prev_userRequest_msg) - {prev_userRequest_msg}")
+            logger.warning(f"[테스트] 챗봇 응답 시간 5초 초과 발생 prev_userRequest_msg - {prev_userRequest_msg}")
             
             # 브루트 포스 완전 탐색 알고리즘 (Brute Force Algorithm) - 무차별 대입법이라고 불리며, 문제를 해결하기 위해 가능한 경우의 수를 모두 검사(완전 탐색) 해보는 방법이다.
             # 참고 URL - https://ko.wikipedia.org/wiki/%EB%AC%B4%EC%B0%A8%EB%B3%84_%EB%8C%80%EC%9E%85_%EA%B2%80%EC%83%89
             # 참고 2 URL - https://wikidocs.net/233719
             # 참고 3 URL - https://youtu.be/QhMY4t2xwG0?si=uYsaL7CLHmx-RHV8
-            for key, value in messageText_mappings.items():   # 이전 사용자 입력 채팅 메세지 (prev_userRequest_msg)에 맞는 return 문 찾아 실행
+            for key, value in messageText_mappings.items():   # 이전 사용자 입력 채팅 메세지(prev_userRequest_msg)에 맞는 return 문 찾아 실행
                 if chatbot_helper._remote_text == prev_userRequest_msg or chatbot_helper._ai_assistant == prev_userRequest_msg:
                     logger.warning(f"[테스트] 재요청 응답 메세지 제외 대상 - {prev_userRequest_msg}")
-                    return lambda_response_format(kakaoResponseFormatter.timeOver_empty_response())
+                    return lambda_response_format(
+                        kakaoResponseFormatter.timeOver_empty_response(),
+                        status_code=chatbot_helper._statusCode_success,   # 카카오톡 서버로 재요청 응답 메세지 전송하기 위해 HTTP 응답 상태 코드 200 전송
+                    )
 
                 if key in prev_userRequest_msg:
                     logger.warning("[테스트] 챗봇 응답 시간 5초 초과 발생 - 재요청 응답 메세지 반환")
-                    return lambda_response_format(kakaoResponseFormatter.timeOver_quickReplies())
+                    return lambda_response_format(
+                        kakaoResponseFormatter.timeOver_quickReplies(),
+                        status_code=chatbot_helper._statusCode_success,   # 카카오톡 서버로 재요청 응답 메세지 전송하기 위해 HTTP 응답 상태 코드 200 전송
+                    )
             
             logger.warning(f"[테스트] 재요청 응답 메세지 제외 대상 - {prev_userRequest_msg}")
-            return lambda_response_format(kakaoResponseFormatter.timeOver_empty_response())
+            return lambda_response_format(
+                kakaoResponseFormatter.timeOver_empty_response(),
+                status_code=chatbot_helper._statusCode_success,   # 카카오톡 서버로 재요청 응답 메세지 전송하기 위해 HTTP 응답 상태 코드 200 전송
+            )
 
         logger.info("[테스트] 챗봇 응답 생성 완료 - 정상 응답 메세지 반환")
         return lambda_response_format(response)   # 9) 챗봇 정상 응답 메세지 반환
@@ -180,19 +189,19 @@ def handler(event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
         logger.critical(f"[테스트] 시스템 오류 - {str(e)}", exc_info=True)
         return lambda_response_format(error_payload_format(str(e)))
     
-# --------------------- 실제 챗봇 응답 처리 (작업 스레드 내부) ---------------------
+# --------------------- 실제 챗봇 응답 처리 (스레드 내부) ---------------------
 
 def chatbot_response(kakao_request: dict[str, Any], res_queue: Queue, file_path: str) -> None:
     """
-    Description: 챗봇 답변 요청 및 큐 res_queue 답변 내용 추가
+    Description: 챗봇 답변 요청 및 큐 객체 res_queue 답변 내용 추가
 
     Parameters: kakao_request - 카카오톡 채팅방 실제 채팅 정보
-                res_queue - 챗봇 답변 내용 포함된 큐
-                file_path - 아마존 웹서비스 람다 함수 (AWS Lambda Function) -> 사용자별 (user_id) 임시 로그 텍스트 파일 상대 경로 - (예시) '/tmp/user_id-1b2bfc8caf85a5dff8fadd1bf4cc70125b533fea7b665d0cdb0fb493a135e94b4d_chatbot.txt'
+                res_queue - 챗봇 답변 내용 포함된 큐 객체
+                file_path - 아마존 웹서비스 람다 함수(AWS Lambda Function) -> 사용자별 (user_id) 임시 로그 텍스트 파일 상대 경로 - (예시) '/tmp/user_id-1b2bfc8caf85a5dff8fadd1bf4cc70125b533fea7b665d0cdb0fb493a135e94b4d_chatbot.txt'
 
                 * 참고
-                /tmp 임시 폴더 (스토리지) - 아마존 웹서비스 람다 함수 (AWS Lambda Function)에서 파일을 저장할 수 있는 임시 로컬 스토리지 영역
-                실행 결과 (Execution results)는 람다 함수 (Lambda Function) 콘솔 "테스트" 탭에서 함수 실행 성공 여부, 실행 결과, 임시 로그 확인 가능
+                /tmp 임시 폴더(스토리지) - 아마존 웹서비스 람다 함수(AWS Lambda Function)에서 파일을 저장할 수 있는 임시 로컬 스토리지 영역
+                실행 결과(Execution results)는 람다 함수(Lambda Function) 콘솔 "테스트" 탭에서 함수 실행 성공 여부, 실행 결과, 임시 로그 확인 가능
                 참고 URL - https://docs.aws.amazon.com/ko_kr/lambda/latest/dg/configuration-ephemeral-storage.html#configuration-ephemeral-storage-use-cases
                 참고 2 URL - https://inpa.tistory.com/entry/AWS-%F0%9F%93%9A-%EB%9E%8C%EB%8B%A4-tmp-%EC%9E%84%EC%8B%9C-%EC%8A%A4%ED%86%A0%EB%A6%AC%EC%A7%80-%EC%82%AC%EC%9A%A9-%EB%B0%A9%EB%B2%95
 
@@ -236,8 +245,8 @@ def chatbot_response(kakao_request: dict[str, Any], res_queue: Queue, file_path:
         if EnumValidator.VALIDATION_ERROR == masterEntity.get_isValid:   # 마스터 데이터 유효성 검사 결과 - 오류.
             raise ValueError("마스터 데이터 유효성 검사 결과 - 오류.")
         
-        if EnumValidator.NOT_EXISTENCE == masterEntity.get_isValid:   # 마스터 데이터 유효성 검사 결과 - 데이터 없음.
-            raise ValueError("마스터 데이터 유효성 검사 결과 - 데이터 없음.")
+        if EnumValidator.NOT_EXISTENCE == masterEntity.get_isValid:   # 마스터 데이터 유효성 검사 결과 - 데이터 존재 안 함.
+            raise ValueError("마스터 데이터 유효성 검사 결과 - 데이터 존재 안 함.")
         
         if EnumValidator.EXISTENCE == masterEntity.get_isValid:   # 마스터 데이터 유효성 검사 결과 - 성공.
             kakao_response = kakaoResponseFormatter.get_response(userRequest_msg)
@@ -251,7 +260,7 @@ def chatbot_response(kakao_request: dict[str, Any], res_queue: Queue, file_path:
 
             aws.write_tmp_file(file_path, userRequest_msg)
 
-            # time.sleep(5)   # 테스트 - 5초 대기
+            time.sleep(5)   # 테스트 - 5초 대기
             res_queue.put(kakao_response[chatbot_helper._payload])
             
             return
@@ -267,7 +276,7 @@ def chatbot_response(kakao_request: dict[str, Any], res_queue: Queue, file_path:
         res_queue.put(error_payload_format(str(e)))
         raise    # raise 사용시 함수 chatbot_response 발생한 현재 예외 다시 발생시켜서 함수 chatbot_response 호출한 상위 코드 블록 전달
 
-# --------------------- 이벤트 파싱 (parsing) ---------------------
+# --------------------- 이벤트 파싱 ---------------------
 
 def parse_event(event: dict[str, Any]) -> dict[str, Any]:
     """
@@ -280,11 +289,11 @@ def parse_event(event: dict[str, Any]) -> dict[str, Any]:
     """
 
     try:
-        # 키(key) 누락 체크 - event['body']에서 키 값 'body' 존재하지 않는 경우
-        # 콜드 스타트(coldstart)인 경우 제외
+        # 키(key) 누락 체크 - event['body']가 존재하지 않는 경우
+        # 콜드 스타트(coldstart)인 경우 제외 
         # 참고 URL - https://chatgpt.com/c/687a0180-e2bc-8010-9a19-90695a1bf477
-        if chatbot_helper._body not in event:
-            raise KeyError(f"카카오톡 채팅방 실제 채팅 정보 저장된 변수 event['body'] - '{chatbot_helper._body}' 키 값 없음.")
+        if chatbot_helper._body not in event: 
+            raise KeyError(f"카카오톡 채팅방 실제 채팅 정보 저장된 변수 event['body'] - '{chatbot_helper._body}' 키 값 존재 안 함.")
 
         event_body_obj = event[chatbot_helper._body]
 
@@ -317,7 +326,7 @@ def parse_event(event: dict[str, Any]) -> dict[str, Any]:
 
 def is_warmup_request(event_body: dict[str, Any]) -> bool:
     """
-    Description: 아마존 웹서비스 람다 함수 (AWS Lambda Function) 가상 컨테이너 웜업 (warmup) 요청 여부 확인
+    Description: 아마존 웹서비스 람다 함수(AWS Lambda Function) 가상 컨테이너 웜업 (warmup) 요청 여부 확인
 
     Parameters: event_body - json 파싱 (parsing) 완료된 카카오톡 채팅방 실제 채팅 정보
 
@@ -328,8 +337,8 @@ def is_warmup_request(event_body: dict[str, Any]) -> bool:
         # 키(key) 누락 체크 - event_body['action']가 존재하지 않는 경우
         # 참고 URL - https://chatgpt.com/c/687a0180-e2bc-8010-9a19-90695a1bf477
         if chatbot_helper._action not in event_body:
-            raise KeyError(f"가상 컨테이너 웜업 (warmup) 요청 여부 확인 event_body['action'] - '{chatbot_helper._action}' 키 값 없음.")
-        return chatbot_helper._warmup_request in event_body[chatbot_helper._action]   # 콜드 스타트 (coldstart)인 경우 - 아마존 웹서비스 람다 함수 (AWS Lambda Function) 초기 응답 속도 느림 현상
+            raise KeyError(f"가상 컨테이너 웜업 (warmup) 요청 여부 확인 event_body['action'] - '{chatbot_helper._action}' 키 값 존재 안 함.")
+        return chatbot_helper._warmup_request in event_body[chatbot_helper._action]   # 콜드 스타트(coldstart)인 경우 - 아마존 웹서비스 람다 함수(AWS Lambda Function) 초기 응답 속도 느림 콜드 스타트(coldstart) 현상
 
     except (KeyError, ValueError, TypeError) as e:
         logger.error(f"[테스트] 데이터 유효성 오류 - {str(e)}", exc_info=True)
@@ -338,7 +347,7 @@ def is_warmup_request(event_body: dict[str, Any]) -> bool:
         logger.critical(f"[테스트] 시스템 오류 - {str(e)}", exc_info=True)
         return False
 
-# --------------------- 작업 스레드 실행 래퍼 ---------------------
+# --------------------- 스레드 실행 래퍼 ---------------------
 
 def thread_wrapper(target: Callable[..., Any], args: tuple[Any, ...], err_queue: Queue) -> None:
     """
@@ -346,10 +355,10 @@ def thread_wrapper(target: Callable[..., Any], args: tuple[Any, ...], err_queue:
 
     Parameters: target - 작업 스레드 실행 대상 함수 (chatbot_response)
                 args - 작업 스레드 실행 대상 함수 (chatbot_response) 동작하기 위해 필요한 인자값 - kakao_request: dict[str, Any], res_queue: Queue, file_path: str
-                res_queue - 챗봇 답변 내용 포함된 큐
-                err_queue - 챗봇 오류 내용 포함된 큐
+                res_queue - 챗봇 답변 내용 포함된 큐 객체
+                err_queue - 챗봇 오류 내용 포함된 큐 객체
 
-                thread_wrapper 함수의 경우 예외만 err_queue 전달 - err_queue.put(str(e))
+                thread_wrapper 함수의 경우 예외만 err_queue 전달 (err_queue.put(str(e)))
 
     Returns: 없음.
     """
@@ -368,9 +377,9 @@ def start_response_thread(kakao_request: dict[str, Any], res_queue: Queue, err_q
     Description: 챗봇 답변 전용 작업 스레드 시작
 
     Parameters: kakao_request - 카카오톡 채팅방 실제 채팅 정보
-                res_queue - 챗봇 답변 내용 포함된 큐
-                err_queue - 챗봇 오류 내용 포함된 큐
-                file_path - 아마존 웹서비스 람다 함수 (AWS Lambda Function) -> 사용자별 (user_id) 임시 로그 텍스트 파일 상대 경로 - (예시) '/tmp/user_id-1b2bfc8caf85a5dff8fadd1bf4cc70125b533fea7b665d0cdb0fb493a135e94b4d_chatbot.txt'
+                res_queue - 챗봇 답변 내용 포함된 큐 객체
+                err_queue - 챗봇 오류 내용 포함된 큐 객체
+                file_path - 아마존 웹서비스 람다 함수(AWS Lambda Function) -> 사용자별 (user_id) 임시 로그 텍스트 파일 상대 경로 - (예시) '/tmp/user_id-1b2bfc8caf85a5dff8fadd1bf4cc70125b533fea7b665d0cdb0fb493a135e94b4d_chatbot.txt'
 
     Returns: 챗봇 답변 전용 작업 스레드 객체
     """
@@ -379,7 +388,7 @@ def start_response_thread(kakao_request: dict[str, Any], res_queue: Queue, err_q
                               args=(
                                 chatbot_response,   # 작업 스레드 실행 대상 함수
                                 (kakao_request, res_queue, file_path),   # chatbot_response 함수 실행시 필요 인자
-                                err_queue   # 챗봇 오류 내용 포함된 큐
+                                err_queue   # 챗봇 오류 전달 전용 큐
                               ),
                               daemon=True)   # 작업 스레드 함수 연결 (daemon=True - 데몬 스레드 생성)
     worker.start()
@@ -390,8 +399,8 @@ def wait_for_response(start_time: float, res_queue: Queue, err_queue: Queue) -> 
     Description: 챗봇 답변 또는 오류 대기 (응답 제한 시간 3.5초 이내)
 
     Parameters: start_time - 메인 핸들러 (handler) 시작 시간 (챗봇 응답 시간 계산 용도)
-                res_queue - 챗봇 답변 내용 포함된 큐
-                err_queue - 챗봇 오류 내용 포함된 큐
+                res_queue - 챗봇 답변 내용 포함된 큐 객체
+                err_queue - 챗봇 오류 내용 포함된 큐 객체
 
                 Blocking - 호출된 함수가 자신이 할 일을 모두 마칠 때까지 제어권을 계속 가지고서 호출한 함수에게 바로 돌려주지 않는 것.
                 Non-Blocking - 호출된 함수가 자신이 할 일을 채 마치지 않았더라도 바로 제어권을 건네주어 (return) 호출한 함수가 다른 일을 진행할 수 있도록 해주는 것.
@@ -402,17 +411,17 @@ def wait_for_response(start_time: float, res_queue: Queue, err_queue: Queue) -> 
     while(time.time() - start_time < chatbot_helper._time_limit):   # 챗봇 응답 시간 3.5초 이내인 경우
 
         try:   # 오류 큐 우선 확인 (err_queue)
-            err_response = err_queue.get_nowait()   # get(block=False) 함수와 비슷한 기능 수행 - 오류 큐 아이템 없을 때 Non-Blocking 처리 (아이템 즉시 반환 또는 아이템 없을 시 즉시 Empty 예외 처리) 및 즉시 오류 큐 아이템 가져오기 (오류 큐 아이템 없이 비어있는지 확인하고, 비어있는 경우 즉시 다른 작업 수행해야 할 때 사용.)
+            err_response = err_queue.get_nowait()   # get(block=False) 함수와 비슷한 기능 수행 - 오류 큐 객체 아이템 없을 때 Non-Blocking 처리 (아이템 즉시 반환 또는 아이템 없을 시 즉시 Empty 예외 처리) 및 즉시 오류 큐 객체 아이템 가져오기 (오류 큐 객체 아이템 없이 비어있는지 확인하고, 비어있는 경우 즉시 다른 작업 수행해야 할 때 사용.)
             err_queue.task_done()   # 오류 큐 작업 완료
             raise Exception(f"작업 스레드 오류: {err_response}")
-        except Empty:   # 오류 큐 err_queue 아이템 없는 경우 즉시 Empty 예외 처리
+        except Empty:   # 오류 큐 객체 err_queue 아이템 없는 경우 즉시 Empty 예외 처리
             pass
 
         try:   # 응답 큐 확인 (res_queue)
-            response = res_queue.get(timeout=chatbot_helper._polling_interval)   # (block=True) - 응답 큐 아이템 없을 때 최대 0.01초 동안 Blocking 처리 (현재 작업 스레드 멈추고, 아이템 추가될 때까지 대기) 및 응답 큐 아이템 가져오기 (응답 큐 아이템 들어올 때까지 안정적으로 처리하고 싶을 때 사용.)
+            response = res_queue.get(timeout=chatbot_helper._polling_interval)   # (block=True) - 응답 큐 객체 아이템 없을 때 최대 0.01초 동안 Blocking 처리 (현재 작업 스레드 멈추고, 아이템 추가될 때까지 대기) 및 응답 큐 객체 아이템 가져오기 (응답 큐 객체 아이템 들어올 때까지 안정적으로 처리하고 싶을 때 사용.)
             res_queue.task_done()   # 응답 큐 작업 완료
             return response
-        except Empty:   # 최대 0.01초 초과 후 응답 큐 res_queue 아이템 없는 경우 Empty 예외 처리
+        except Empty:   # 최대 0.01초 초과 후 응답 큐 객체 res_queue 아이템 없는 경우 Empty 예외 처리
             continue
 
     return None
@@ -424,7 +433,7 @@ def lambda_response_format(response: dict[str, Any], status_code: int = chatbot_
 
     Parameters: response - 챗봇 답변 내용 (페이로드)
                 status_code - HTTP 응답 상태 코드 값 (예) 2XX - 성공 / 4XX - 클라이언트 오류 / 5XX - 서버 오류 (default value parameter)
-                              해당 파라미터에 값 전달하지 않으면 카카오톡 서버로 응답 메세지 전송하기 위해 미리 설정된 기본값 사용 (chatbot_helper._statusCode_success - HTTP 응답 상태 코드 200)
+                              해당 파라미터에 값 전달하지 않으면 카카오톡 서버로 재요청 응답 메세지 전송하기 위해 미리 설정된 기본값 사용 (chatbot_helper._statusCode_success - HTTP 응답 상태 코드 200)
 
     Returns: 카카오톡 서버로 전송할 json format 형식 데이터
     """
@@ -437,9 +446,9 @@ def lambda_response_format(response: dict[str, Any], status_code: int = chatbot_
 
 def error_payload_format(msg: str) -> dict[str, Any]:
     """
-    Description: 챗봇 오류 메세지 json 포맷 리턴
+    Description: 챗봇 오류 내용 리턴
 
-    Parameters: msg - 오류 메세지
+    Parameters: msg - 오류 내용
 
     Returns: 오류 메세지 json 포맷
     """
@@ -448,6 +457,38 @@ def error_payload_format(msg: str) -> dict[str, Any]:
 
 """
 *** 참고 ***
+*** 아마존 웹서비스 문서 ***
+* LambdaContext 클래스
+참고 URL - https://docs.aws.amazon.com/powertools/python/latest/utilities/typing/
+참고 2 URL - https://docs.aws.amazon.com/ko_kr/lambda/latest/dg/python-context.html
+참고 3 URL - https://jibinary.tistory.com/551
+
+* 콜드 스타트(coldstart)
+아마존 웹서비스 람다 함수(AWS Lambda Function) 초기 응답 속도 느림(coldstart) 개선 (2025.07.16 minjae)
+참고 URL - https://docs.aws.amazon.com/ko_kr/lambda/latest/dg/provisioned-concurrency.html
+참고 2 URL - https://jeonghwan-kim.github.io/dev/2021/04/01/aws-lambda-cold-start.html  
+참고 3 URL - https://blog.naver.com/chandong83/221975639559
+참고 4 URL - https://wave35.tistory.com/150
+참고 5 URL - https://chatgpt.com/c/687872f0-2ad0-8010-9eb3-2b4e8dba2ba8
+참고 6 URL - https://chatgpt.com/c/6878b74a-b478-8010-b277-313b21eeceee
+
+* 아마존 웹서비스 람다 함수(AWS Lambda Function)와 EventBridge 조합으로 일정 시간마다 함수 handler 호출하여 초기 응답 속도 느림(coldstart) 개선 (2025.07.18 minjae)
+참고 URL - https://docs.aws.amazon.com/ko_kr/eventbridge/latest/userguide/eb-run-lambda-schedule.html
+참고 2 URL - https://docs.aws.amazon.com/ko_kr/AmazonCloudWatch/latest/logs/example_cross_LambdaScheduledEvents_section.html
+참고 3 URL - https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/python/example_code/lambda#readme
+참고 4 URL - https://docs.aws.amazon.com/ko_kr/lambda/latest/dg/with-eventbridge-scheduler.html
+참고 5 URL - https://jimmy-ai.tistory.com/505
+참고 6 URL - https://www.freeconvert.com/ko/time/utc-to-kst
+참고 7 URL - https://chatgpt.com/c/687df65c-c718-8010-802f-8f8d03c81f5f
+참고 8 URL - https://chatgpt.com/c/6886e63d-c67c-8010-9056-c578b981c95e
+참고 9 URL - https://zamezzz.tistory.com/entry/Serverless-%EC%84%9C%EB%B9%84%EC%8A%A4-%EA%B0%9C%EB%B0%9C-6-Lambda-%EC%84%B1%EB%8A%A5-%EC%98%AC%EB%A6%AC%EA%B8%B0
+
+* 아마존 웹서비스 람다 함수(AWS Lambda Function) API Gateway 오류 처리
+참고 URL - https://docs.aws.amazon.com/ko_kr/apigateway/latest/developerguide/handle-errors-in-lambda-integration.html
+
+* 페이로드 (payload)
+참고 URL - https://ssue95.tistory.com/30
+
 *** 파이썬 문서 ***
 * threading.Thread
 참고 URL - https://docs.python.org/ko/3/library/threading.html#thread-objects
@@ -485,9 +526,9 @@ default value parameter - 함수를 호출할 때 값을 전달하지 않으면 
 참고 3 URL - https://fierycoding.tistory.com/58
 참고 4 URL - https://claude.ai/chat/e9803e84-1f2c-4fff-9f22-3603392000ad
 
-* Blocking VS Non-Blocking
+* Blocking vs Non-Blocking
 Blocking - 호출된 함수가 자신이 할 일을 모두 마칠 때까지 제어권을 계속 가지고서 호출한 함수에게 바로 돌려주지 않는 것.
-Non-Blocking - 호출된 함수가 자신이 할 일을 채 마치지 않았더라도 바로 제어권을 건네주어 (return) 호출한 함수가 다른 일을 진행할 수 있도록 해주는 것.
+Non-Blocking - 호출된 함수가 자신이 할 일을 채 마치지 않았더라도 바로 제어권을 건네주어(return) 호출한 함수가 다른 일을 진행할 수 있도록 해주는 것.
 참고 URL - https://exmemory.tistory.com/78
 
 * 큐 (queue) except Empty:
@@ -497,38 +538,6 @@ Non-Blocking - 호출된 함수가 자신이 할 일을 채 마치지 않았더�
 json 파싱 (parsing)은 json 형식의 문자열 (str)을 프로그래밍 언어에서 사용할 수 있는 객체 (dict 등등...)로 변환하는 과정이다.
 참고 URL - https://docs.python.org/ko/3/library/json.html
 참고 2 URL - https://kyeong-hoon.tistory.com/226
-
-*** 아마존 웹서비스 문서 ***
-* LambdaContext 클래스
-참고 URL - https://docs.aws.amazon.com/powertools/python/latest/utilities/typing/
-참고 2 URL - https://docs.aws.amazon.com/ko_kr/lambda/latest/dg/python-context.html
-참고 3 URL - https://jibinary.tistory.com/551
-
-* 콜드 스타트 (coldstart)
-아마존 웹서비스 람다 함수 (AWS Lambda Function) 초기 응답 속도 느림 개선 (2025.07.16 minjae)
-참고 URL - https://docs.aws.amazon.com/ko_kr/lambda/latest/dg/provisioned-concurrency.html
-참고 2 URL - https://jeonghwan-kim.github.io/dev/2021/04/01/aws-lambda-cold-start.html
-참고 3 URL - https://blog.naver.com/chandong83/221975639559
-참고 4 URL - https://wave35.tistory.com/150
-참고 5 URL - https://chatgpt.com/c/687872f0-2ad0-8010-9eb3-2b4e8dba2ba8
-참고 6 URL - https://chatgpt.com/c/6878b74a-b478-8010-b277-313b21eeceee
-
-아마존 웹서비스 람다 함수 (AWS Lambda Function)와 EventBridge 조합으로 일정 시간마다 함수 handler 호출하여 초기 응답 속도 느림 개선 (2025.07.18 minjae)
-참고 URL - https://docs.aws.amazon.com/ko_kr/eventbridge/latest/userguide/eb-run-lambda-schedule.html
-참고 2 URL - https://docs.aws.amazon.com/ko_kr/AmazonCloudWatch/latest/logs/example_cross_LambdaScheduledEvents_section.html
-참고 3 URL - https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/python/example_code/lambda#readme
-참고 4 URL - https://docs.aws.amazon.com/ko_kr/lambda/latest/dg/with-eventbridge-scheduler.html
-참고 5 URL - https://jimmy-ai.tistory.com/505
-참고 6 URL - https://www.freeconvert.com/ko/time/utc-to-kst
-참고 7 URL - https://chatgpt.com/c/687df65c-c718-8010-802f-8f8d03c81f5f
-참고 8 URL - https://chatgpt.com/c/6886e63d-c67c-8010-9056-c578b981c95e
-참고 9 URL - https://zamezzz.tistory.com/entry/Serverless-%EC%84%9C%EB%B9%84%EC%8A%A4-%EA%B0%9C%EB%B0%9C-6-Lambda-%EC%84%B1%EB%8A%A5-%EC%98%AC%EB%A6%AC%EA%B8%B0
-
-* 아마존 웹서비스 람다 함수 (AWS Lambda Function) API Gateway 오류 처리
-참고 URL - https://docs.aws.amazon.com/ko_kr/apigateway/latest/developerguide/handle-errors-in-lambda-integration.html
-
-* 페이로드 (payload)
-참고 URL - https://ssue95.tistory.com/30
 
 *** 기타 문서 ***
 * HTTP 응답 상태 코드

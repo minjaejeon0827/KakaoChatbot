@@ -15,7 +15,7 @@ class EnumValidator(IntEnum):   # 명시적으로 IntEnum 클래스 상속
 
     Attributes: DATA_TYPE_MISMATCH - 데이터 타입 불일치 (default: -2)
                 VALIDATION_ERROR - 데이터 유효성 검사 오류 (default: -1)
-                NOT_EXISTENCE - 데이터 존재 안 함. (default: 0)
+                NOT_EXISTENCE - 데이터 없음. (default: 0)
                 EXISTENCE - 데이터 존재함. (default: 1)
     """
     
@@ -35,4 +35,4 @@ class EnumValidator(IntEnum):   # 명시적으로 IntEnum 클래스 상속
         Returns: 데이터 존재 여부 문자열 
         """
         
-        return "데이터 존재함." if value == _class.EXISTENCE else "데이터 존재 안 함."
+        return "데이터 존재함." if value == _class.EXISTENCE else "데이터 없음."

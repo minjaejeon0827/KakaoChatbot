@@ -126,6 +126,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
             messageText_mappings[chatbot_helper._start]: lambda: self.__common_basicCard(master_datas[chatbot_helper._startCard]),   # start - 시작 화면
             messageText_mappings[chatbot_helper._beginning]: lambda: self.__common_basicCard(master_datas[chatbot_helper._startCard]),   # start - 처음으로
 
+            messageText_mappings[chatbot_helper._ai_assistant]: lambda: self.__empty_response(master_datas[chatbot_helper._startCard]),   # level1 - AI Assistant
             messageText_mappings[chatbot_helper._remote_text]: lambda: self.__empty_response(master_datas[chatbot_helper._startCard]),   # level1 - 원격 지원
             messageText_mappings[chatbot_helper._ask_chatbot]: lambda: self.__chatbot_carousel(master_datas[chatbot_helper._chatbotCard]),   # level1 - 챗봇 문의
             
@@ -207,7 +208,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
 
         Parameters: self - 카카오 스킬 응답 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
                     outputs - 출력 그룹 리스트
-                    quickReplies - 바로가기 그룹 버튼 리스트 (label + messageText) (non-default value parameter)
+                    quickReplies - 바로가기 그룹 버튼 리스트 (label + messageText)
 
         Returns: 스킬 응답 json 포맷
         """
@@ -238,7 +239,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
         Description: [public] 텍스트 메시지 (text) 카카오톡 채팅방 전송
 
         Parameters: self - 카카오 스킬 응답 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
-                    text - 챗봇 답변 내용 (non-default value parameter)
+                    text - 챗봇 답변 내용
 
         Returns: self.__skillResponse_format(outputs) - 텍스트 메시지 json 포맷
         """
@@ -266,7 +267,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
         Description: [public] 오류 메세지 (error_msg) 카카오톡 채팅방 전송
 
         Parameters: self - 카카오 스킬 응답 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
-                    error_msg - 오류 메세지 (non-default value parameter)
+                    error_msg - 오류 메세지
 
         Returns: self.__skillResponse_format(outputs, quickReplies) - 오류 메세지 json 포맷
         """
@@ -484,7 +485,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
 
         Parameters: self - 카카오 스킬 응답 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
                     master_data - 특정 마스터 데이터
-                    message_prefix - 버튼 messageText 접두사 (non-default value parameter)
+                    message_prefix - 버튼 messageText 접두사
 
         Returns: buttons - [공통] 버튼 리스트 (label + messageText)
         """
@@ -521,7 +522,7 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
 
         Parameters: self - 카카오 스킬 응답 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
                     master_data - 특정 마스터 데이터
-                    message_prefix - 버튼 messageText 접두사 (non-default value parameter)
+                    message_prefix - 버튼 messageText 접두사
 
         Returns: quickReplies - [공통] 바로가기 그룹 버튼 리스트 (label + messageText)
         """
@@ -738,9 +739,13 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
 * Union Type
 참고 URL - https://docs.python.org/ko/3.11/library/stdtypes.html#types-union
 
-* non-default value parameter, default value parameter
+* non-default value parameter (필수 매개변수), default value parameter (기본값 매개변수)
+non-default value parameter - 함수를 호출할 때 반드시 값을 전달해야 하는 매개변수
+default value parameter - 함수를 호출할 때 값을 전달하지 않으면 미리 설정된 기본값을 사용하는 매개변수
 참고 URL - https://docs.python.org/ko/3/glossary.html#term-parameter
 참고 2 URL - https://docs.python.org/3/faq/programming.html#why-are-default-values-shared-between-objects
+참고 3 URL - https://fierycoding.tistory.com/58
+참고 4 URL - https://claude.ai/chat/e9803e84-1f2c-4fff-9f22-3603392000ad
 
 * ValueError
 참고 URL - https://docs.python.org/ko/3.13/library/exceptions.html#ValueError

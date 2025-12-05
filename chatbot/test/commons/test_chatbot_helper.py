@@ -57,7 +57,7 @@ _chatbotItem_Idx = 0   # [챗봇 문의] itemList 'title', 'description'
 # level3 
 _askInst_autodeskProduct = f'{_autodeskProduct} {_instSupport}' # Autodesk 제품 설치 지원
 _askInst_boxProduct = f'{_boxProduct} {_instSupport}'   # 상상진화 BOX 제품 설치 지원
-# _ask_accountProduct = f'{_accountProduct} {_ask}'   # 계정 & 제품배정 문의 
+# _ask_accountProduct = f'{_accountProduct} {_ask}'   # 계정 & 제품배정 문의
 
 # TODO: level4 필요시 구현 예정 (2025.09.05 minjae)
 # level4 
@@ -77,7 +77,7 @@ _video = '동영상'
 _survey = '만족도 조사'  
 
 # 버튼 인덱스 번호
-_videoButton_Idx = 1   # [마지막 화면] 버튼 "동영상" (masterEntity.json -> "endCard" Dictionary -> "buttons" list 객체 인덱스 번호)  
+_videoButton_Idx = 1   # [마지막 화면] 버튼 "동영상" (masterEntity.json -> "endCard" Dictionary -> "buttons" list 객체 인덱스 번호)
 _webLinkUrl_Idx = 0   # [마지막 화면] 버튼 "동영상"과 연동할 webLinkUrl 인덱스 번호 (masterEntity.json -> "endCard" Dictionary -> "autoCADInfos", "revitInfos", "navisworksManageInfos", "infraWorksInfos", "civil3DInfos", "revitBoxInfos", "cadBoxInfos", "energyBoxInfos", "accountInfos" list 객체 인덱스 번호
 _text_Idx = 0   # [마지막 화면] Autodesk, Box 제품별 카카오 챗봇 답변 내용 인덱스 번호
 

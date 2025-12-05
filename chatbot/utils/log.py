@@ -6,20 +6,20 @@
 참고 URL - https://claude.ai/chat/8fc1ceeb-fe95-4d1b-8517-ecec83beb3f2
 """
 
-# 1. 공통 모듈 먼저 import
+# 1. 공통 모듈 (module) 먼저 import
 # from commons import chatbot_helper   # 챗봇 전용 도움말 텍스트
 
-# 2. singleton 모듈 import
+# 2. singleton 모듈 (module) import
 from modules.singleton import KSTFormatter   # 싱글톤 패턴 (singleton)
 
-# 3. 나머지 모듈 import
+# 3. 나머지 모듈 (module) import
 import logging, os, sys
 
 def init_logger(name: str = "chatbot_logger") -> logging.Logger:
     """
     Description: 챗봇 전역 로그 객체 (logger) 생성 및 초기화
 
-    Parameters: name - 챗봇 전역 로그 객체 (logger) 이름 (non-default value parameter)
+    Parameters: name - 챗봇 전역 로그 객체 (logger) 이름
                 참고 URL - https://docs.python.org/ko/3/glossary.html#term-parameter
 
     Returns: logger - 챗봇 전역 로그 객체
@@ -84,6 +84,14 @@ logger = init_logger()   # 챗봇 전역 로그 객체 (logger) 생성 및 초�
 * logging 모듈 Stack Traces 캡쳐 exc_info=True
 참고 URL - https://docs.python.org/ko/3.7/library/logging.html
 참고 2 URL - https://tjlog-tistory.tistory.com/82
+
+* non-default value parameter (필수 매개변수), default value parameter (기본값 매개변수)
+non-default value parameter - 함수를 호출할 때 반드시 값을 전달해야 하는 매개변수
+default value parameter - 함수를 호출할 때 값을 전달하지 않으면 미리 설정된 기본값을 사용하는 매개변수
+참고 URL - https://docs.python.org/ko/3/glossary.html#term-parameter
+참고 2 URL - https://docs.python.org/3/faq/programming.html#why-are-default-values-shared-between-objects
+참고 3 URL - https://fierycoding.tistory.com/58
+참고 4 URL - https://claude.ai/chat/e9803e84-1f2c-4fff-9f22-3603392000ad
 
 * 챗봇 전역 로그 모듈 구현 순서 및 로그 기록 방법
 ​1. instance 설정 - log (로그) instance 설정
