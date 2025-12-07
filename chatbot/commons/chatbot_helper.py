@@ -75,7 +75,7 @@ _start = '/start'   # 시작 화면
 
 # level1
 _ai_assistant = "✨ Coming Soon!\n\nAI Assistant 기능 출시 준비 중!\n더 스마트한 기술지원 기대해주세요.\n\n그동안 기술지원 챗봇 '상진'이가\n설치 업무 도와드릴게요.😊"   # AI Assistant
-_remote_text = '아래 링크를 클릭하시면 원격 지원 프로그램 다운로드 시작됩니다.\nhttps://113366.com/client/download?relayUri=imbu\n\n프로그램 다운로드 완료 후\n상상진화 기술지원 콜센터 02-3474-2263\n연락 부탁드립니다.'   # 원격 지원
+_remote_text = '아래 링크 클릭 시 원격 지원 프로그램 다운로드 시작됩니다.\nhttps://113366.com/client/download?relayUri=imbu\n\n프로그램 다운로드 완료 후\n상상진화 기술지원 콜센터 02-3474-2263\n연락 부탁드립니다.'   # 원격 지원
 _ask_chatbot = f'챗봇 {_ask}'   # 챗봇 문의
 
 # level2

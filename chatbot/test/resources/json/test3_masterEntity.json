@@ -9,7 +9,7 @@
       "description": "▶ 기술지원문의\n월~금요일: 오전 9시 ~ 오후 5시 30분\n주말, 공휴일: 휴무",
       "thumbnail": { "imageUrl": "https://testkakao.s3.ap-northeast-2.amazonaws.com/ssflex.png", "webLinkUrl": "https://www.ssflex.co.kr/" }, 
       "buttons": [ { "label": "챗봇 문의", "messageText": "챗봇 문의", "webLinkUrl": null }, 
-                   { "label": "원격 지원", "messageText": "아래 링크를 클릭하시면 원격 지원 프로그램 다운로드 시작됩니다.\nhttps://113366.com/client/download?relayUri=imbu", "webLinkUrl": null } ],
+                   { "label": "원격 지원", "messageText": "아래 링크 클릭 시 원격 지원 프로그램 다운로드 시작됩니다.\nhttps://113366.com/client/download?relayUri=imbu", "webLinkUrl": null } ],
       "items": [ { "title": null, "description": null } ]
     },
     "chatbotCard": {

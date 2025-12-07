@@ -78,7 +78,7 @@ _checkRequest = '요청사항 확인 중이에요.\n잠시후 아래 말풍선�
 _start = '/start'   # 시작 화면
 
 # level1 
-_remote_text = '아래 링크를 클릭하시면 원격 지원 프로그램 다운로드 시작됩니다.\nhttps://113366.com/client/download?relayUri=imbu'   # 원격 지원
+_remote_text = '아래 링크 클릭 시 원격 지원 프로그램 다운로드 시작됩니다.\nhttps://113366.com/client/download?relayUri=imbu'   # 원격 지원
 _ask_chatbot = f'챗봇 {_ask}'   # 챗봇 문의
 # _chatbotItem_Idx = 0   # [챗봇 문의] itemList "title", "description"
 

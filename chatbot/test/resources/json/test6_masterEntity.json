@@ -14,7 +14,7 @@
         }
       },
       "buttons": [ { "action": "message", "label": "챗봇 문의", "messageText": "챗봇 문의", "webLinkUrl": null }, 
-                   { "action": "message", "label": "원격 지원", "messageText": "아래 링크를 클릭하시면 원격 지원 프로그램 다운로드 시작됩니다.\nhttps://113366.com/client/download?relayUri=imbu", "webLinkUrl": null } ],
+                   { "action": "message", "label": "원격 지원", "messageText": "아래 링크 클릭 시 원격 지원 프로그램 다운로드 시작됩니다.\nhttps://113366.com/client/download?relayUri=imbu", "webLinkUrl": null } ],
       "quickReplies": [ { "action": null, "label": null, "messageText": null } ],
       "itemList": [ { "title": null, "description": null } ]
     },
