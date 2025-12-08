@@ -77,3 +77,16 @@ CMD ["lambda_function.handler"]
 # 2 단계: 카카오 챗봇 관리자센터 최종 배포
 # 10. 카카오 챗봇 관리자센터 이동 -> 화면 좌측 탭 "배포" 클릭 -> 화면 "배포" 이동 -> 항목 "배포 형태" 전체 배포 체크 -> 버튼 "배포" 클릭
 # 11. 카카오 챗봇 최종 배포 완료
+
+# *** 아마존 웹서비스 (AWS) 환경 구축 순서 ***
+# 1 단계: ECR (AWS Elastic Container Registry) 프라이빗 리포지토리 생성 (Private Repositories)
+# 참고 URL - https://docs.aws.amazon.com/ko_kr/AmazonECR/latest/userguide/repository-create.html
+
+# 2 단계: 람다 함수 생성 (Lambda Funtion)
+# 참고 URL - https://docs.aws.amazon.com/ko_kr/lambda/latest/dg/images-create.html
+
+# 3 단계: API Gateway 생성
+# 참고 URL - https://docs.aws.amazon.com/ko_kr/apigateway/latest/developerguide/getting-started.html
+
+# 4 단계: Amazon EventBridge 이벤트 버스 규칙 생성
+# 참고 URL - https://docs.aws.amazon.com/ko_kr/eventbridge/latest/userguide/event-bus-rule-get-started.html

@@ -499,6 +499,19 @@ json 파싱 (parsing)은 json 형식의 문자열 (str)을 프로그래밍 언�
 참고 2 URL - https://kyeong-hoon.tistory.com/226
 
 *** 아마존 웹서비스 문서 ***
+*** 환경 구축 순서 ***
+1 단계: ECR (AWS Elastic Container Registry) 프라이빗 리포지토리 생성 (Private Repositories)
+참고 URL - https://docs.aws.amazon.com/ko_kr/AmazonECR/latest/userguide/repository-create.html
+
+2 단계: 람다 함수 생성 (Lambda Funtion)
+참고 URL - https://docs.aws.amazon.com/ko_kr/lambda/latest/dg/images-create.html
+
+3 단계: API Gateway 생성
+참고 URL - https://docs.aws.amazon.com/ko_kr/apigateway/latest/developerguide/getting-started.html
+
+4 단계: Amazon EventBridge 이벤트 버스 규칙 생성
+참고 URL - https://docs.aws.amazon.com/ko_kr/eventbridge/latest/userguide/event-bus-rule-get-started.html
+
 * LambdaContext 클래스
 참고 URL - https://docs.aws.amazon.com/powertools/python/latest/utilities/typing/
 참고 2 URL - https://docs.aws.amazon.com/ko_kr/lambda/latest/dg/python-context.html
