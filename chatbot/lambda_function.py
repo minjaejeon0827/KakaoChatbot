@@ -521,7 +521,7 @@ json 파싱 (parsing)은 json 형식의 문자열 (str)을 프로그래밍 언�
 참고 3 URL - https://jibinary.tistory.com/551
 
 * 콜드 스타트 (coldstart)
-아마존 웹서비스 람다 함수 (AWS Lambda Function) 초기 응답 속도 느림 개선 (2025.07.16 minjae)
+- 아마존 웹서비스 람다 함수 (AWS Lambda Function) 초기 응답 속도 느림 개선 (2025.07.16 minjae)
 참고 URL - https://docs.aws.amazon.com/ko_kr/lambda/latest/dg/provisioned-concurrency.html
 참고 2 URL - https://jeonghwan-kim.github.io/dev/2021/04/01/aws-lambda-cold-start.html
 참고 3 URL - https://blog.naver.com/chandong83/221975639559
@@ -529,7 +529,7 @@ json 파싱 (parsing)은 json 형식의 문자열 (str)을 프로그래밍 언�
 참고 5 URL - https://chatgpt.com/c/687872f0-2ad0-8010-9eb3-2b4e8dba2ba8
 참고 6 URL - https://chatgpt.com/c/6878b74a-b478-8010-b277-313b21eeceee
 
-아마존 웹서비스 람다 함수 (AWS Lambda Function)와 EventBridge 조합으로 일정 시간마다 함수 handler 호출하여 초기 응답 속도 느림 개선 (2025.07.18 minjae)
+- 아마존 웹서비스 람다 함수 (AWS Lambda Function)와 EventBridge Scheduler 조합으로 일정 시간마다 함수 handler 호출하여 초기 응답 속도 느림 개선 (2025.07.18 minjae)
 참고 URL - https://docs.aws.amazon.com/ko_kr/eventbridge/latest/userguide/eb-run-lambda-schedule.html
 참고 2 URL - https://docs.aws.amazon.com/ko_kr/AmazonCloudWatch/latest/logs/example_cross_LambdaScheduledEvents_section.html
 참고 3 URL - https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/python/example_code/lambda#readme
