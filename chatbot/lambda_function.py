@@ -325,7 +325,7 @@ def is_warmup_request(event_body: dict[str, Any]) -> bool:
     """
 
     try:
-        # 키(key) 누락 체크 - event_body['action']가 존재하지 않는 경우
+        # 키(key) 누락 체크 - event_body['action'] 키(key) 'action' 존재하지 않는 경우
         # 참고 URL - https://chatgpt.com/c/687a0180-e2bc-8010-9a19-90695a1bf477
         if chatbot_helper._action not in event_body:
             raise KeyError(f"가상 컨테이너 웜업 (warmup) 요청 여부 확인 event_body['action'] - '{chatbot_helper._action}' 키 값 없음.")
