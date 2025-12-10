@@ -26,7 +26,7 @@ RUN pip install --no-cache-dir -r requirements.txt --target /tmp/python
 # ============================
 # Stage 2: Runtime Image
 # ============================
-FROM public.ecr.aws/lambda/python:3.11
+FROM public.ecr.aws/lambda/python:3.11 AS runtime
 
 # Stage 1에서 빌드한 패키지들만 복사 (가볍고 빠른 런타임)
 COPY --from=build /tmp/python /var/task/
