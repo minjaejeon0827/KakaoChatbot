@@ -18,6 +18,7 @@ Race의 뜻 그대로, 간단히 말하면 경쟁하는 상태, 즉 두 개의 �
 
 # 2025-12-16 Ubuntu linux 테스트 커밋
 # 2025-12-16 Ubuntu linux 2차 테스트 커밋
+# 2025-12-16 Ubuntu linux 3차 테스트 커밋
 
 # 1. 공통 모듈 (module) 먼저 import
 from commons import chatbot_helper   # 챗봇 전용 도움말 텍스트
