@@ -46,7 +46,7 @@ class SingletonBase:
     """
     Description: 싱글톤 (singleton) 패턴 기본형 클래스
 
-                 * 참고
+                 *** 참고 ***
                  class Docstring 작성 가이드라인
                  참고 URL - https://claude.ai/chat/0556e5bc-59d5-4d40-8b12-acf1e8388ee9
  
@@ -97,7 +97,7 @@ class MasterEntity(SingletonBase):   # 상속 구조 단순화 하기 위해 명
     """
     Description: 마스터 데이터 싱글톤 (singleton) 클래스
 
-                 * 참고
+                 *** 참고 ***
                  마스터 데이터 - SW 프로그램을 실행하기 위해 사용되는 기준 데이터 의미. (특정 기업의 업무지식 및 비즈니스 운영의 핵심 정보 반영 필수!) 
                  참고 URL - https://en.wikipedia.org/wiki/Master_data
                  참고 2 URL - https://wiki1.kr/index.php/%EB%A7%88%EC%8A%A4%ED%84%B0%EB%8D%B0%EC%9D%B4%ED%84%B0#cite_note-masterdata_synopsis-2

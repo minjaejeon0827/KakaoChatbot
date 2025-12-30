@@ -53,7 +53,7 @@ logger.addHandler(streamHandler)
 # logger.addHandler(fileHandler)
 
 """
-* 참고 
+*** 참고 ***
 파이썬 logging 모듈 사용하여 로그 기록하기 
 참고 URL - https://docs.python.org/ko/3/library/logging.html
 참고 2 URL - https://docs.python.org/ko/3/howto/logging.html#basic-logging-tutorial

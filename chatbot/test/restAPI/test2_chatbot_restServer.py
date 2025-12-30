@@ -58,7 +58,7 @@ async def get_masterDownLoadAsync(masterEntity_json_file_path: str) -> dict[str,
     finally: return master_datas
 
 """
-* 참고
+*** 참고 ***
 비동기 프로그래밍 전용 모듈 asyncio (asyncio는 async/await 구문을 사용하여 동시성 코드를 작성하는 라이브러리이다.)
 참고 URL - https://docs.python.org/3/library/asyncio.html
 참고 2 URL - https://docs.python.org/ko/3/library/asyncio-task.html

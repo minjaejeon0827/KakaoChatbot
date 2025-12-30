@@ -25,7 +25,7 @@ COPY . .
 # 람다 함수(Lambda Function) 핸들러 설정
 CMD ["lambda_function.handler"]
 
-# * 참고
+# *** 참고 ***
 # *** 카카오 챗봇 배포 순서 ***
 # 1 단계: Docker 카카오 챗봇 이미지 배포 - 아마존 웹서비스(AWS) ECR(Elastic Container Registry)
 # 참고 URL - https://chatgpt.com/c/6822e459-65f8-8010-b848-afebf01bf52e

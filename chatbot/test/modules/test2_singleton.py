@@ -74,7 +74,7 @@ class MasterEntity:   # 암시적으로 object 클래스 상속
     """
     Description: 마스터 데이터 싱글톤(singleton) 클래스
 
-                 * 참고
+                 *** 참고 ***
                  마스터 데이터 - SW 프로그램을 실행하기 위해 사용되는 기준 데이터 의미. (특정 기업의 업무지식 및 비즈니스 운영의 핵심 정보 반영 필수!) 
                  참고 URL - https://en.wikipedia.org/wiki/Master_data
                  참고 2 URL - https://wiki1.kr/index.php/%EB%A7%88%EC%8A%A4%ED%84%B0%EB%8D%B0%EC%9D%B4%ED%84%B0#cite_note-masterdata_synopsis-2

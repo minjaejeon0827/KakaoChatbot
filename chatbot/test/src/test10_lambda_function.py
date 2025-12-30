@@ -161,7 +161,7 @@ def chatbot_response(kakao_request: dict[str, Any], res_queue: q.Queue, file_pat
                 res_queue - 챗봇 답변 내용 담을 큐 객체
                 file_path - 아마존 웹서비스 람다 함수(AWS Lambda Function) -> 임시 로그 텍스트 파일 상대 경로 ('/tmp/botlog.txt')
 
-                * 참고
+                *** 참고 ***
                 /tmp 임시 디렉터리(스토리지) - 아마존 웹서비스 람다 함수(AWS Lambda Function)에서 파일을 저장할 수 있는 임시 로컬 스토리지 영역
                 실행 결과(Execution results)는 람다 함수(Lambda Function) 콘솔 "테스트" 탭에서 함수 실행 성공 여부, 실행 결과, 임시 로그 확인 가능
                 참고 URL - https://docs.aws.amazon.com/ko_kr/lambda/latest/dg/configuration-ephemeral-storage.html#configuration-ephemeral-storage-use-cases
@@ -228,7 +228,7 @@ def chatbot_response(kakao_request: dict[str, Any], res_queue: q.Queue, file_pat
         # if '/error'== userRequest_msg:   # 오류 테스트
         #     raise Exception("사유: 오류 테스트!")
         
-        # *** 참고 - masterEntity.get_isValid.name - Enum 열거형 구조체 EnumValidator 멤버변수 이름
+        # 참고 - masterEntity.get_isValid.name - Enum 열거형 구조체 EnumValidator 멤버변수 이름
         if EnumValidator.VALIDATION_ERROR == masterEntity.get_isValid:   # 데이터 유효성 검사 결과 오류인 경우
             raise ValueError("데이터 유효성 검사 오류.")
         

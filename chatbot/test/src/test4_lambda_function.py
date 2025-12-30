@@ -151,7 +151,7 @@ def chatbot_response(kakao_request, res_queue, file_name):
         res_queue (object): 챗봇 답변 내용 담을 큐(queue) 객체 (Queue class)
         file_name (str): 아마존 웹서비스 람다 함수(AWS Lambda function) -> 임시 로그 텍스트 파일('/tmp/botlog.txt') 상대 경로
 
-        * 참고 
+        *** 참고 *** 
         /tmp 임시 디렉터리(스토리지) - 아마존 웹서비스 람다 함수(AWS Lambda function)에서 파일을 저장할 수 있는 임시 로컬 스토리지 영역
         실행 결과(Execution results)는 람다 함수(Lambda Function) 콘솔 "테스트" 탭에서 함수 실행 성공 여부, 실행 결과, 임시 로그 확인 가능
         참고 URL - https://docs.aws.amazon.com/ko_kr/lambda/latest/dg/configuration-ephemeral-storage.html#configuration-ephemeral-storage-use-cases
@@ -299,7 +299,7 @@ def saveLog(file_name, msg):
     dbSave(file_name, msg)
 
 """
-* 참고
+*** 참고 ***
 ColdStart(콜드 스타트)
 아마존 웹서비스 람다 함수(AWS Lambda function) 초기 응답 속도 느림(Cold Start) 개선 (2025.07.16 minjae)
 참고 URL - https://docs.aws.amazon.com/ko_kr/lambda/latest/dg/provisioned-concurrency.html

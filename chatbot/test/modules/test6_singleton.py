@@ -63,7 +63,7 @@ class SingletonBase:
     """
     Description: 싱글톤 (singleton) 패턴 기본 클래스
 
-                 * 참고
+                 *** 참고 ***
                  class Docstring 작성 가이드라인
                  참고 URL - https://claude.ai/chat/0556e5bc-59d5-4d40-8b12-acf1e8388ee9
  
