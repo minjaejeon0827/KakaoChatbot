@@ -1,4 +1,6 @@
-# [openai 전용 모듈] openai==1.77.0
+"""
+* OpenAI 전용 유틸 (util) openai==1.77.0
+"""
 
 # 터미널창에 Langchain 라이브러리 설치 명령어 입력 및 엔터  
 # pip install "pydantic>=2.5.2,<3.0.0" langchain-community langchain-openai chromadb
