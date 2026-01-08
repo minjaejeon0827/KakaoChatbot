@@ -42,7 +42,7 @@ from aws_lambda_powertools.utilities.typing import LambdaContext
 from queue import Queue, Empty   # 자료구조 queue (deque 기반)
 
 import json        # json 데이터 처리
-import threading   # 멀티스레드 패키지
+import threading   # 멀티스레드
 import time        # 챗봇 답변 시간 계산
 
 # 마스터 데이터 유효성 검사 대상 리스트
