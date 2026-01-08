@@ -3,8 +3,9 @@
 코드 리뷰 참고 URL - https://chatgpt.com/c/691e9f6e-3940-832a-afda-92c53ae4b49a
 """
 
-import os
 from utils.log import logger   # 챗봇 전역 로그 객체 (logger)
+
+import os                      # 폴더/파일 처리
 
 def create_tmp_file(file_path: str) -> None:
     """
