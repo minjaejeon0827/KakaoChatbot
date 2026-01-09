@@ -1,0 +1,755 @@
+"""
+* [카카오톡 서버 전송 용도] 스킬 응답 json 포맷 전용 모듈 (module)
+코드 리뷰 
+참고 URL - https://chatgpt.com/c/69002b43-44c0-8322-8298-e7871b39da2a
+참고 2 URL - https://chatgpt.com/c/691c1cc3-6614-8321-bda2-126705ee5b89
+
+* 챗봇 응답 타입별 json 포맷
+참고 URL - https://kakaobusiness.gitbook.io/main/tool/chatbot/skill_guide/answer_json_format
+
+* 카카오 응답 json 포맷 "buttons" VS "quickReplies" 차이점
+- "quickReplies"의 경우 "action": "webLink" 기능 실행 불가.
+
+* 메타 데이터 (meta_data)
+참고 URL - https://namu.wiki/w/%EB%A9%94%ED%83%80%EB%8D%B0%EC%9D%B4%ED%84%B0
+참고 2 URL - https://ko.wikipedia.org/wiki/%EB%A9%94%ED%83%80%EB%8D%B0%EC%9D%B4%ED%84%B0#cite_note-NISO-22
+
+* Race Condition
+- 두 개 이상의 프로세스가 공통 자원(데이터)을 병행적으로 (concurrently) 읽거나 쓰는 동작을 할 때, 공통 자원(데이터)에 대한 접근이 어떤 순서에 따라 이루어졌는지에 따라 그 실행 결과가 같지 않고 달라지는 상황을 말한다.
+Race의 뜻 그대로, 간단히 말하면 경쟁하는 상태, 즉 두 개의 스레드가 하나의 자원 (공통 자원(데이터))을 놓고 서로 사용하려고 경쟁하는 상황을 말한다.
+참고 URL - https://en.wikipedia.org/wiki/Race_condition
+참고 2 URL - https://namu.wiki/w/%EA%B2%BD%EC%9F%81%20%EC%83%81%ED%83%9C
+참고 3 URL - https://lake0989.tistory.com/121
+"""
+
+# 1. 공통 모듈 (module) 먼저 import
+from commons import chatbot_helper   # 챗봇 전용 도움말 텍스트
+
+# 2. log 모듈 (module) import
+from utils.log import logger   # 챗봇 전역 로그 객체 (logger)
+
+# 3. Type Hints class Any import
+from typing import Any
+
+# 4. 나머지 모듈 (module) import
+# from functools import cached_property   # 속성 (property)의 결과 캐싱하여 속성 (property)이 여러 번 호출될 때마다 매번 계산하지 않고 처음 계산된 값 재사용
+
+# class KakaoResponseFormatter(object):   # 명시적으로 object 클래스 상속
+class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
+    """
+    Description: 카카오 스킬 응답 json 포맷 클래스
+
+                 *** 참고 ***
+                 class Docstring 작성 가이드라인
+                 참고 URL - https://claude.ai/chat/0556e5bc-59d5-4d40-8b12-acf1e8388ee9
+ 
+                 Properties Docstring 작성 가이드라인
+                 참고 URL - https://claude.ai/chat/37ddea1f-89db-470b-b789-1781893801b7
+
+    Attributes: __master_datas (dict[str, Any]) - 전체 마스터 데이터
+                __messageText_mappings (dict[str, Any]) - 챗봇 버튼 메시지 텍스트 매핑 Dictionary 타입 객체
+
+    Parameters: master_datas (dict[str, Any]) - 전체 마스터 데이터
+                messageText_mappings (dict[str, Any]) - 챗봇 버튼 메시지 텍스트 매핑 Dictionary 타입 객체
+
+    Properties (읽기 전용): 없음. (추후 필요시 구현 예정!)
+
+    Methods: get_response - 카카오 json 포맷 가져오기
+
+             __skillResponse_format - 스킬 응답 json 포맷
+             simple_text - 텍스트 메시지 (text) 카카오톡 채팅방 전송
+             error_text - 오류 메세지 (error_msg) 카카오톡 채팅방 전송
+             timeOver_empty_response - 챗봇 응답 시간 5초 초과시 비어있는 응답 메세지 카카오톡 채팅방 전송 (기술지원 문의 제외 일반 문의 또는 응답 메시지 출력하고 싶지 않은 경우 모두 해당)
+             timeOver_quickReplies - 챗봇 응답 시간 5초 초과시 응답 재요청 메세지 (requestAgain_msg) 카카오톡 채팅방 전송
+
+             __quickReplies_format - 바로가기 그룹 (quickReplies) json 포맷
+             __textCard_format - 텍스트 카드 (textCard) json 포맷
+             __basicCard_format - 기본형 카드 (basicCard) json 포맷
+             __carousel_format - 아이템형 케로셀 (carousel) json 포맷
+
+             __empty_response - 비어있는 응답 메세지 카카오톡 채팅방 전송 (기술지원 문의 제외 일반 문의 또는 응답 메시지 출력하고 싶지 않은 경우 모두 해당)
+             __create_buttons - [공통] 버튼 리스트 생성
+             __create_quickReplies - [공통] 바로가기 그룹 (quickReplies) 버튼 리스트 생성
+             __common_basicCard - [공통] 기본형 카드 (basicCard) 카카오톡 채팅방 전송
+             __common_quickReplies - [공통] Autodesk or 상상진화 BOX 제품 설치 지원 바로가기 그룹 (quickReplies) 카카오톡 채팅방 전송
+             __common_ver_quickReplies - [공통] Autodesk or 상상진화 BOX 제품 버전 바로가기 그룹 (quickReplies) 카카오톡 채팅방 전송
+             
+             __chatbot_carousel - 챗봇 문의 아이템형 케로셀 (carousel) 카카오톡 채팅방 전송
+             __end_basicCard - 마지막화면 기본형 카드 (basicCard) 카카오톡 채팅방 전송
+
+    Notes: 없음. (추후 필요시 작성 예정!)
+    """
+
+    __master_datas: dict[str, Any]
+    __messageText_mappings: dict[str, Any]
+
+    def __init__(self, master_datas: dict[str, Any], messageText_mappings: dict[str, Any]) -> None:
+        """
+        Description: 생성된 객체 초기화
+
+                     *** 주요 특징 ***
+                     1. __new__ 메서드는 해당 클래스 (KakaoResponseFormatter)에 정의되어 있지 않으면 알아서 부모 클래스 (object)의 __new__ 메서드가 호출되어 객체 생성
+                     2. 객체 생성 시 전달된 모든 인자 (master_datas 제외)를 __new__ 메서드가 먼저 받고, 그 다음 __init__ 메서드로 전달
+                     3. 생성된 객체에 속성 (property) 추가 및 값 할당 
+
+                     참고 URL - https://docs.python.org/ko/3.6/reference/datamodel.html#object.__new__
+                     참고 2 URL - https://docs.python.org/ko/3.6/reference/datamodel.html#object.__init__
+
+        Parameters: self - 카카오 스킬 응답 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
+                    master_datas - 전체 마스터 데이터
+                    messageText_mappings - 챗봇 버튼 메시지 텍스트 매핑 Dictionary 타입 객체
+
+        Returns: 없음.
+        """
+
+        self.__master_datas = master_datas
+        self.__messageText_mappings = messageText_mappings
+        
+    def get_response(self, userRequest_msg: str) -> dict[str, Any]:
+        """
+        Description: [public] 카카오 json 포맷 기반 응답 데이터 가져오기
+
+        Parameters: self - 카카오 스킬 응답 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
+                    userRequest_msg - 사용자 입력 채팅 메세지
+
+        Returns: dict[str, Any] key 
+                 "payload" - 카카오톡 서버로 전송할 json 포맷 기반 챗봇 답변 메시지 (페이로드),
+                 "meta_data" - 특정 마스터 데이터 (예) 아이템 카드 (basicCard, carousel) or 바로가기 그룹 (quickReplies)
+        """
+
+        master_datas = self.__master_datas   # 전체 마스터 데이터
+        messageText_mappings = self.__messageText_mappings   # 챗봇 버튼 메시지 텍스트 매핑 Dictionary 타입 객체
+
+        # 파이썬 람다 표현식
+        # 참고 URL - https://docs.python.org/ko/2/tutorial/controlflow.html#lambda-expressions
+        eq_operator_mappings = {   # if 조건절 eq 연산자(==) 매핑 Dictionary 타입 객체
+            messageText_mappings[chatbot_helper._start]: lambda: self.__common_basicCard(master_datas[chatbot_helper._startCard]),   # start - 시작 화면
+            messageText_mappings[chatbot_helper._beginning]: lambda: self.__common_basicCard(master_datas[chatbot_helper._startCard]),   # start - 처음으로
+
+            messageText_mappings[chatbot_helper._ai_assistant]: lambda: self.__empty_response(master_datas[chatbot_helper._startCard]),   # level1 - AI Assistant
+            messageText_mappings[chatbot_helper._remote_text]: lambda: self.__empty_response(master_datas[chatbot_helper._startCard]),   # level1 - 원격 지원
+            messageText_mappings[chatbot_helper._ask_chatbot]: lambda: self.__chatbot_carousel(master_datas[chatbot_helper._chatbotCard]),   # level1 - 챗봇 문의
+            
+            messageText_mappings[chatbot_helper._instSupport_adskProduct]: lambda: self.__common_quickReplies(master_datas[chatbot_helper._adskReplies]),   # level2 - Autodesk 제품 설치 지원
+            messageText_mappings[chatbot_helper._instSupport_boxProduct]: lambda: self.__common_quickReplies(master_datas[chatbot_helper._boxReplies]),   # level2 - 상상진화 BOX 제품 설치 지원
+
+            # level3 - 상상진화 BOX 제품 버전
+            messageText_mappings[chatbot_helper._revitBox]: lambda: self.__common_ver_quickReplies(userRequest_msg, master_datas[chatbot_helper._boxVerReplies]),
+            messageText_mappings[chatbot_helper._cadBox]: lambda: self.__common_ver_quickReplies(userRequest_msg, master_datas[chatbot_helper._boxVerReplies]),
+            messageText_mappings[chatbot_helper._energyBox]: lambda: self.__common_ver_quickReplies(userRequest_msg, master_datas[chatbot_helper._boxVerReplies]),
+
+            # level3 - Autodesk 제품 버전
+            messageText_mappings[chatbot_helper._autoCAD]: lambda: self.__common_ver_quickReplies(userRequest_msg, master_datas[chatbot_helper._adskVerReplies]),
+            messageText_mappings[chatbot_helper._revit]: lambda: self.__common_ver_quickReplies(userRequest_msg, master_datas[chatbot_helper._adskVerReplies]),
+            messageText_mappings[chatbot_helper._navisworksManage]: lambda: self.__common_ver_quickReplies(userRequest_msg, master_datas[chatbot_helper._adskVerReplies]),
+            messageText_mappings[chatbot_helper._infraWorks]: lambda: self.__common_ver_quickReplies(userRequest_msg, master_datas[chatbot_helper._adskVerReplies]),
+            messageText_mappings[chatbot_helper._civil3D]: lambda: self.__common_ver_quickReplies(userRequest_msg, master_datas[chatbot_helper._adskVerReplies]) 
+        }
+
+        in_operator_mappings = {   # if 조건절 in 연산자 매핑 Dictionary 타입 객체
+            # end - 텍스트 + basicCard Autodesk or 상상진화 BOX 제품 설치 방법 매핑 Dictionary 타입 객체
+            messageText_mappings[f"{chatbot_helper._instType} {chatbot_helper._revitBox}"]: lambda: self.__end_basicCard(userRequest_msg, master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._revitBoxInfos]),
+            messageText_mappings[f"{chatbot_helper._instType} {chatbot_helper._cadBox}"]: lambda: self.__end_basicCard(userRequest_msg, master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._cadBoxInfos]),
+            messageText_mappings[f"{chatbot_helper._instType} {chatbot_helper._energyBox}"]: lambda: self.__end_basicCard(userRequest_msg, master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._energyBoxInfos]),
+            messageText_mappings[f"{chatbot_helper._instType} {chatbot_helper._autoCAD}"]: lambda: self.__end_basicCard(userRequest_msg, master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._autoCADInfos]),
+            messageText_mappings[f"{chatbot_helper._instType} {chatbot_helper._revit}"]: lambda: self.__end_basicCard(userRequest_msg, master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._revitInfos]),
+            messageText_mappings[f"{chatbot_helper._instType} {chatbot_helper._navisworksManage}"]: lambda: self.__end_basicCard(userRequest_msg, master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._navisworksManageInfos]),
+            messageText_mappings[f"{chatbot_helper._instType} {chatbot_helper._infraWorks}"]: lambda: self.__end_basicCard(userRequest_msg, master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._infraWorksInfos]),
+            messageText_mappings[f"{chatbot_helper._instType} {chatbot_helper._civil3D}"]: lambda: self.__end_basicCard(userRequest_msg, master_datas[chatbot_helper._endCard], master_datas[chatbot_helper._endCard][chatbot_helper._civil3DInfos])
+        }
+
+        try:
+            logger.info("[테스트] 카카오 json 포맷 가져오기 - 시작!")
+            
+            # TODO: 아래 주석친 코드 필요시 참고 (2025.10.30 minjae)
+            # raise Exception(chatbot_helper._error_title + 
+            #                 '사유: 카카오 json 포맷 가져오기 오류 발생!!!\n'+
+            #                 chatbot_helper._error_ssflex)   # 예외 발생시킴
+
+            # 브루트 포스 완전 탐색 알고리즘 (Brute Force Algorithm) - 무차별 대입법이라고 불리며, 문제를 해결하기 위해 가능한 경우의 수를 모두 검사(완전 탐색) 해보는 방법이다.
+            # 참고 URL - https://ko.wikipedia.org/wiki/%EB%AC%B4%EC%B0%A8%EB%B3%84_%EB%8C%80%EC%9E%85_%EA%B2%80%EC%83%89
+            # 참고 2 URL - https://wikidocs.net/233719
+            # 참고 3 URL - https://youtu.be/QhMY4t2xwG0?si=uYsaL7CLHmx-RHV8
+
+            # eq_operator_mappings, in_operator_mappings Dictionary 타입 객체들을 for문으로 루핑하기 위해 items() 메서드 사용 (2025.10.29 minjae)
+            # 참고 URL - https://docs.python.org/ko/3.13/tutorial/datastructures.html#looping-techniques
+            # 조기 종료(return) 통해 불필요한 후속 탐색을 줄이는 최적화된 브루트 포스 완전 탐색 알고리즘 (Brute Force Algorithm) - "브루트 포스(Brute Force) 완전 탐색 알고리즘 기반 탐색 구조 + 그리디(Greedy) 알고리즘 방식 조기 종료" 혼합형
+            for key, handler in eq_operator_mappings.items():   # 사용자 입력(userRequest_msg)에 맞는 핸들러 함수(handler) 찾아 실행
+                if key == userRequest_msg:
+                    logger.info(f"[테스트] [eq_operator_mappings] key: '{key}', userRequest_msg: '{userRequest_msg}'")
+                    return handler()
+
+            for key, handler in in_operator_mappings.items():   # 사용자 입력(userRequest_msg)에 맞는 핸들러 함수(handler) 찾아 실행
+                if key in userRequest_msg:
+                    logger.info(f"[테스트] [in_operator_mappings] key: '{key}', userRequest_msg: '{userRequest_msg}'")
+                    return handler()
+
+            # 오류 메시지 "TypeError: cannot unpack non-iterable NoneType object" 출력 원인 파악 (2025.10.30 minjae)
+            # 오류 원인 - 함수나 메서드가 None 값을 반환했을 때, 해당 None 값을 언패킹 (unpacking) 하려고 시도할 경우 발생. 즉, Python에서 None 객체는 반복 (iteration)이 불가능하므로, 언패킹 (unpacking) 불가.
+            # 참고 URL - https://python.realjourney.co.kr/entry/Pytorch-TypeError-cannot-unpack-non-iterable-NoneType-object
+
+            # 사용자가 카카오 챗봇 버튼이 아닌 일반 메시지를 채팅창에 입력시 아래처럼 오류 메시지가 출력되어 원인 파악하니 함수 실행 결과 None으로 반환되고
+            # lambda_function.py 소스파일 -> chatbot_response 함수에서 res_queue.put(kakao_response[chatbot_helper._payload]) 실행할 때 발생하는 오류로 확인 되어 아래처럼 else 절 코드 추가 (2025.10.30 minjae)
+            # 참고 URL - https://claude.ai/chat/2035baf1-0f86-4d08-af37-0091c8358dbb
+            # 오류 메시지 - "TypeError: 'NoneType' object is not subscriptable"
+            logger.info("[테스트] [기술지원 문의 제외 일반 문의] 카카오 json 포맷 가져오기 - 완료!")
+            return self.__empty_response(master_datas[chatbot_helper._emptyResponse])   # 기술지원 문의 제외 일반 문의
+
+        except (KeyError, ValueError, TypeError) as e:
+            logger.error(f"[테스트] 데이터 유효성 오류 - {str(e)}", exc_info=True)
+            raise
+        except Exception as e:
+            logger.critical(f"[테스트] 시스템 오류 - {str(e)}", exc_info=True)
+            raise
+
+    def __skillResponse_format(self, outputs: list[dict], quickReplies: list[dict] | None = None) -> dict[str, Any]:
+        """
+        Description: [private] 스킬 응답 json 포맷
+
+        Parameters: self - 카카오 스킬 응답 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
+                    outputs - 출력 그룹 리스트
+                    quickReplies - 바로가기 그룹 버튼 리스트 (label + messageText)
+
+        Returns: 스킬 응답 json 포맷
+        """
+    
+        if None is quickReplies: quickReplies = []
+
+        logger.info(f"[테스트] 스킬 응답 템플릿 출력 그룹 리스트 - outputs: '{outputs}', 바로가기 그룹 버튼 리스트 - quickReplies: '{quickReplies}'")
+
+        return {
+            "version": "2.0",
+            "template": {
+                "outputs": outputs,
+                "quickReplies": quickReplies
+            },
+            # TODO: 아래 주석친 코드 필요시 참고 (2025.11.24 minjae)
+            # "context": {
+            #     "values": []
+            # },
+            # "data": {
+            #     "msg": "안녕하세요.",
+            #     "name": "상진",
+            #     "position": "Autodesk 기술지원 챗봇"
+            # }
+        }
+    
+    def simple_text(self, text: str | None = None) -> dict[str, Any]:
+        """
+        Description: [public] 텍스트 메시지 (text) 카카오톡 채팅방 전송
+
+        Parameters: self - 카카오 스킬 응답 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
+                    text - 챗봇 답변 메시지
+
+        Returns: self.__skillResponse_format(outputs) - 텍스트 메시지 json 포맷
+        """
+
+        logger.info(f"[테스트] 텍스트 메세지 text: '{text}'")
+
+        outputs = []
+
+        if text:   # text에 할당된 값이 None 또는 공백("")이 아닌 경우 (None or Empty String Check)
+            outputs.append({
+                "simpleText": {
+                    "text": text
+                }
+            })
+            
+        return self.__skillResponse_format(outputs)
+
+    # TODO: 아래 구현한 error_text 함수 Parameters "master_data"에 값이 None 들어와서 None 으로 리턴될 경우
+    #       lambda_function.py 소스파일 -> chatbot_response 함수 몸체 -> 해당 NoneType 객체(response_data[chatbot_helper._meta_data]) 인덱싱 또는 슬라이싱 시도할 때 (response_data[chatbot_helper._meta_data][chatbot_helper._displayName]) 
+    #       아래와 같은 오류 발생하여 해당 오류 해결하기 위해 None으로 리턴 되지 않도록 로직 보완 (2025.11.03 minjae)
+    # 참고 URL - https://python.realjourney.co.kr/entry/OpenCV-TypeError-NoneType-object-is-not-subscriptable
+    # 오류 메시지 - TypeError: 'NoneType' object is not subscriptable
+    def error_text(self, error_msg: str | None = None) -> dict[str, Any]:
+        """
+        Description: [public] 오류 메세지 (error_msg) 카카오톡 채팅방 전송
+
+        Parameters: self - 카카오 스킬 응답 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
+                    error_msg - 오류 메세지
+
+        Returns: self.__skillResponse_format(outputs, quickReplies) - 오류 메세지 json 포맷
+        """
+
+        logger.info(f"[테스트] 오류 메세지 error_msg: '{error_msg}'")
+
+        outputs = []
+        quickReplies = []
+
+        if error_msg:   # error_msg에 할당된 값이 None 또는 공백("")이 아닌 경우 (None or Empty String Check)
+            outputs.append({
+                "simpleText": {
+                    "text": error_msg
+                }
+            })
+
+        quickReplies.append({
+            "action": chatbot_helper._message,
+            # "action": chatbot_helper._webLink,     # "quickReplies"의 경우 "action" -> "webLink" 기능 실행 불가.
+            "label": chatbot_helper._beginning,
+            "messageText": chatbot_helper._beginning
+            # "webLinkUrl": "https://e.kakao.com/t/hello-ryan"   # "quickReplies"의 경우 "webLinkUrl" 기능 실행 불가.
+        })
+
+        return self.__skillResponse_format(outputs, quickReplies)
+    
+    def timeOver_empty_response(self) -> dict[str, Any]:
+        """
+        Description: [public] 챗봇 응답 시간 5초 초과시 비어있는 응답 메세지 카카오톡 채팅방 전송 (기술지원 문의 제외 일반 문의 또는 응답 메시지 출력하고 싶지 않은 경우 모두 해당)
+
+        Parameters: self - 카카오 스킬 응답 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
+
+        Returns: self.__skillResponse_format(outputs) - 비어있는 응답 메세지 json 포맷
+                 master_data - 특정 마스터 데이터
+        """
+
+        outputs = []
+
+        return self.__skillResponse_format(outputs)
+
+    def timeOver_quickReplies(self) -> dict[str, Any]:
+        """
+        Description: [public] 챗봇 응답 시간 5초 초과시 응답 재요청 메세지 (chatbot_helper._done_thinking) 카카오톡 채팅방 전송
+
+        Parameters: self - 카카오 스킬 응답 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
+
+        Returns: self.__skillResponse_format(outputs, quickReplies) - 응답 재요청 메세지 json 포맷
+        """
+
+        logger.info(f"[테스트] 응답 재요청 메세지: '{chatbot_helper._done_thinking}'")
+
+        outputs = []
+        quickReplies = []
+
+        outputs.append({
+            "simpleText": {
+                "text": chatbot_helper._checkRequest
+            }
+        })
+
+        quickReplies.append({
+            "action": chatbot_helper._message,
+            "label": chatbot_helper._done_thinking,
+            "messageText": chatbot_helper._done_thinking
+        })
+
+        return self.__skillResponse_format(outputs, quickReplies)
+
+    def __quickReplies_format(self, master_data: dict[str, Any], quickReplies: list[dict]) -> dict[str, Any]:
+        """
+        Description: [private] 바로가기 그룹 (quickReplies) json 포맷
+
+        Parameters: self - 카카오 스킬 응답 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
+                    master_data - 특정 마스터 데이터
+                    quickReplies - 바로가기 그룹 버튼 리스트 (label + messageText)
+
+        Returns: self.__skillResponse_format(outputs, quickReplies) - 바로가기 그룹 json 포맷
+        """
+
+        logger.info(f"[테스트] 바로가기 그룹 master_data: '{master_data}', quickReplies: '{quickReplies}'")
+
+        outputs = []
+
+        # 아래 주석친 코드 처럼 master_data[chatbot_helper._text]에 할당된 값이 None 또는 공백("")일 경우 바로가기 그룹이 카카오톡 채팅방에 출력 안되는 오류 발생함.
+        # master_data[chatbot_helper._text] = None
+        # 하여 None 또는 공백("")이 아닌 문자열로 할당 해야함. (2025.11.03 minjae)
+        # 참고 URL - https://stackoverflow.com/questions/9573244/how-to-check-if-the-string-is-empty-in-python
+        # 참고 2 URL - https://hello-bryan.tistory.com/131
+        # 참고 3 URL - https://jino-dev-diary.tistory.com/42
+        # 참고 4 URL - https://claude.ai/chat/eaf7856e-1b5e-4c26-992e-de1683005638
+        if master_data[chatbot_helper._text]:   # master_data[chatbot_helper._text]에 할당된 값이 None 또는 공백("")이 아닌 경우 (None or Empty String Check)
+            outputs.append({
+                "simpleText": {
+                    "text": master_data[chatbot_helper._text]
+                }
+            })
+
+        return self.__skillResponse_format(outputs, quickReplies)
+
+    def __textCard_format(self, master_data: dict[str, Any], buttons: list[dict]) -> dict[str, Any]:
+        """
+        Description: [private] 텍스트 카드 (textCard) json 포맷
+
+        Parameters: self - 카카오 스킬 응답 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
+                    master_data - 특정 마스터 데이터
+                    buttons - 버튼 리스트 (label + messageText)
+
+        Returns: self.__skillResponse_format(outputs) - 텍스트 카드 json 포맷
+        """
+
+        logger.info(f"[테스트] 텍스트 카드 master_data: '{master_data}', buttons: '{buttons}'")
+
+        outputs = []
+        
+        outputs.append({   # textCard 항상 추가
+            "textCard": {
+                "title": master_data[chatbot_helper._title],
+                "description": master_data[chatbot_helper._description],
+                "buttons": buttons
+            }
+        })
+
+        return self.__skillResponse_format(outputs)
+
+    def __basicCard_format(self, master_data: dict[str, Any], buttons: list[dict]) -> dict[str, Any]:
+        """
+        Description: [private] 기본형 카드 (basicCard) json 포맷
+
+        Parameters: self - 카카오 스킬 응답 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
+                    master_data - 특정 마스터 데이터
+                    buttons - 버튼 리스트 (label + messageText)
+
+        Returns: self.__skillResponse_format(outputs) - 기본형 카드 json 포맷
+        """
+
+        logger.info(f"[테스트] 기본형 카드 master_data: '{master_data}', buttons: '{buttons}'")
+
+        outputs = []
+
+        # master_data[chatbot_helper._text]에 할당된 값이 None 또는 공백("")일 경우 basicCard 가 카카오톡 채팅방에 출력 안되는 오류 발생함. 
+        # 하여 None 또는 공백("")이 아닌 문자열로 할당 해야함. (2025.09.03 minjae)
+        # 참고 URL - https://stackoverflow.com/questions/9573244/how-to-check-if-the-string-is-empty-in-python
+        # 참고 2 URL - https://hello-bryan.tistory.com/131
+        # 참고 3 URL - https://jino-dev-diary.tistory.com/42
+        # 참고 4 URL - https://claude.ai/chat/eaf7856e-1b5e-4c26-992e-de1683005638
+        if master_data[chatbot_helper._text]:   # master_data[chatbot_helper._text]에 할당된 값이 None 또는 공백("")이 아닌 경우 (None or Empty String Check)
+            outputs.append({
+                "simpleText": {
+                    "text": master_data[chatbot_helper._text]
+                }
+            })
+
+        outputs.append({   # basicCard 항상 추가
+            "basicCard": {
+                "title": master_data[chatbot_helper._title],
+                "description": master_data[chatbot_helper._description],
+                "thumbnail": master_data[chatbot_helper._thumbnail],
+                "buttons": buttons
+            }
+        })
+
+        return self.__skillResponse_format(outputs)
+
+    def __carousel_format(self, master_data: dict[str, Any], items: list[dict]) -> dict[str, Any]:
+        """
+        Description: [private] 아이템형 케로셀 (carousel) json 포맷
+
+        Parameters: self - 카카오 스킬 응답 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
+                    master_data - 특정 마스터 데이터
+                    items - 아이템 리스트 (imageTitle + thumbnail + itemList 등등 ...)
+
+        Returns: self.__skillResponse_format(outputs) - 아이템형 케로셀 json 포맷
+        """
+
+        logger.info(f"[테스트] 아이템형 케로셀 master_data: '{master_data}', items: '{items}'")
+
+        outputs = []
+
+        if master_data[chatbot_helper._text]:   # master_data[chatbot_helper._text]에 할당된 값이 None 또는 공백("")이 아닌 경우 (None or Empty String Check)
+            outputs.append({
+                "simpleText": {
+                    "text": master_data[chatbot_helper._text]
+                }
+            })
+
+        outputs.append({   # carousel 항상 추가
+            "carousel": {
+                "type": "itemCard",
+                "items": items
+            }
+        })
+
+        return self.__skillResponse_format(outputs)
+
+    def __empty_response(self, master_data: dict[str, Any]) -> dict[str, Any]:
+        """
+        Description: [private] 비어있는 응답 메세지 카카오톡 채팅방 전송 (기술지원 문의 제외 일반 문의 또는 응답 메시지 출력하고 싶지 않은 경우 모두 해당)
+
+        Parameters: self - 카카오 스킬 응답 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
+                    master_data - 특정 마스터 데이터
+
+        Returns: self.__skillResponse_format(outputs) - 비어있는 응답 메세지 json 포맷
+                 master_data - 특정 마스터 데이터
+        """
+
+        logger.info(f"[테스트] 비어있는 응답 메세지 master_data: '{master_data}'")
+
+        outputs = []
+
+        return { "payload": self.__skillResponse_format(outputs), "meta_data": master_data }
+
+    def __create_buttons(self, master_data: dict[str, Any], message_prefix: str | None = None) -> list[dict]:
+        """
+        Description: [private] [공통] 버튼 리스트 생성
+
+        Parameters: self - 카카오 스킬 응답 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
+                    master_data - 특정 마스터 데이터
+                    message_prefix - 버튼 messageText 접두사
+
+        Returns: buttons - [공통] 버튼 리스트 (label + messageText)
+        """
+
+        logger.info(f"[테스트] [공통] 버튼 리스트 master_data: '{master_data}', message_prefix: '{message_prefix}'")
+
+        buttons = []
+
+        # 브루트 포스 완전 탐색 알고리즘 (Brute Force Algorithm) - 무차별 대입법이라고 불리며, 문제를 해결하기 위해 가능한 경우의 수를 모두 검사(완전 탐색) 해보는 방법이다.
+        # 참고 URL - https://ko.wikipedia.org/wiki/%EB%AC%B4%EC%B0%A8%EB%B3%84_%EB%8C%80%EC%9E%85_%EA%B2%80%EC%83%89
+        # 참고 2 URL - https://wikidocs.net/233719
+        # 참고 3 URL - https://youtu.be/QhMY4t2xwG0?si=uYsaL7CLHmx-RHV8
+        for button in master_data[chatbot_helper._buttons]:   # [공통] 버튼 텍스트 및 메세지 추가
+            if button[chatbot_helper._webLinkUrl]:   # button[chatbot_helper._webLinkUrl]에 할당된 값이 None 또는 공백("")이 아닌 경우 (None or Empty String Check)
+                buttons.append({
+                    "action": button[chatbot_helper._action],
+                    "label": button[chatbot_helper._label],
+                    "webLinkUrl": button[chatbot_helper._webLinkUrl]
+                })
+                
+            else:   # button[chatbot_helper._webLinkUrl]에 할당된 값이 None 또는 공백("")인 경우
+                messageText = f"{message_prefix} {button[chatbot_helper._messageText]}" if message_prefix else button[chatbot_helper._messageText]
+                buttons.append({
+                    "action": button[chatbot_helper._action],
+                    "label": button[chatbot_helper._label],
+                    "messageText": messageText
+                })
+
+        return buttons
+
+    def __create_quickReplies(self, master_data: dict[str, Any], message_prefix: str | None = None) -> list[dict]:
+        """
+        Description: [private] [공통] 바로가기 그룹 (quickReplies) 버튼 리스트 생성
+
+        Parameters: self - 카카오 스킬 응답 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
+                    master_data - 특정 마스터 데이터
+                    message_prefix - 버튼 messageText 접두사
+
+        Returns: quickReplies - [공통] 바로가기 그룹 버튼 리스트 (label + messageText)
+        """
+
+        logger.info(f"[테스트] [공통] 바로가기 그룹 버튼 리스트 생성 master_data: '{master_data}', message_prefix: '{message_prefix}'")
+
+        quickReplies = []
+
+        # 브루트 포스 완전 탐색 알고리즘 (Brute Force Algorithm) - 무차별 대입법이라고 불리며, 문제를 해결하기 위해 가능한 경우의 수를 모두 검사(완전 탐색) 해보는 방법이다.
+        # 참고 URL - https://ko.wikipedia.org/wiki/%EB%AC%B4%EC%B0%A8%EB%B3%84_%EB%8C%80%EC%9E%85_%EA%B2%80%EC%83%89
+        # 참고 2 URL - https://wikidocs.net/233719
+        # 참고 3 URL - https://youtu.be/QhMY4t2xwG0?si=uYsaL7CLHmx-RHV8
+        for quickReply in master_data[chatbot_helper._quickReplies]:   # [공통] 바로가기 그룹 버튼 텍스트 및 메세지 추가
+            messageText = f"{message_prefix} {quickReply[chatbot_helper._messageText]}" if message_prefix else quickReply[chatbot_helper._messageText]
+            quickReplies.append({
+                "action": quickReply[chatbot_helper._action],
+                "label": quickReply[chatbot_helper._label],
+                "messageText": messageText
+            })
+
+        return quickReplies
+
+    def __common_basicCard(self, master_data: dict[str, Any]) -> dict[str, Any]:
+        """
+        Description: [private] [공통] 기본형 카드 (basicCard) 카카오톡 채팅방 전송
+
+        Parameters: self - 카카오 스킬 응답 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
+                    master_data - 특정 마스터 데이터
+
+        Returns: self.__basicCard_format(master_data, buttons) - [공통] 기본형 카드 json 포맷
+                 master_data - 특정 마스터 데이터
+        """
+    
+        logger.info(f"[테스트] [공통] 기본형 카드 master_data: '{master_data}'")
+
+        buttons = self.__create_buttons(master_data)   # [공통] 버튼 리스트 생성
+
+        return { "payload": self.__basicCard_format(master_data, buttons), "meta_data": master_data }
+
+    def __common_quickReplies(self, master_data: dict[str, Any]) -> dict[str, Any]:
+        """
+        Description: [private] [공통] Autodesk or 상상진화 BOX 제품 설치 지원 바로가기 그룹 (quickReplies) 카카오톡 채팅방 전송
+
+        Parameters: self - 카카오 스킬 응답 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
+                    master_data - 특정 마스터 데이터
+
+        Returns: self.__quickReplies_format(master_data, quickReplies) - [공통] Autodesk or 상상진화 BOX 제품 설치 지원 바로가기 그룹 json 포맷
+                 master_data - 특정 마스터 데이터
+        """
+
+        logger.info(f"[테스트] [공통] Autodesk or 상상진화 BOX 제품 설치 지원 바로가기 그룹 master_data: '{master_data}'")
+
+        quickReplies = self.__create_quickReplies(master_data)
+
+        return { "payload": self.__quickReplies_format(master_data, quickReplies), "meta_data": master_data }
+
+    def __common_ver_quickReplies(self, userRequest_msg: str, master_data: dict[str, Any]) -> dict[str, Any]:
+        """
+        Description: [private] [공통] Autodesk or 상상진화 BOX 제품 버전 바로가기 그룹 (quickReplies) 카카오톡 채팅방 전송
+
+        Parameters: self - 카카오 스킬 응답 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
+                    userRequest_msg - 사용자 입력 채팅 메세지
+                    master_data - 특정 마스터 데이터
+
+        Returns: self.__quickReplies_format(master_data, quickReplies) - [공통] Autodesk or 상상진화 BOX 제품 버전 바로가기 그룹 json 포맷
+                 master_data - 특정 마스터 데이터
+        """
+
+        logger.info(f"[테스트] [공통] Autodesk or 상상진화 BOX 제품 버전 바로가기 그룹 userRequest_msg: '{userRequest_msg}', master_data: '{master_data}'")
+
+        message_prefix = f"{chatbot_helper._instType} {userRequest_msg}"
+        quickReplies = self.__create_quickReplies(master_data, message_prefix)
+
+        return { "payload": self.__quickReplies_format(master_data, quickReplies), "meta_data": master_data }
+
+    def __chatbot_carousel(self, master_data: dict[str, Any]) -> dict[str, Any]:
+        """
+        Description: [private] 챗봇 문의 아이템형 케로셀 (carousel) 카카오톡 채팅방 전송
+
+        Parameters: self - 카카오 스킬 응답 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
+                    master_data - 특정 마스터 데이터
+
+        Returns: self.__carousel_format(master_data, chatbot_items) - 챗봇 문의 아이템형 케로셀 json 포맷
+                 master_data - 특정 마스터 데이터
+        """
+
+        logger.info(f"[테스트] 챗봇 문의 아이템형 케로셀 master_data: '{master_data}'")
+
+        buttons = []
+        
+        for chatbotButton in master_data[chatbot_helper._buttons]:   # 챗봇 문의 아이템형 케로셀 3가지 버튼 텍스트 및 메세지 추가
+            buttons.append({
+                "action": chatbotButton[chatbot_helper._action],
+                "label": chatbotButton[chatbot_helper._label],
+                "messageText": chatbotButton[chatbot_helper._messageText]
+            })
+
+        chatbot_items = []
+        chatbot_items.append({
+            "imageTitle": {
+                "title": master_data[chatbot_helper._title],
+                "description": master_data[chatbot_helper._description]
+            },
+            # "title": "",
+            # "description": "",
+            "thumbnail": master_data[chatbot_helper._thumbnail],
+            "itemList": master_data[chatbot_helper._itemList],
+            "itemListAlignment": "left",
+            "buttons": buttons,
+            "buttonLayout": "vertical"
+        })
+
+        return { "payload": self.__carousel_format(master_data, chatbot_items), "meta_data": master_data }
+
+    # TODO: 아래 함수 __end_basicCard 필요시 로직 수정 예정 (2025.09.05 minjae)
+    def __end_basicCard(self, userRequest_msg: str, master_data: dict[str, Any], endInfos: list[dict]) -> dict[str, Any]:
+        """
+        Description: [private] 마지막화면 기본형 카드 (basicCard) 카카오톡 채팅방 전송
+
+        Parameters: self - 카카오 스킬 응답 json 포맷 클래스 (KakaoResponseFormatter) 인스턴스 (Instance)
+                    userRequest_msg - 사용자 입력 채팅 메세지
+                    master_data - 특정 마스터 데이터
+                    endInfos - 특정 기술지원 정보 리스트 (예) Autodesk or 상상진화 BOX 제품 설치 지원 등등...
+
+        Returns: self.__skillResponse_format(outputs) - 마지막화면 기본형 카드 json 포맷
+                 master_data - 특정 마스터 데이터
+        """
+
+        logger.info(f"[테스트] 마지막화면 기본형 카드 master_data: '{master_data}', endInfos: '{endInfos}'")
+
+        outputs = []
+        buttons = []
+
+        # 브루트 포스 완전 탐색 알고리즘 (Brute Force Algorithm) - 무차별 대입법이라고 불리며, 문제를 해결하기 위해 가능한 경우의 수를 모두 검사(완전 탐색) 해보는 방법이다.
+        # 참고 URL - https://ko.wikipedia.org/wiki/%EB%AC%B4%EC%B0%A8%EB%B3%84_%EB%8C%80%EC%9E%85_%EA%B2%80%EC%83%89
+        # 참고 2 URL - https://wikidocs.net/233719
+        # 참고 3 URL - https://youtu.be/QhMY4t2xwG0?si=uYsaL7CLHmx-RHV8
+        # 오류 메시지 "string indices must be integers, not 'str'" 출력되어 아래처럼 코드 변경 처리함. (2025.08.28 minjae)
+        # (기존) master_data -> (변경) master_data[chatbot_helper._buttons]
+        for endButton in master_data[chatbot_helper._buttons]:   # 처음으로, 동영상 버튼 텍스트 및 메세지 추가
+            if chatbot_helper._video == endButton[chatbot_helper._label]:   # 버튼 '동영상'인 경우
+                for endInfo in endInfos:
+                    if (chatbot_helper._yes == endInfo[chatbot_helper._videoYn] and endInfo[chatbot_helper._version] in userRequest_msg):   # 동영상 시청 가능하고 ("videoYn": "Y") 사용자 입력 채팅 메세지(userRequest_msg)에 해당 버전(endInfo[chatbot_helper._version]) 포함된 경우
+                        buttons.append({
+                            "action": endButton[chatbot_helper._action],
+                            "label": endButton[chatbot_helper._label],
+                            "webLinkUrl": endInfo[chatbot_helper._webLinkUrl]
+                        })
+
+                        if endInfo[chatbot_helper._text]:   # endInfo[chatbot_helper._text]에 할당된 값이 None 또는 공백("")이 아닌 경우 (None or Empty String Check)
+                            outputs.append({
+                                "simpleText": {
+                                    "text": endInfo[chatbot_helper._text]
+                                }
+                            })
+
+                        logger.info(f"[테스트] __end_basicCard 함수 userRequest_msg: '{userRequest_msg}', version: '{endInfo[chatbot_helper._version]}', buttons: '{buttons}', outputs: '{outputs}'")
+
+            else:   # 버튼 "동영상" 아닐 경우
+                buttons.append({
+                    "action": endButton[chatbot_helper._action],
+                    "label": endButton[chatbot_helper._label],
+                    "messageText": endButton[chatbot_helper._messageText]
+                })
+
+        outputs.append({   # basicCard 항상 추가
+            "basicCard": {
+                "title": master_data[chatbot_helper._title],
+                "description": master_data[chatbot_helper._description],
+                "thumbnail": master_data[chatbot_helper._thumbnail],
+                "buttons": buttons
+            }
+        })
+
+        return { "payload": self.__skillResponse_format(outputs), "meta_data": master_data }
+    
+"""
+*** 참고 ***
+*** 파이썬 문서 ***
+* 클래스
+참고 URL - https://docs.python.org/ko/3/tutorial/classes.html
+참고 2 URL - https://wikidocs.net/28
+참고 3 URL - https://wikidocs.net/215474
+
+* 클래스 다중 상속
+참고 URL - https://docs.python.org/ko/3.10/tutorial/classes.html#multiple-inheritance
+참고 2 URL - https://wikidocs.net/16073
+참고 3 URL - https://dojang.io/mod/page/view.php?id=2388
+
+* 클래스 인스턴스 변수 접근제한자 private 대신 언더바(__) 2개 사용
+참고 URL - https://docs.python.org/ko/3/reference/expressions.html#private-name-mangling
+참고 2 URL - https://wikidocs.net/297028
+참고 3 URL - https://wikidocs.net/297029
+참고 4 URL - https://oniondev.tistory.com/20
+
+* functools @cached_property
+참고 URL - https://docs.python.org/ko/dev/library/functools.html
+참고 2 URL - https://sosodev.tistory.com/entry/Python-cachedproperty-%EA%B0%92%EC%9D%84-%EC%9E%AC%EC%82%AC%EC%9A%A9-%ED%95%98%EA%B8%B0
+
+* 패키지 (package), 모듈 (module)
+참고 URL - https://docs.python.org/ko/3.13/tutorial/modules.html
+참고 2 URL - https://wikidocs.net/1418
+참고 3 URL - https://dojang.io/mod/page/view.php?id=2450
+
+* Type Hints
+참고 URL - https://docs.python.org/ko/3.14/library/typing.html
+참고 2 URL - https://peps.python.org/pep-0484/
+참고 3 URL - https://devpouch.tistory.com/189
+참고 4 URL - https://supermemi.tistory.com/entry/Python-3-%ED%8C%8C%EC%9D%B4%EC%8D%AC%EC%97%90%EC%84%9C-%EC%9D%98%EB%AF%B8%EB%8A%94-%EB%AC%B4%EC%97%87%EC%9D%BC%EA%B9%8C-%EC%A3%BC%EC%84%9D
+
+* Type Hints class Any
+참고 URL - https://docs.python.org/ko/3.9/library/typing.html#the-any-type
+
+* Union Type
+참고 URL - https://docs.python.org/ko/3.11/library/stdtypes.html#types-union
+
+* non-default value parameter (필수 매개변수), default value parameter (기본값 매개변수)
+non-default value parameter - 함수를 호출할 때 반드시 값을 전달해야 하는 매개변수
+default value parameter - 함수를 호출할 때 값을 전달하지 않으면 미리 설정된 기본값을 사용하는 매개변수
+참고 URL - https://docs.python.org/ko/3/glossary.html#term-parameter
+참고 2 URL - https://docs.python.org/3/faq/programming.html#why-are-default-values-shared-between-objects
+참고 3 URL - https://fierycoding.tistory.com/58
+참고 4 URL - https://claude.ai/chat/e9803e84-1f2c-4fff-9f22-3603392000ad
+
+* ValueError
+참고 URL - https://docs.python.org/ko/3.13/library/exceptions.html#ValueError
+
+* raise ValueError()
+참고 URL - https://docs.python.org/ko/3/tutorial/errors.html#raising-exceptions
+"""
