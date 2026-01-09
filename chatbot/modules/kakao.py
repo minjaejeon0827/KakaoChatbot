@@ -192,8 +192,10 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
             # lambda_function.py 소스파일 -> chatbot_response 함수에서 res_queue.put(kakao_response[chatbot_helper._payload]) 실행할 때 발생하는 오류로 확인 되어 아래처럼 else 절 코드 추가 (2025.10.30 minjae)
             # 참고 URL - https://claude.ai/chat/2035baf1-0f86-4d08-af37-0091c8358dbb
             # 오류 메시지 - "TypeError: 'NoneType' object is not subscriptable"
-            logger.info("[테스트] [기술지원 문의 제외 일반 문의] 카카오 json 포맷 가져오기 - 완료!")
-            return self.__empty_response(master_datas[chatbot_helper._emptyResponse])   # 기술지원 문의 제외 일반 문의
+            # logger.info("[테스트] [기술지원 문의 제외 일반 문의] 카카오 json 포맷 가져오기 - 완료!")
+            # return self.__empty_response(master_datas[chatbot_helper._emptyResponse])   # 기술지원 문의 제외 일반 문의
+            logger.info("[테스트] [start - 시작 화면] 카카오 json 포맷 가져오기 - 완료!")
+            return self.__common_basicCard(master_datas[chatbot_helper._startCard])   # start - 시작 화면
 
         except (KeyError, ValueError, TypeError) as e:
             logger.error(f"[테스트] 데이터 유효성 오류 - {str(e)}", exc_info=True)

@@ -13,7 +13,7 @@
           "web": "https://www.ssflex.co.kr/"
         }
       },
-      "buttons": [ { "action": "message", "label": "AI Assistant", "messageText": "✨ Coming Soon!\n\nAI Assistant 기능 출시 준비 중!\n더 스마트한 기술지원 기대해주세요.\n\n그동안 기술지원 챗봇 '상진'이가\n설치 업무 도와드릴게요.😊", "webLinkUrl": null },
+      "buttons": [ { "action": "webLink", "label": "AI Assistant", "messageText": null, "webLinkUrl": "https://testaiassistant-jdv8q6orakadqqrvcg6vgh.streamlit.app/" },
                    { "action": "message", "label": "챗봇 문의", "messageText": "챗봇 문의", "webLinkUrl": null },
                    { "action": "message", "label": "원격 지원", "messageText": "아래 링크 클릭 시 원격 지원 프로그램 다운로드 시작됩니다.\nhttps://113366.com/client/download?relayUri=imbu\n\n프로그램 다운로드 완료 후\n상상진화 기술지원 콜센터 02-3474-2263\n연락 부탁드립니다.", "webLinkUrl": null } ],
       "quickReplies": [ { "action": null, "label": null, "messageText": null } ],
