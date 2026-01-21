@@ -16,13 +16,16 @@
 참고 URL - https://hianna.tistory.com/358
 
 * 파이썬 가상환경 생성 방법
+참고 - Ubuntu linux 환경에서 파이썬 가상환경 생성 하려면 "sudo apt install python3.10-venv" 터미널 명령어 먼저 실행 필수
+참고 URL - https://claude.ai/chat/9ad65b04-2a86-456e-b655-cd8f3d1fae8c
+
 비쥬얼스튜디오코드 (VSCode) cmd 터미널창 열고 -> 터미널 명령어 python -m venv "가상환경이름" 입력 및 엔터 
-예) python -m venv chatbot_env
+예) Window - python -m venv chatbot_env / Ubuntu linux - python3 -m venv chatbot_env
 가상환경 폴더 "chatbot_env" 안에는 앞으로 가상환경에 설치할 모든 라이브러리 소스코드가 저장된다. (예) 폴더 Include, Lib, Scripts 등등...
 
 * 파이썬 가상환경 활성화 방법
 비쥬얼스튜디오코드 (VSCode) cmd 터미널창 열고 -> 터미널 명령어 "가상환경이름"\Scripts\activate.bat 입력 및 엔터
-예) chatbot_env\Scripts\activate.bat
+예) Window - chatbot_env\Scripts\activate.bat / Ubuntu linux - source chatbot_env/bin/activate
 위의 명령어가 뜻하는 것은 새로 생성한 가상환경 "chatbot_env" 안에 폴더 Scripts 안에 activate.bat 파일을 실행한다는 뜻이다.
 
 가상환경이 활성화 되면 아래처럼 cmd 터미널창 맨 왼쪽에 (가상환경이름)이 생성된다.
