@@ -80,8 +80,9 @@ class KakaoResponseFormatter:   # 암시적으로 object 클래스 상속
     Notes: 없음. (추후 필요시 작성 예정!)
     """
 
-    __master_datas: dict[str, Any]
-    __messageText_mappings: dict[str, Any]
+    # TODO: 아래 주석친 클래스 변수 필요시 사용 예정 (2026.02.09 minjae)
+    # __master_datas: dict[str, Any]
+    # __messageText_mappings: dict[str, Any]
 
     def __init__(self, master_datas: dict[str, Any], messageText_mappings: dict[str, Any]) -> None:
         """
