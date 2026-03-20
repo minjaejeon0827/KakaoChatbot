@@ -371,6 +371,11 @@ def thread_wrapper(target: Callable[..., Any], args: tuple[Any, ...], err_queue:
 def start_response_thread(kakao_request: dict[str, Any], res_queue: Queue, err_queue: Queue, file_path: str) -> threading.Thread:
     """
     Description: 챗봇 답변 전용 작업 스레드 시작
+                threading.Thread 함수에서 파라미터 daemon=True 설정시 해당 스레드를 백그라운드 스레드로 생성. 
+                백그라운드 스레드는 메인 스레드가 종료될 때 함께 종료되며 메인 작업 완료 시 프로그램 종료할 때 유용.
+
+                백그라운드 스레드는 주로 주기적으로 발생하는 작업 또는 데몬과 같은 작업에 사용됨. 
+                참고 URL - https://wikidocs.net/234419
 
     Parameters: kakao_request - 카카오톡 채팅방 실제 채팅 정보
                 res_queue - 챗봇 답변 메시지 포함된 큐
