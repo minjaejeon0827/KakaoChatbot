@@ -10,6 +10,9 @@
 * OpenAI API Key 발급 및 크레딧 충전 방법
 참고: https://do-hyeon.tistory.com/pages/OpenaiGPT-API-KEY-%EB%B0%9C%EA%B8%89-%EB%B0%8F-%ED%81%AC%EB%A0%88%EB%94%A7-%EC%B6%A9%EC%A0%84%EB%B0%A9%EB%B2%95
 
+* OpenAI API Key 자동충전(automatic recharge) 옵션 및 월 한도 제한 설정
+참고: https://happy-metamong.tistory.com/12
+
 * 비쥬얼스튜디오코드 (VSCode) 파이썬 코드접기 (# region, # endregion)
 참고 URL - https://m.blog.naver.com/cjinnnn/222950485960
 
