@@ -46,6 +46,10 @@
 참고 URL - https://code-angie.tistory.com/15
 pip freeze > requirements.txt 명령어 사용 및 커밋
 
+* requirements.txt 텍스트 파일 작성된 파이썬 패키지 목록 설치 방법 
+참고: https://code-angie.tistory.com/15
+pip install -r requirements.txt
+
 * 비쥬얼스튜디오코드 (VSCode) cmd 터미널창에 아래처럼 파이썬 환경변수 라이브러리 "python-dotenv" 설치 및 환경 변수 파일 ".env" 사용하기
 설치 명령어 - pip install python-dotenv
 주의사항 - 깃허브 (GitHub), 깃소스트리 (SourceTree) 등등...
