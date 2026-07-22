@@ -52,9 +52,15 @@
 참고 URL - https://code-angie.tistory.com/15
 pip freeze > requirements.txt 명령어 사용 및 커밋
 
-* requirements.txt 텍스트 파일 작성된 파이썬 패키지 목록 설치 방법 
+* requirements.txt 텍스트 파일 작성된 파이썬 패키지 목록 설치 방법
 참고: https://code-angie.tistory.com/15
 pip install -r requirements.txt
+
+* requirements.txt 텍스트 파일 작성된 파이썬 패키지 목록 삭제 방법
+참고: https://passwd.tistory.com/entry/Pip-pip%EB%A5%BC-%ED%86%B5%ED%95%B4-%EC%84%A4%EC%B9%98%ED%95%9C-%ED%8C%A8%ED%82%A4%EC%A7%80-%EC%A0%84%EB%B6%80-%EC%82%AD%EC%A0%9C%EC%B4%88%EA%B8%B0%ED%99%94
+pip uninstall -r <requirements.txt> -y
+# -r : --requirement. 지정한 requirements 파일에 나열된 모든 패키지를 제거한다.
+# -y : 삭제 시 확인 요청 하지 않음
 
 * 비쥬얼스튜디오코드 (VSCode) cmd 터미널창에 아래처럼 파이썬 환경변수 라이브러리 "python-dotenv" 설치 및 환경 변수 파일 ".env" 사용하기
 설치 명령어 - pip install python-dotenv
