@@ -67,7 +67,7 @@
 # 오류 발생 명령어: aws lambda put-provisioned-concurrency-config \ --function-name test_kakao \ --qualifier 1 \ --provisioned-concurrent-executions 2
 # 오류 수정 명령어: aws lambda put-provisioned-concurrency-config --function-name test_kakao --qualifier 1 --provisioned-concurrent-executions 2
 
-# 오류 메세지 : PS D:\minjae\testKakaoChatbot\chatbot> aws lambda put-provisioned-concurrency-config \ --function-name test_kakao \ --qualifier 1 \ --provisioned-concurrent-executions 2
+# 오류 메세지 : PS D:\minjae\testKakaoChatbot> aws lambda put-provisioned-concurrency-config \ --function-name test_kakao \ --qualifier 1 \ --provisioned-concurrent-executions 2
 # usage: aws [options] <command> <subcommand> [<subcommand> ...] [parameters]
 # To see help text, you can run:
 
@@ -88,11 +88,11 @@
 # TODO: 아래와 같은 오류 메시지 출력되어 아마존 웹서비스(AWS) Service Quotas -> AWS 서비스 -> AWS Lambda -> Concurrent executions 들어가서 
 #       적용된 계정 수준 할당량 값 (기존) 10 count -> (변경) 1,000 count 증가 요청 (2025.07.17 minjae)
 # 오류 메시지 1
-# PS D:\minjae\testKakaoChatbot\chatbot> aws lambda put-provisioned-concurrency-config --function-name test_kakao --qualifier 1 --provisioned-concurrent-executions 1
+# PS D:\minjae\testKakaoChatbot> aws lambda put-provisioned-concurrency-config --function-name test_kakao --qualifier 1 --provisioned-concurrent-executions 1
 # An error occurred (InvalidParameterValueException) when calling the PutProvisionedConcurrencyConfig operation: Specified ConcurrentExecutions for function decreases account's UnreservedConcurrentExecution below its minimum value of [10].
 
 # 오류 메시지 2
-# PS D:\minjae\testKakaoChatbot\chatbot> aws lambda put-provisioned-concurrency-config --function-name test_kakao --qualifier 1 --provisioned-concurrent-executions 2
+# PS D:\minjae\testKakaoChatbot> aws lambda put-provisioned-concurrency-config --function-name test_kakao --qualifier 1 --provisioned-concurrent-executions 2
 # An error occurred (AccessDeniedException) when calling the PutProvisionedConcurrencyConfig operation: User: arn:aws:iam::980921720325:user/codingapple1 is not authorized to perform: lambda:PutProvisionedConcurrencyConfig on resource: arn:aws:lambda:ap-northeast-2:980921720325:function:test_kakao:1 because no identity-based policy allows the lambda:PutProvisionedConcurrencyConfig action
 # 참고 URL - https://docs.aws.amazon.com/ko_kr/lambda/latest/dg/example_lambda_PutProvisionedConcurrencyConfig_section.html
 # 참고 2 URL - https://chatgpt.com/c/68788b83-bf48-8010-9892-446614b04d1f

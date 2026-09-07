@@ -35,7 +35,7 @@
 위의 명령어가 뜻하는 것은 새로 생성한 가상환경 "chatbot_env" 안에 폴더 Scripts 안에 activate.bat 파일을 실행한다는 뜻이다.
 
 가상환경이 활성화 되면 아래처럼 cmd 터미널창 맨 왼쪽에 (가상환경이름)이 생성된다.
-(예) (chatbot_env) D:\minjae\KakaoChatbot\chatbot>
+(예) (chatbot_env) D:\minjae\KakaoChatbot>
 
 가상환경이 활성화 되면 이제 cmd 터미널창 안에서 설치하는 모든 라이브러리는 해당 가상 환경 안에 설치 된다.
 
