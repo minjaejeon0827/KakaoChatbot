@@ -54,21 +54,21 @@ CMD ["lambda_function.handler"]
 #       [default]
 #       aws_access_key_id = 액세스 키
 #       aws_secret_access_key = 비밀 (Secret) 액세스 키
-#    -> 명령어 aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 980921720325.dkr.ecr.ap-northeast-2.amazonaws.com 입력 및 엔터
+#    -> 명령어 aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin <AWS_ACCOUNT_ID>.dkr.ecr.ap-northeast-2.amazonaws.com 입력 및 엔터
 #    -> 아래처럼 로그인 성공 출력
 #       Login Succeeded
 #    -> 자격증명 명령어 aws sts get-caller-identity 입력 및 엔터
 #    -> 아래처럼 자격증명 결과 출력
 #       {
 #           "UserId": "AIDA6IY35TYC7JM4K6R5E",
-#           "Account": "980921720325",
-#           "Arn": "arn:aws:iam::980921720325:user/codingapple1"
+#           "Account": "<AWS_ACCOUNT_ID>",
+#           "Arn": "arn:aws:iam::<AWS_ACCOUNT_ID>:<AWS_IAM_ARN>"
 #       }
 
 # * 별도 버전 필요 없는 경우
 # 4. 명령어 docker build -t test_kakao_repo . 입력 및 엔터
-# 5. 명령어 docker tag test_kakao_repo:latest 980921720325.dkr.ecr.ap-northeast-2.amazonaws.com/test_kakao_repo:latest 입력 및 엔터
-# 6. 명령어 docker push 980921720325.dkr.ecr.ap-northeast-2.amazonaws.com/test_kakao_repo:latest 입력 및 엔터
+# 5. 명령어 docker tag test_kakao_repo:latest <AWS_ACCOUNT_ID>.dkr.ecr.ap-northeast-2.amazonaws.com/test_kakao_repo:latest 입력 및 엔터
+# 6. 명령어 docker push <AWS_ACCOUNT_ID>.dkr.ecr.ap-northeast-2.amazonaws.com/test_kakao_repo:latest 입력 및 엔터
 # 7. 아마존 웹서비스 람다 함수 (AWS Lambda Function) 함수명 (예) test_kakao 콘솔 화면 들어와서 탭 "이미지" 클릭 -> 화면 우측 버튼 "새 이미지 배포" 클릭
 # 8. 화면 "이미지 선택" 이동 -> 버튼 "이미지 찾아보기" 클릭 -> 팝업화면 "컨테이너 이미지 선택" 출력
 #    -> 위의 5번~6번 Docker 명령어 입력 후 푸시 된 (push) 이미지 태그 항목 값이 "latest"인 카카오 챗봇 이미지 체크 -> 버튼 "이미지 선택" 클릭 -> 버튼 "저장" 클릭
