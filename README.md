@@ -2,7 +2,7 @@
 
 # Autodesk 설치 기술지원 카카오톡 챗봇
 
-**오프라인 전화 상담에 집중되던 Autodesk 제품 설치 문의를<br/>카카오톡에서 24시간 자동 응대하는 서버리스 챗봇 서비스**
+**오프라인 전화 상담에 집중되던 Autodesk 제품 설치 문의를<br/>카카오톡에서 24시간 자동 응대하는 서버리스(AWS Lambda) 챗봇 서비스**
 
 ㈜상상진화 · Autodesk 공식 파트너사 기술지원 솔루션<br/>
 2024.12 ~ 2025.12 · 기획/개발/배포/운영 1인 담당
@@ -78,13 +78,9 @@
 | 항목 | 내용 |
 |---|---|
 | 지원 제품 | **8종** — Autodesk 5종(AutoCAD, Revit, Navisworks Manage, InfraWorks, Civil3D) + 자사 BOX 3종(RevitBOX, CADBOX, EnergyBOX) |
-| 지원 버전 | Autodesk 2023~2026 / BOX 제품 2022~2026 |
+| 지원 버전 | Autodesk 2023-2026 / BOX 제품 2022-2026 |
 | 시나리오 | 4단계 계층형 대화 흐름 (start → level1 → level2 → level3 → end) |
 | 운영 형태 | 서버리스(AWS Lambda) — 요청당 과금, 상시 인스턴스 없음 |
-| 평균 응답 시간 | <!-- TODO: CloudWatch Logs의 Duration 지표 평균값 기입 (예: 1.2초) --> |
-| 콜드 스타트 개선 | <!-- TODO: warmup 적용 전/후 초기 응답 시간 비교 기입 (예: 8.4초 → 1.3초) --> |
-
-> **참고** — 본 저장소는 포트폴리오 공개를 위해 사내 자산(실제 설치파일 링크, 인프라 식별자, 고객 응대 정보)을 샘플 데이터로 대체했습니다.
 
 ---
 
@@ -173,7 +169,7 @@ flowchart LR
 
 | 원칙 | 적용 내용 |
 |---|---|
-| **콜드 스타트 최소화** | 싱글톤 인스턴스를 `handler` **바깥**에서 생성 → 웜 스타트 시 마스터 데이터 재로드 없이 재사용 |
+| **콜드 스타트 최소화** | MasterEntity 마스터 데이터 싱글톤 인스턴스를 `handler` **바깥**에서 생성 → 웜 스타트 시 마스터 데이터 재로드 없이 재사용 |
 | **관심사 분리** | 라우팅(`lambda_function`) / 응답 포맷(`kakao`) / 데이터(`singleton`) / 로깅(`log`) / 인프라 유틸(`aws`) 를 모듈 단위로 분리 |
 | **데이터-코드 분리** | 문구·링크·버튼은 전부 JSON. 코드는 "구조를 만드는 역할"만 수행 |
 | **문자열 상수 중앙화** | 모든 키·문구를 `chatbot_helper.py`에 집약하여 오타로 인한 런타임 오류 차단 |
@@ -247,10 +243,7 @@ EventBridge Scheduler가 아래 페이로드를 주기적으로 전송하고, �
 { "body": "{ \"action\": \"aws-lambda_function-container-warmup\" }" }
 ```
 
-동시에 마스터 데이터 싱글톤과 응답 포맷터 인스턴스를 `handler` 함수 바깥(모듈 스코프)에 배치하여, 웜 스타트 시 JSON 재파싱과 유효성 검사를 건너뛰도록 했습니다.
-
-**결과**<br/>
-<!-- TODO: CloudWatch Logs에서 Init Duration 지표를 warmup 적용 전/후로 비교하여 수치 기입 -->
+동시에 MasterEntity 마스터 데이터 싱글톤 인스턴스와 응답 포맷터 인스턴스를 `handler` 함수 바깥(모듈 스코프)에 배치하여, 웜 스타트 시 JSON 재파싱과 유효성 검사를 건너뛰도록 했습니다.
 
 ---
 
@@ -285,7 +278,7 @@ CMD ["lambda_function.handler"]
 
 ### 4-4. 의존성 버전 충돌
 
-Lambda 런타임 환경에서만 재현되는 문제들을 해결한 기록입니다.
+AWS Lambda 런타임 환경에서만 재현되는 문제들을 해결한 기록입니다.
 
 | 증상 | 원인 | 해결 |
 |---|---|---|
@@ -324,7 +317,7 @@ in_operator_mappings = {   # 부분 포함 — "Inst - AutoCAD 2025, 2026 버전
 
 ---
 
-### 4-6. 서버리스 환경의 사용자별 상태 관리
+### 4-6. 서버리스(AWS Lambda) 환경의 사용자별 상태 관리
 
 **문제**<br/>
 Lambda는 상태를 유지하지 않으며 여러 사용자의 요청이 동일 컨테이너에서 처리될 수 있습니다. 4-1의 재요청 기능을 구현하려면 "직전 질문"을 사용자별로 보관해야 하는데, 전역 변수를 쓰면 **사용자 간 데이터 혼선(Race Condition)** 이 발생합니다.
@@ -409,13 +402,13 @@ kakaoChatbot/
 ├── utils/
 │   ├── log.py                   전역 로거 초기화 (logging + KST + 환경변수 레벨 제어)
 │   ├── chatbot_logger.py        경량 로거 (전역 로거 초기화 이전 단계용)
-│   ├── aws.py                   Lambda /tmp 임시 스토리지 입출력 유틸
-│   └── openAI.py                LLM·RAG 유틸 (2단계 AI Assistant용)
+│   ├── aws.py                   AWS Lambda /tmp 임시 스토리지 입출력 유틸
+│   └── openAI.py                LLM·RAG 유틸 (2단계 AI Assistant 추후 적용 예정!)
 ├── resources/
 │   └── json/
 │       └── masterEntity.json    챗봇 시나리오 마스터 데이터
 ├── tests/                       모듈별 테스트 코드
-├── lambda_function.py           Lambda 진입점 (handler)
+├── lambda_function.py           AWS Lambda 진입점 (handler)
 ├── Dockerfile                   멀티 스테이지 빌드 정의
 ├── requirements.txt
 └── README.md
@@ -447,10 +440,10 @@ kakaoChatbot/
 
 ```bash
 git clone https://github.com/minjaejeon0827/KakaoChatbot.git
-cd KakaoChatbot
+cd kakaoChatbot
 
-python -m venv chatbot_env
-source chatbot_env/bin/activate      # Windows: chatbot_env\Scripts\activate.bat
+python -m venv kakaoChatbot_env
+source kakaoChatbot_env/bin/activate      # Windows: kakaoChatbot_env\Scripts\activate.bat
 
 pip install -r requirements.txt
 ```
@@ -480,7 +473,7 @@ docker tag kakao-chatbot:latest \
 docker push \
   <AWS_ACCOUNT_ID>.dkr.ecr.ap-northeast-2.amazonaws.com/kakao-chatbot:latest
 
-# 4) Lambda 콘솔에서 새 이미지 배포
+# 4) AWS Lambda 콘솔에서 새 이미지 배포
 # 5) 카카오 챗봇 관리자센터에서 전체 배포
 ```
 
@@ -488,7 +481,7 @@ docker push \
 
 ```
 ECR 프라이빗 저장소 생성
-  → Lambda 함수 생성 (컨테이너 이미지 기반)
+  → AWS Lambda 함수 생성 (컨테이너 이미지 기반)
     → API Gateway 생성 및 Lambda 연동
       → EventBridge Scheduler 규칙 생성 (warmup)
         → 카카오 i 오픈빌더 스킬 서버에 API Gateway 엔드포인트 등록
@@ -498,12 +491,12 @@ ECR 프라이빗 저장소 생성
 
 ## 8. 개발 이력 및 주요 의사결정
 
-날짜순 나열이 아니라, **무엇을 왜 바꿨는지**를 기록했습니다.
+단순하게 날짜순 나열이 아니라, **무엇을 왜 바꿨는지** 기록했습니다.
 
 | 시기 | 의사결정 | 배경 |
 |---|---|---|
 | 2024.12 | 프로젝트 착수 (PM · 웹개발자 · 개발자 3인 체제) | 오프라인 기술지원의 온라인 확장 요구 |
-| 2025.01–03 | 카카오 i 오픈빌더 + AWS 서버리스 아키텍처 확정 | 상시 서버 운영 비용 대비 요청량이 낮아 서버리스가 유리하다고 판단 |
+| 2025.01–03 | 카카오 i 오픈빌더 + AWS Lambda 서버리스 아키텍처 확정 | 상시 서버 운영 비용 대비 요청량이 낮아 서버리스(AWS Lambda)가 유리하다고 판단 |
 | 2025.04 | **1인 개발 체제 전환** | 초기 참여 PM·웹개발자 퇴사. 기획·개발·배포·운영 전 범위 단독 수행 |
 | 2025.05 | ZIP → **컨테이너 이미지 배포** 전환 | LangChain·FAISS 의존성이 250MB 한계 초과 ([4-3](#4-3-배포-패키지-용량-한계)) |
 | 2025.05 | 벡터 저장소 **Chroma → FAISS** | Amazon Linux의 sqlite3 버전 제약 ([4-4](#4-4-의존성-버전-충돌)) |
@@ -529,7 +522,7 @@ ECR 프라이빗 저장소 생성
 | 기획 | 기술지원 업무 프로세스 분석 → 4단계 대화 시나리오 설계, 제품 8종 지원 범위 정의 |
 | 아키텍처 | 서버리스 구조 설계, 모듈 분리 및 임포트 순서 정의, 데이터-코드 분리 원칙 수립 |
 | 개발 | 전체 코드 작성 — 라우팅, 카카오 응답 포맷터, 동시성 처리, 유효성 검사, 로깅 |
-| 인프라 | ECR · Lambda · API Gateway · EventBridge 구성, Docker 멀티 스테이지 빌드 |
+| 인프라 | AWS ECR · Lambda · API Gateway · EventBridge 구성, Docker 멀티 스테이지 빌드 |
 | 운영 | CloudWatch 기반 장애 대응, 제품/버전 변경 반영, 콘텐츠 갱신 |
 | 문서화 | 전 모듈 Docstring 작성, 설계 의사결정 기록 |
 
@@ -543,11 +536,11 @@ ECR 프라이빗 저장소 생성
 
 본 프로젝트는 **2단계 확장 구조**로 설계되었습니다.
 
-### 1단계 — 규칙 기반 시나리오 챗봇 `완료 · 운영 중`
+### 1단계 — 규칙 기반 시나리오 챗봇 `완료 · 정석 서비스 오픈 중단`
 
 마스터 데이터 기반의 계층형 버튼 응대. 정형화된 설치 문의를 100% 자동 처리합니다.
 
-### 2단계 — LLM · RAG 기반 AI Assistant `진행 중`
+### 2단계 — LLM · RAG 기반 AI Assistant `개발 중단`
 
 버튼 시나리오로 처리할 수 없는 **자유 형식 질문**에 대응하는 것이 목표입니다. 현재 `utils/openAI.py`에 RAG 파이프라인 PoC가 구현되어 있으며, 별도 저장소에서 Streamlit 기반 프로토타입을 검증하고 있습니다.
 
