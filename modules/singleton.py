@@ -1,4 +1,5 @@
 """
+modules/singleton.py
 * 싱글톤 패턴 (singleton) 전용 모듈 (module)
 코드 리뷰 
 참고 URL - https://chatgpt.com/c/691424a3-8e0c-8327-98b9-cabf6b80cf17

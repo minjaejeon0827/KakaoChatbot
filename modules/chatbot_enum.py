@@ -1,4 +1,5 @@
 """
+modules/chatbot_enum.py
 * 챗봇 IntEnum 열거형 구조체 클래스 모듈 (module)
 코드 리뷰 
 참고 URL - https://chatgpt.com/c/691424a3-8e0c-8327-98b9-cabf6b80cf17

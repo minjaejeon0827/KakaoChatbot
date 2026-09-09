@@ -1,4 +1,5 @@
 """
+utils/aws.py
 * 아마존 웹서비스 람다 함수 (AWS Lambda Function) -> 임시 로그 텍스트 파일 처리 유틸 (util)
 코드 리뷰 참고 URL - https://chatgpt.com/c/691e9f6e-3940-832a-afda-92c53ae4b49a
 """

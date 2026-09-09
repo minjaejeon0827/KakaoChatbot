@@ -1,4 +1,5 @@
 """
+modules/kakao.py
 * [카카오톡 서버 전송 용도] 스킬 응답 json 포맷 전용 모듈 (module)
 코드 리뷰 
 참고 URL - https://chatgpt.com/c/69002b43-44c0-8322-8298-e7871b39da2a

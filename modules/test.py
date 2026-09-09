@@ -1,3 +1,7 @@
+"""
+modules/test.py
+"""
+
 from utils import chatbot_logger
 
 def _testDebug(msg: str) -> None:

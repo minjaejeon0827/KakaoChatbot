@@ -1,4 +1,5 @@
 """
+modules/test_log.py
 * 챗봇 전역 로그 모듈
 
 파이썬 logging 라이브러리 사용해서 전역 로그 객체(logger) 및 로그 기록 기능 구현 (2025.09.18 minjae)
