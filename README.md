@@ -474,7 +474,7 @@ docker push \
   <AWS_ACCOUNT_ID>.dkr.ecr.ap-northeast-2.amazonaws.com/kakao-chatbot:latest
 
 # 4) AWS Lambda 콘솔에서 새 이미지 배포
-# 5) 카카오 챗봇 관리자센터에서 전체 배포
+# 5) 카카오톡 챗봇 관리자센터에서 전체 배포
 ```
 
 ### AWS 리소스 구성 순서
@@ -536,13 +536,15 @@ ECR 프라이빗 저장소 생성
 
 본 프로젝트는 **2단계 확장 구조**로 설계되었습니다.
 
-### 1단계 — 규칙 기반 시나리오 챗봇 `완료 · 정석 서비스 오픈 중단`
+### 1단계 — 규칙 기반 시나리오 카카오톡 챗봇 `완료 · 정석 서비스 오픈 중단`
 
 마스터 데이터 기반의 계층형 버튼 응대. 정형화된 설치 문의를 100% 자동 처리합니다.
 
 ### 2단계 — LLM · RAG 기반 AI Assistant `개발 중단`
 
-버튼 시나리오로 처리할 수 없는 **자유 형식 질문**에 대응하는 것이 목표입니다. 현재 `utils/openAI.py`에 RAG 파이프라인 PoC가 구현되어 있으며, 별도 저장소에서 Streamlit 기반 프로토타입을 검증하고 있습니다.
+버튼 시나리오로 처리할 수 없는 **자유 형식 질문**에 대응하는 것이 목표입니다. 현재 `utils/openAI.py`에 RAG 파이프라인 PoC가 구현되어 있으며, 별도 저장소에서 Streamlit 기반 프로토타입 구현 및 기술 검증하였습니다.
+향후 다른 프로젝트에서 LLM · RAG 기반 AI Assistant 개발 진행 시
+`utils/openAI.py`에 구현된 RAG 파이프라인 PoC 기능을 참고하려고 합니다.
 
 ```mermaid
 flowchart LR
@@ -599,7 +601,7 @@ flowchart LR
 
 [![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/minjaejeon0827)
 <!-- TODO: 이메일 주소 확인 후 수정 -->
-[![Email](https://img.shields.io/badge/Email-D14836?style=flat-square&logo=gmail&logoColor=white)](mailto:your-email@example.com)
+[![Email](https://img.shields.io/badge/Email-D14836?style=flat-square&logo=gmail&logoColor=white)](mailto:minjaejeon0827@gmail.com)
 
 본 프로젝트는 ㈜상상진화 재직 중 수행한 업무이며,<br/>
 공개한 소스코드는 프로토타입 모델입니다.
