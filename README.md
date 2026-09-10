@@ -1,10 +1,10 @@
 <div align="center">
 
-# Autodesk 설치 기술지원 카카오 챗봇
+# Autodesk 제품 설치 기술지원 카카오 챗봇
 
 **오프라인 전화 상담에 집중되던 Autodesk 제품 설치 문의를<br/>카카오톡에서 24시간 자동 응대하는 서버리스(AWS Lambda) 챗봇 서비스**
 
-㈜상상진화 · Autodesk 공식 파트너사 기술지원 솔루션<br/>
+㈜상상진화 · Autodesk 공식 파트너 회사 기술지원 솔루션<br/>
 2024.12 ~ 2025.12 · 기획/개발/배포/운영 1인 담당
 
 <br/>
@@ -16,7 +16,7 @@
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white)
 ![LangChain](https://img.shields.io/badge/LangChain-1C3C3C?style=flat-square&logo=langchain&logoColor=white)
 ![OpenAI](https://img.shields.io/badge/OpenAI-412991?style=flat-square&logo=openai&logoColor=white)
-![Kakao](https://img.shields.io/badge/Kakao_i_OpenBuilder-FFCD00?style=flat-square&logo=kakaotalk&logoColor=black)
+![Kakao](https://img.shields.io/badge/Kakao_Business_Chatbot-FFCD00?style=flat-square&logo=kakaotalk&logoColor=black)
 
 </div>
 
@@ -57,21 +57,21 @@
 
 ### 배경
 
-㈜상상진화는 Autodesk 공식 파트너사로서 AutoCAD, Revit 등 제품의 설치 기술지원을 제공한다. 그러나 기존 지원 체계는 다음과 같은 구조적 한계를 갖고 있었다.
+㈜상상진화는 Autodesk 공식 파트너 회사로서 AutoCAD, Revit 등 제품의 설치 기술지원을 제공한다. 그러나 기존 지원 체계는 다음과 같은 구조적 한계를 갖고 있었다.
 
 - **채널 단일화** — 설치 문의가 전화 상담(콜센터)에 집중
 - **시간 제약** — 업무 시간 외 문의는 다음 영업일까지 대기
-- **반복 응대** — 문의의 상당수가 "제품별·버전별 표준 설치 절차" 안내로, 매번 동일한 내용을 구두로 반복
+- **반복 응대** — 설치 문의 상당수가 "제품별·버전별 표준 설치 절차" 안내로, 매번 동일한 내용을 기술지원 엔지니어가 구두로 반복 처리
 - **자료 분산** — 설치 가이드가 담당자별 문서로 흩어져 안내 내용이 일관되지 않음
 
 ### 목표
 
-기존 오프라인 기술지원을 **온라인에서도 동일한 품질로 받을 수 있도록** 카카오톡 채널 기반 자동 응대 서비스를 구축합니다.
+기존 오프라인 기술지원을 **온라인에서도 동일한 품질로 받을 수 있도록** 카카오톡 채널 기반 자동 응대 서비스를 구축했다.
 
-1. 제품·버전 선택만으로 **표준화된 설치 가이드**를 즉시 제공
+1. 제품·버전 선택만으로 **표준화된 설치 가이드** 즉시 제공
 2. 서버 상시 운영 없이 **서버리스(AWS Lambda) 구조로 운영 비용 최소화**
-3. 안내 문구·설치 링크를 **마스터 데이터(JSON)로 분리**하여 비개발자도 콘텐츠 수정 가능
-4. 향후 **LLM 모델 기반 자유 질의응답**으로 확장 가능한 구조 확보
+3. 안내 문구·설치 링크를 **masterEntity.json 마스터 데이터(JSON)로 분리**하여 비개발자도 콘텐츠 수정 가능
+4. 향후 **LLM 모델 기반 자유 질의응답 가능한 AI Assistant**서비스로 확장 가능한 구조 확보
 
 ### 결과
 
@@ -86,13 +86,13 @@
 
 ## 2. 주요 기능
 
-### 계층형 설치 가이드 제공
+### 계층형 제품 설치 가이드 제공
 
-사용자가 자연어로 질문할 필요 없이, **버튼 선택만으로** 원하는 설치 가이드에 도달한다.
+사용자가 자연어로 질문할 필요 없이, **버튼 선택만으로** 원하는 설치 가이드를 안내 받을 수 있다.
 
 ```
 시작 화면
-  ├─ AI Assistant          (2단계 개발 중단)
+  ├─ AI Assistant          (개발 중단)
   ├─ 원격 지원              → 원격 지원 프로그램 다운로드 안내
   └─ 챗봇 문의
        ├─ Autodesk 제품 설치 지원
@@ -105,7 +105,7 @@
 
 ### 마스터 데이터 기반 콘텐츠 관리
 
-모든 안내 문구·버튼·카드 구성은 `masterEntity.json` 하나로 관리됩니다. 신규 제품이나 버전을 추가할 때 **애플리케이션 코드 수정할 필요 없다.**
+모든 안내 문구·버튼·카드 구성은 `masterEntity.json` 파일 하나로 관리된다. 신규 제품이나 버전을 추가할 때 **애플리케이션 코드를 수정할 필요 없다.**
 
 ```
 masterEntity
@@ -125,7 +125,7 @@ masterEntity
 
 ### 데이터 무결성 검증
 
-서비스 시작 시 마스터 데이터의 필수 키·값 존재 여부를 전수 검사하여, 잘못된 데이터로 인한 런타임 오류를 사전에 차단합니다. 검사 결과는 `IntEnum` 열거형으로 4단계 상태를 반환한다.
+서비스 시작 시 마스터 데이터의 필수 키·값 존재 여부를 전수 검사하여, 잘못된 데이터로 인한 런타임 오류를 사전에 차단한다. 검사 결과는 `IntEnum` 열거형으로 4단계 상태를 반환한다.
 
 | 상태 | 값 | 의미 |
 |---|---:|---|
@@ -169,11 +169,11 @@ flowchart LR
 
 | 원칙 | 적용 내용 |
 |---|---|
-| **콜드 스타트 최소화** | MasterEntity 마스터 데이터 싱글톤 인스턴스를 `handler` **바깥**에서 생성 → 웜 스타트 시 마스터 데이터 재로드 없이 재사용 가능 |
-| **관심사 분리** | 라우팅(`lambda_function`) / 응답 포맷(`kakao`) / 데이터(`singleton`) / 로깅(`log`) / 인프라 유틸(`aws`) 를 모듈 단위로 분리 |
+| **콜드 스타트 최소화** | MasterEntity 마스터 데이터 싱글톤 인스턴스를 `handler` **바깥**에서 생성 → 웜 스타트 진행 시 마스터 데이터 재로드 없이 재사용 가능 |
+| **관심사 분리** | 라우팅(`lambda_function`) / 응답 포맷(`kakao`) / 데이터(`singleton`) / 로깅(`log`) / 인프라 유틸(`aws`) 들을 모듈 단위로 분리 |
 | **데이터-코드 분리** | 문구·링크·버튼은 전부 JSON. 코드는 "구조를 만드는 역할"만 수행 |
 | **문자열 상수 중앙화** | 모든 키·문구를 `chatbot_helper.py`에 집약하여 오타로 인한 런타임 오류 차단 |
-| **실패 시 안전한 응답** | 어떤 예외가 나도 카카오톡에는 항상 유효한 JSON을 반환 (채팅방 멈춤 방지) |
+| **실패 시 안전한 응답** | 어떤 예외가 나도 카카오톡에는 항상 유효한 JSON 데이터 반환 (채팅방 멈춤 방지) |
 
 ---
 
@@ -232,7 +232,7 @@ sequenceDiagram
 
 | 방안 | 판단 |
 |---|---|
-| Provisioned Concurrency | 상시 과금 발생. 문의량이 업무시간에 집중되는 해당 챗봇 서비스에는 과잉 투자 |
+| Provisioned Concurrency | 상시 과금 발생. 문의량이 업무시간에 집중되는 해당 챗봇 서비스에는 과잉 투자라고 판단 |
 | EventBridge Scheduler warmup | 주기적 더미 호출로 컨테이너 유지. 호출 비용이 미미하여 채택함 |
 | 초기화 로직 경량화 | 병행 적용 |
 
@@ -270,9 +270,9 @@ CMD ["lambda_function.handler"]
 ```
 
 **효과**
-- `requirements.txt`를 먼저 복사해 **의존성 레이어 캐싱** → 코드만 수정 시 빌드 시간 대폭 단축
+- `requirements.txt` 파일 먼저 복사 및 **의존성 레이어 캐싱** → 코드만 수정 시 빌드 시간 대폭 단축
 - 컴파일 도구(`gcc`, `make` 등)가 최종 이미지에 포함되지 않아 **이미지 경량화 + 공격 표면 축소**
-- `.dockerignore`로 테스트 코드·문서를 배포 대상 제외
+- `.dockerignore` 사용하여 테스트 코드·문서 배포 대상 제외
 
 ---
 
@@ -290,7 +290,7 @@ AWS Lambda 런타임 환경에서만 재현되는 문제들을 해결한 기록�
 
 ---
 
-### 4-5. 시나리오 분기 하드코딩 제거
+### 4-5. 시나리오 분기 하드코딩 로직 보완
 
 **문제**<br/>
 초기 구현한 해당 챗봇 로직의 경우 사용자 입력에 대한 `if-elif` 분기가 코드에 직접 작성되어 있었다. 다만, 제품이 8종으로 늘고 버전 분기가 추가되자 조건문이 비대해졌고, 문구 하나를 수정하려 해도 코드 배포가 필요했다.
@@ -317,7 +317,7 @@ eq_operator_mappings 정확히 일치를 먼저 순회하고 매칭 시 즉시 �
 
 ---
 
-### 4-6. 서버리스(AWS Lambda) 환경의 사용자별 상태 관리
+### 4-6. 서버리스 환경의 사용자별 상태 관리
 
 **문제**<br/>
 AWS Lambda는 상태를 유지하지 않으며 여러 사용자의 요청이 동일 컨테이너에서 처리될 수 있다. 4-1의 재요청 기능을 구현하려면 "직전 질문"을 사용자별로 보관해야 하는데, 전역 변수를 쓰면 **사용자 간 데이터 혼선(Race Condition)** 이 발생한다.
@@ -332,23 +332,27 @@ AWS Lambda의 `/tmp` 임시 스토리지를 사용하되, 카카오톡 사용자
 
 `threading.local()` 기반 방식도 검토했으나, 스레드가 재사용되는 환경에서 이전 사용자 데이터가 남을 위험이 있어 파일 기반 격리를 선택했다.
 
-**한계 인식** — `/tmp`는 컨테이너 생명주기에 종속되므로 데이터를 영구적으로 보관하는 저장소가 아니다. 다중 턴 대화 이력이 필요한 AI Assistant 단계에서는 **DynamoDB 또는 ElastiCache 도입이 필요**하다고 생각한다.
+**한계 인식** — `/tmp`는 컨테이너 생명주기에 종속되므로 데이터를 영구적으로 보관하는 저장소가 아니다. 다중 턴 대화 이력이 필요한 AI Assistant 관련 기능 구현 진행 시 **DynamoDB 또는 ElastiCache 도입이 필요**하다고 생각한다.
+
+**참고(DynamoDB)** — [바로가기](https://docs.aws.amazon.com/ko_kr/amazondynamodb/latest/developerguide/Introduction.html)
+
+**참고(ElastiCache)** — [바로가기](https://docs.aws.amazon.com/ko_kr/AmazonElastiCache/latest/dg/WhatIs.html)
 
 ---
 
-### 4-7. 서버리스(AWS Lambda) 환경 로깅 체계
+### 4-7. 서버리스 환경 로깅 체계
 
 **문제**<br/>
-AWS Lambda 기본 로그는 UTC 기준이며 최상위 로거를 공유한다. 국내 운영 서비스에서 장애 발생 시각을 파악하기 어려웠고, 어느 모듈에서 발생한 로그인지 추적이 힘들었다.
+AWS Lambda 기본 로그는 UTC 기준이며 최상위 로거를 공유한다. 국내 운영 서비스에서 장애 발생 시각을 대한민국 표준시로 파악하기 어려웠고, 어느 모듈에서 발생한 로그인지 추적이 힘들었다.
 
 **해결**<br/>
-`logging.Formatter`를 상속한 `KSTFormatter`를 싱글톤 인스턴스로 구현해 시각을 KST로 변환하고, 전용 네임스페이스 로거에 `propagate = False`를 설정해 AWS Lambda 기본 로거와 분리했다.
+`logging.Formatter`를 상속한 `KSTFormatter`를 싱글톤 인스턴스로 구현해 시각을 대한민국 표준시(KST)로 변환하고, 전용 네임스페이스 로거에 `propagate = False`를 설정해 AWS Lambda 기본 로거와 분리했다.
 
 ```
 [INFO] [2025-11-25 14:32:07] [lambda_function.py | handler - L142]: 채팅 입력 사용자 아이디: ...
 ```
 
-로그 레벨은 `LOG_LEVEL` 환경 변수로 제어하여, 코드 수정 없이 운영 중 디버그 레벨을 조정할 수 있도록 했다. 또한 순환 참조를 피하기 위해, 전역 로거 초기화 이전 단계에서 동작하는 모듈용으로 `inspect` 기반 경량 로거(`chatbot_logger.py`)를 별도로 두었다.
+로그 레벨은 `LOG_LEVEL` 환경 변수로 제어하여, 코드 수정 없이 운영 중 디버그 레벨을 조정할 수 있도록 했다. 또한 순환 참조를 피하기 위해, 전역 로거 초기화 이전 단계에서 동작하는 모듈용으로 `inspect` 기반 경량 로거(`chatbot_logger.py`) 별도 구현 및 사용했다.
 
 ---
 
@@ -358,7 +362,7 @@ AWS Lambda 기본 로그는 UTC 기준이며 최상위 로거를 공유한다. �
 
 ![Python](https://img.shields.io/badge/Python_3.11-3776AB?style=flat-square&logo=python&logoColor=white)
 
-Type Hints, `IntEnum`, `dataclass` 스타일 상수 관리, PEP 257 기반 Docstring 전면 적용
+Type Hints, `IntEnum`, `dataclass` 스타일 상수 관리, PEP 257 기반 Docstring 적용
 
 ### 클라우드 인프라
 
@@ -376,14 +380,14 @@ Type Hints, `IntEnum`, `dataclass` 스타일 상수 관리, PEP 257 기반 Docst
 |---|---|
 | 동시성 | `threading`, `queue.Queue` |
 | AWS 연동 | `aws-lambda-powertools` (LambdaContext 타입 지원) |
-| LLM · RAG *(2단계)* | `openai`, `langchain-openai`, `langchain-community`, `faiss-cpu` |
+| LLM · RAG *(2단계 - 개발 중단!)* | `openai`, `langchain-openai`, `langchain-community`, `faiss-cpu` |
 | 로깅 | `logging`, `zoneinfo`, `inspect` |
 | 컨테이너 | Docker (멀티 스테이지 빌드) |
 
 ### 적용한 설계 디자인 패턴
 
-- **싱글톤 패턴** — `SingletonBase`를 상속받는 `MasterEntity`, `KSTFormatter`. AWS Lambda 웜 스타트 시 인스턴스 재사용으로 초기화 비용 절감
-- **Facade 패턴** — `KakaoResponseFormatter`가 복잡한 카카오 스킬 응답 스펙(basicCard / carousel / quickReplies)을 단일 인터페이스로 은닉
+- **싱글톤 패턴** — `SingletonBase`를 상속받는 `MasterEntity`, `KSTFormatter`. AWS Lambda 웜 스타트 진행 시 인스턴스 재사용으로 초기화 비용 절감
+- **Facade 패턴** — `KakaoResponseFormatter`가 복잡한 카카오 스킬 응답 스펙(basicCard / carousel / quickReplies)을 단일 인터페이스로 은닉 처리
 - **전략 패턴 (딕셔너리 디스패치)** — 조건 분기를 매핑 테이블로 대체
 - **참고 (파이썬 디자인패턴 스터디)** — [바로가기](https://github.com/minjaejeon0827/test_Python_Design_Pattern)
 
@@ -405,9 +409,9 @@ kakaoChatbot/
 │   ├── log.py                   전역 로거 초기화 (logging + KST + 환경변수 레벨 제어)
 │   ├── chatbot_logger.py        경량 로거 (전역 로거 초기화 이전 단계 전용)
 │   ├── aws.py                   AWS Lambda /tmp 임시 스토리지 입출력 유틸
-│   └── openAI.py                LLM·RAG 유틸 (2단계 AI Assistant - 추후 개발 진행 시 적용 예정!)
+│   └── openAI.py                LLM·RAG 유틸 (2단계 AI Assistant - 개발 중단!)
 ├── resources/
-|   ├── image/                   챗봇 응답 데이터 이미지
+|   ├── image/                   카카오 스킬 응답 데이터 이미지
 |   ├── text/                    Autodesk 제품별 설치 방법 텍스트 파일
 │   └── json/
 │       └── masterEntity.json    챗봇 시나리오 마스터 데이터
@@ -499,16 +503,16 @@ AWS ECR 프라이빗 저장소 생성
 
 | 시기 | 의사결정 | 배경 |
 |---|---|---|
-| 2024.12 | 프로젝트 착수 (PM · 웹개발자 · 개발자 3인 체제) | Autodesk 오프라인 제품 설치 기술지원의 온라인 확장 요구 |
+| 2024.12 | 프로젝트 착수 (PM · 웹개발자 · 개발자 3인 체제) | Autodesk 제품 설치 오프라인 기술지원의 온라인 확장 요구 |
 | 2025.01–03 | 카카오 챗봇 관리자센터 + AWS Lambda 서버리스 아키텍처 확정 | 상시 서버 운영 비용 대비 요청량이 낮아 서버리스(AWS Lambda)가 유리하다고 판단 |
 | 2025.04 | **1인 개발 체제 전환** | 초기 참여 PM·웹개발자 퇴사. 기획·개발·배포·운영 전 범위 단독 수행 |
 | 2025.05 | ZIP → **컨테이너 이미지 배포** 전환 | LangChain·FAISS 의존성이 250MB 한계 초과 ([4-3](#4-3-배포-패키지-용량-한계)) |
 | 2025.05 | 벡터 저장소 **Chroma → FAISS** | Amazon Linux의 sqlite3 버전 제약 ([4-4](#4-4-의존성-버전-충돌)) |
-| 2025.07 | **콜드 스타트 대응** — EventBridge warmup 도입 | 초기 응답 지연이 카카오 5초 제한을 초과 ([4-2](#4-2-aws-lambda-콜드-스타트)) |
+| 2025.07 | **콜드 스타트 대응** — EventBridge warmup 도입 | 초기 응답 지연이 카카오 5초 제한 초과 ([4-2](#4-2-aws-lambda-콜드-스타트)) |
 | 2025.07 | 응답 지연 시 **재요청 UX** 설계 | 채팅방 멈춤으로 인한 사용자 챗봇 채널 탈퇴 방지 ([4-1](#4-1-카카오톡-5초-응답-제한-대응)) |
 | 2025.08 | 마스터 데이터 JSON **구조 재설계** | 제품 8종 확장에 따라 카드/바로가기 스키마 통일 |
 | 2025.09 | `lambda_function.py` **전면 리팩토링** | 핸들러 비대화 해소 — 파싱·스레드·대기·포맷 책임 분리 |
-| 2025.09 | 전역 로깅 체계 도입 (`logging` + KST) | 운영 중 장애 추적 시간 단축 ([4-7](#4-7-서버리스(AWS Lambda)-환경-로깅-체계)) |
+| 2025.09 | 전역 로깅 체계 도입 (`logging` + KST) | 운영 중 장애 추적 시간 단축 ([4-7](#4-7-서버리스-환경-로깅-체계)) |
 | 2025.10 | 조건 분기 → **딕셔너리 디스패치** 전환 | 제품 확장 시 코드 수정 최소화 ([4-5](#4-5-시나리오-분기-하드코딩-제거)) |
 | 2025.11 | Navisworks Simulate → **InfraWorks 대체** | 제품 판매 중단에 따른 지원 대상 조정 |
 | 2025.12 | 통합 테스트 진행 | 챗봇 서비스 베타 버전 배포 직전 통합 테스트 작업 필요하다고 판단 |
@@ -528,11 +532,11 @@ AWS ECR 프라이빗 저장소 생성
 | 개발 | 전체 코드 작성 — 라우팅, 카카오 응답 포맷터, 동시성 처리, 유효성 검사, 로깅 |
 | 인프라 | AWS ECR · Lambda · API Gateway · EventBridge 구성, Docker 멀티 스테이지 빌드 |
 | 운영 | CloudWatch 기반 장애 대응, 제품/버전 변경 반영, 콘텐츠 갱신 |
-| 문서화 | 전 모듈 Docstring 작성, 설계 의사결정 기록 |
+| 문서화 | 전체 모듈 Docstring 작성, 설계 의사결정 기록 |
 
 **이 과정에서 얻은 것**
 
-기존 오프라인 기술지원 서비스를 온라인으로 확장하는 일은 도전적인 과제였다. 함께 시작한 팀원들이 떠난 뒤 1인 개발로 마무리하면서, 기획부터 운영까지 프로젝트 전체 주기를 책임지는 경험을 하였다. 특히 **"카카오 5초 제한"이라는 외부 플랫폼 제약을 아키텍처 설계로 해결**하는 과정에서, 기술 선택이 곧 사용자 경험을 결정한다는 것을 배웠다. 이 경험을 바탕으로 앞으로는 사용자의 문제를 실제로 해결하는데 도움을 주는 AI 서비스를 개발하고 싶다.
+기존 오프라인 기술지원 서비스를 온라인으로 확장하는 일은 도전적인 과제였다. 함께 시작한 팀원들이 떠난 뒤 1인 개발로 마무리하면서, 기획부터 운영까지 프로젝트 전체 주기를 책임지는 경험을 하였다. 특히 **"카카오톡 5초 응답 제한"이라는 외부 플랫폼 제약을 아키텍처 설계로 해결**하는 과정에서, 기술 선택이 곧 사용자 경험을 결정한다는 것을 배웠다. 이 경험을 바탕으로 앞으로는 사용자의 문제를 실제로 해결하는데 도움을 주는 AI 서비스를 개발하고 싶다.
 
 ---
 
@@ -546,9 +550,9 @@ AWS ECR 프라이빗 저장소 생성
 
 ### 2단계 — LLM · RAG 기반 AI Assistant `개발 중단!`
 
-버튼 시나리오로 처리할 수 없는 **자유 형식 질문**에 대응하는 것이 목표이다. 현재 `utils/openAI.py`에 RAG 파이프라인 PoC 관련 기능이 구현되어 있으며, 별도 저장소에서 Streamlit 기반 프로토타입 구현 및 기술 검증을 하였다.
+버튼 시나리오로 처리할 수 없는 **자유 형식 질문**에 대응하는 것이 목표이다. 현시점 기준 `utils/openAI.py`에 RAG 파이프라인 PoC 관련 기능이 구현되어 있다.
 향후 다른 프로젝트에서 LLM · RAG 기반 AI Assistant 개발 진행 시
-`utils/openAI.py`에 구현된 RAG 파이프라인 PoC 관련 기능을 참고할 것입니다.
+`utils/openAI.py`에 구현된 RAG 파이프라인 PoC 관련 기능을 참고할 것이다.
 
 ```mermaid
 flowchart LR
@@ -573,8 +577,8 @@ flowchart LR
 
 - [ ] **응답 시간** — RAG 파이프라인 PoC 관련 전체 기능 실행 시 실제 응답 처리 가용 시간 3.5초 초과. 벡터 인덱스 사전 빌드 및 캐싱 필요
 - [ ] **검색 실패 대응** — threshold 0.8 미만 시 관련 문서 미검색. 임계값 튜닝 또는 폴백 전략 수립
-- [ ] **대화 이력 관리** — `/tmp` 대신 DynamoDB 등 데이터를 영구적으로 저장 가능한 저장소 도입 필요 ([4-6](#4-6-서버리스(AWS Lambda)-환경의-사용자별-상태-관리))
-- [ ] **환각 억제** — 설치 안내는 오답 시 실질적 피해가 발생. 근거 문서 미검색 시 상담원 연결로 전환하는 안전장치 필요
+- [ ] **대화 이력 관리** — `/tmp` 대신 DynamoDB 등 데이터를 영구적으로 저장 가능한 저장소 도입 필요 ([4-6](#4-6-서버리스-환경의-사용자별-상태-관리))
+- [ ] **환각 억제** — 제품 설치 안내는 오답 시 사용자에게 실질적 불편함 발생. 근거 문서 미검색 시 상담원 연결로 전환하는 안전장치 필요
 - [ ] **비용 관리** — 임베딩·생성 API 호출량 모니터링 및 상한 설정
 
 ---
@@ -584,7 +588,7 @@ flowchart LR
 | 저장소 | 내용 |
 |---|---|
 | [KakaoChatbot](https://github.com/minjaejeon0827/KakaoChatbot) | **(현재 저장소)** 1단계 — 규칙 기반 카카오 챗봇 |
-| [test_AI_Assistant](https://github.com/minjaejeon0827/test_AI_Assistant) | 2단계 — LLM · RAG 기반 AI Assistant 프로토타입 |
+| [test_AI_Assistant](https://github.com/minjaejeon0827/test_AI_Assistant) | 2단계 — LLM · RAG 기반 AI Assistant 프로토타입 모델 |
 
 ---
 
@@ -594,7 +598,7 @@ flowchart LR
 |---|---|
 | OpenAI `gpt-4o`, `gpt-3.5-turbo` | OpenAI API 이용약관 (상업적 사용 가능) |
 | OpenAI `text-embedding-3-small` | OpenAI API 이용약관 (상업적 사용 가능) |
-| `faiss-cpu` | MIT License |
+| FAISS `faiss-cpu` | MIT License |
 | LangChain | MIT License |
 
 ---
