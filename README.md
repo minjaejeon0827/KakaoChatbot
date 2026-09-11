@@ -140,6 +140,11 @@ masterEntity
 
 ### 전체 구성
 
+![전체 구성](resources/assets/architecture.png)
+
+<details>
+<summary><strong>전체 구성</strong></summary>
+
 ```mermaid
 flowchart TB
     U["사용자<br/>카카오톡"] -->|"질문 입력"| KB["카카오 챗봇 관리자센터<br/>스킬 서버 연동"]
@@ -149,8 +154,8 @@ flowchart TB
     subgraph LAMBDA["Lambda 실행 환경"]
         direction TB
         H["lambda_function<br/>handler"]
-        S["MasterEntity<br/>싱글톤"]
-        K["KakaoResponseFormatter<br/>응답 포맷터"]
+        S["MasterEntity<br/>싱글톤 인스턴스"]
+        K["KakaoResponseFormatter<br/>응답 포맷터 인스턴스"]
         T["/tmp<br/>사용자별 상태 저장"]
         H --> S
         H --> K
@@ -162,8 +167,10 @@ flowchart TB
     EB["Amazon EventBridge<br/>Scheduler"] -.->|"주기적 warmup"| L
     ECR[("Amazon ECR<br/>컨테이너 이미지")] -.->|"배포"| L
     LAMBDA -->|"스킬 응답 JSON"| KB
-    KB --> U
+    KB -->|"답변 전달"| U
 ```
+
+</details>
 
 ### 핵심 설계 원칙
 
@@ -190,6 +197,11 @@ flowchart TB
 **해결**<br/>
 응답 생성을 데몬 스레드로 분리하고, 메인 핸들러는 큐를 논블로킹 폴링하도록 설계했다. 제한 시간 초과 시 직전 질문을 `/tmp`에 저장한 뒤, 재요청용 바로가기 버튼을 즉시 반환한다.
 
+![카카오톡 5초 응답 제한 대응](resources/assets/sequence-5sec-limit.png)
+
+<details>
+<summary><strong>카카오톡 5초 응답 제한 대응</strong></summary>
+
 ```mermaid
 sequenceDiagram
     participant U as 사용자
@@ -214,6 +226,8 @@ sequenceDiagram
         H-->>U: 완성된 응답 반환
     end
 ```
+
+</details>
 
 **추가 고려**<br/>
 스레드 내부 예외가 메인 핸들러에서 유실되지 않도록 `thread_wrapper`를 두어 `err_queue`로 전파하고, 응답 큐보다 **오류 큐를 먼저 확인**하도록 폴링 순서를 정했다. 오류 상황에서 3.5초를 낭비하지 않기 위한 선택이다.
@@ -555,16 +569,23 @@ AWS ECR 프라이빗 저장소 생성
 향후 다른 프로젝트에서 LLM · RAG 기반 AI Assistant 개발 진행 시
 `utils/openAI.py`에 구현된 RAG 파이프라인 PoC 관련 기능을 참고할 것이다.
 
+![RAG 파이프라인](resources/assets/rag-pipeline.png)
+
+<details>
+<summary><strong>RAG 파이프라인</strong></summary>
+
 ```mermaid
 flowchart TB
     Q["사용자 자유 질문"] --> R{"시나리오<br/>매칭 여부"}
-    R -->|"매칭"| B["1단계<br/>버튼 응답"]
+    R -->|"매칭"| B["1단계ㆍ버튼 응답<br/>정형 설치 문의"]
     R -->|"미매칭"| E["질문 임베딩<br/>text-embedding-3-small"]
     E --> V[("FAISS<br/>벡터 저장소")]
     V --> S["유사도 검색<br/>threshold 0.8"]
     S --> L["LLM 답변 생성<br/>Retrieval Chain"]
     L --> A["근거 기반 답변"]
 ```
+
+</details>
 
 | 구성 요소 | 현재 구현 |
 |---|---|
