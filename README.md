@@ -141,7 +141,7 @@ masterEntity
 ### 전체 구성
 
 ```mermaid
-flowchart LR
+flowchart TB
     U["사용자<br/>카카오톡"] -->|"질문 입력"| KB["카카오 챗봇 관리자센터<br/>스킬 서버 연동"]
     KB -->|"POST · JSON"| AG["Amazon<br/>API Gateway"]
     AG --> L["AWS Lambda<br/>Container Image"]
@@ -411,6 +411,7 @@ kakaoChatbot/
 │   ├── aws.py                   AWS Lambda /tmp 임시 스토리지 입출력 유틸
 │   └── openAI.py                LLM·RAG 유틸 (2단계 AI Assistant - 개발 중단!)
 ├── resources/
+|   ├── assets/                  카카오 챗봇 정적 자원 (Static Assets)
 |   ├── image/                   카카오 스킬 응답 데이터 이미지
 |   ├── text/                    Autodesk 제품별 설치 방법 텍스트 파일
 │   └── json/
@@ -555,7 +556,7 @@ AWS ECR 프라이빗 저장소 생성
 `utils/openAI.py`에 구현된 RAG 파이프라인 PoC 관련 기능을 참고할 것이다.
 
 ```mermaid
-flowchart LR
+flowchart TB
     Q["사용자 자유 질문"] --> R{"시나리오<br/>매칭 여부"}
     R -->|"매칭"| B["1단계<br/>버튼 응답"]
     R -->|"미매칭"| E["질문 임베딩<br/>text-embedding-3-small"]
