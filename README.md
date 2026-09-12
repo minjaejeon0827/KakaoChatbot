@@ -57,7 +57,7 @@
 ### 배경
 
 ㈜상상진화는 Autodesk 공식 파트너 회사로서 AutoCAD, Revit 등 제품의 설치 기술지원을 제공한다. 
-그러나 기존 지원 체계는 다음과 같은 구조적 한계를 갖고 있었다.
+그러나 기존 기술지원 체계는 다음과 같은 구조적 한계를 갖고 있었다.
 
 - **채널 단일화** — 설치 문의가 전화 상담(콜센터)에 집중
 - **시간 제약** — 업무 시간 외 문의는 다음 영업일까지 대기
@@ -126,7 +126,7 @@ masterEntity
 
 ### 데이터 무결성 검증
 
-서비스 시작 시 마스터 데이터의 필수 키·값 존재 여부를 전수 검사하여, 잘못된 데이터로 인한 런타임 오류를 사전에 차단한다. 검사 결과는 `IntEnum` 열거형으로 4단계 상태를 반환한다.
+서비스 시작 시 마스터 데이터의 필수 키·값 존재 여부를 전수 검사하여, 잘못된 데이터로 인한 런타임 오류를 사전에 차단한다. 검사 결과는 EnumValidator `IntEnum` 열거형으로 4단계 상태를 반환한다.
 
 | 상태 | 값 | 의미 |
 |---|---:|---|
@@ -147,11 +147,11 @@ masterEntity
 
 | 원칙 | 적용 내용 |
 |---|---|
-| **콜드 스타트 최소화** | MasterEntity 마스터 데이터 싱글톤 인스턴스를 `handler` **바깥**에서 생성 → 웜 스타트 진행 시 마스터 데이터 재로드 없이 재사용 가능 |
+| **콜드 스타트 최소화** | MasterEntity 마스터 데이터 싱글톤 인스턴스를 `handler` **바깥**에서 생성 → 웜 스타트(warmup) 진행 시 마스터 데이터 재로드 없이 재사용 가능 |
 | **관심사 분리** | 라우팅(`lambda_function`) / 응답 포맷(`kakao`) / 데이터(`singleton`) / 로깅(`log`) / 인프라 유틸(`aws`) 들을 모듈 단위로 분리 |
-| **데이터-코드 분리** | 문구·링크·버튼은 전부 masterEntity.json JSON. 코드는 "구조를 만드는 역할"만 수행 |
+| **데이터-코드 분리** | 문구·링크·버튼은 전부 masterEntity.json 파일. 코드는 "구조를 만드는 역할"만 수행 |
 | **문자열 상수 중앙화** | 모든 키·문구를 `chatbot_helper.py`에 집약하여 오타로 인한 런타임 오류 차단 |
-| **실패 시 안전한 응답** | 어떤 예외가 나도 카카오톡에는 항상 유효한 JSON 데이터 반환 (채팅방 멈춤 방지) |
+| **실패 시 안전한 응답** | 어떤 예외가 발생해도 카카오톡에는 항상 유효한 JSON 데이터 반환 (채팅방 멈춤 방지) |
 
 ---
 
@@ -161,7 +161,7 @@ masterEntity
 
 **문제**<br/>
 카카오톡 스킬 서버는 5초 내에 응답하지 않으면 채팅방이 멈춤 상태가 된다.
-사용자 입장에서는 "챗봇이 오류 발생했다"고 인식되어 컴플레인 (Complain)을 제기하고 심한 경우 챗봇 채널 탈퇴로 이어진다.
+사용자 입장에서는 "챗봇이 오류 발생했다"고 인식하여 컴플레인 (Complain)을 제기하고 심한 경우 챗봇 채널 탈퇴로 이어질 수 있다.
 
 **분석**<br/>
 5초 전체를 카카오 응답 생성에 쓸 수 없다.
@@ -206,7 +206,7 @@ EventBridge Scheduler가 아래 페이로드를 주기적으로 전송하고,
 { "body": "{ \"action\": \"aws-lambda_function-container-warmup\" }" }
 ```
 
-동시에 MasterEntity 마스터 데이터 싱글톤 인스턴스와 KakaoResponseFormatter 응답 포맷터 인스턴스를 `handler` 함수 바깥(모듈 스코프)에 배치하여, 웜 스타트 진행 시 JSON 재파싱과 유효성 검사를 건너뛰도록 했다.
+동시에 MasterEntity 마스터 데이터 싱글톤 인스턴스와 KakaoResponseFormatter 응답 포맷터 인스턴스를 `handler` 함수 바깥(모듈 스코프)에 배치하여, 웜 스타트(warmup) 진행 시 JSON 재파싱과 유효성 검사를 건너뛰도록 했다.
 
 ---
 
@@ -267,20 +267,20 @@ AWS Lambda 런타임 환경에서만 재현되는 문제들을 해결한 기록�
 ```python
 eq_operator_mappings = {   # 정확히 일치 — 메뉴 버튼 클릭
     "/start":                    lambda: self.__common_basicCard(...),
-    "Autodesk 제품 설치 지원":    lambda: self.__common_quickReplies(...),
+    "Autodesk 제품 설치 지원":     lambda: self.__common_quickReplies(...),
     "AutoCAD":                   lambda: self.__common_ver_quickReplies(...),
 }
 
 in_operator_mappings = {   # 부분 포함 — "Inst - AutoCAD 2025, 2026 버전 공통 설치 방법"
-    "Inst - AutoCAD": lambda: self.__end_basicCard(...),
-    "Inst - Revit":   lambda: self.__end_basicCard(...),
+    "Inst - AutoCAD":            lambda: self.__end_basicCard(...),
+    "Inst - Revit":              lambda: self.__end_basicCard(...),
 }
 ```
 
 eq_operator_mappings 정확히 일치를 먼저 순회하고 매칭 시 즉시 반환하여 불필요한 탐색을 줄였다.
 어떤 규칙에도 걸리지 않으면 시작 화면으로 되돌려, 사용자가 임의의 문장을 입력해도 대화가 끊기지 않도록 했다.
 
-**결과** — 신규 제품 추가 시 **masterEntity.json JSON 파일에 항목 추가 + 매핑 1줄**로 대응 가능해졌다.
+**결과** — 신규 제품 추가 시 **masterEntity.json 파일에 항목 추가 + 매핑 1줄**로 대응 가능해졌다.
 
 ---
 
@@ -302,7 +302,7 @@ AWS Lambda의 `/tmp` 임시 스토리지를 사용하되, 카카오톡 사용자
 `threading.local()` 기반 방식도 검토했으나, 스레드가 재사용되는 환경에서 이전 사용자 데이터가 남을 위험이 있어 파일 기반 격리를 선택했다.
 
 **한계 인식** — `/tmp`는 컨테이너 생명주기에 종속되므로 데이터를 영구적으로 보관하는 저장소가 아니다.
-다중 턴 대화 이력이 필요한 AI Assistant 관련 기능 구현 진행 시 **DynamoDB 또는 ElastiCache 도입이 필요**하다고 생각한다.
+다중 턴 대화 이력이 필요한 AI Assistant 관련 기능 구현 진행 시 **DynamoDB 또는 ElastiCache 도입이 필요하다.**
 
 **참고(DynamoDB)** — [바로가기](https://docs.aws.amazon.com/ko_kr/amazondynamodb/latest/developerguide/Introduction.html)
 
@@ -314,10 +314,10 @@ AWS Lambda의 `/tmp` 임시 스토리지를 사용하되, 카카오톡 사용자
 
 **문제**<br/>
 AWS Lambda 기본 로그는 UTC 기준이며 최상위 로거를 공유한다.
-국내 운영 서비스에서 장애 발생 시각을 대한민국 표준시로 파악하기 어려웠고, 어느 모듈에서 발생한 로그인지 추적이 힘들었다.
+서비스를 국내에서 운영하는 경우, 장애 발생 시각을 대한민국 표준시로 파악하기 어려웠고, 어느 모듈에서 발생한 로그인지 추적이 힘들었다.
 
 **해결**<br/>
-`logging.Formatter`를 상속한 `KSTFormatter`를 싱글톤 인스턴스로 구현해 시각을 대한민국 표준시(KST)로 변환하고,
+`logging.Formatter`를 상속받은 `KSTFormatter`를 싱글톤 인스턴스로 구현해 시각을 대한민국 표준시(KST)로 변환하고,
 전용 네임스페이스 로거에 `propagate = False`를 설정해 AWS Lambda 기본 로거와 분리했다.
 
 ```
@@ -325,7 +325,7 @@ AWS Lambda 기본 로그는 UTC 기준이며 최상위 로거를 공유한다.
 ```
 
 로그 레벨은 `LOG_LEVEL` 환경 변수로 제어하여, 코드 수정 없이 운영 중 디버그 레벨을 조정할 수 있도록 했다.
-또한 순환 참조를 피하기 위해, 전역 로거 초기화 이전 단계에서 동작하는 모듈용으로 `inspect` 기반 경량 로거(`chatbot_logger.py`) 별도 구현 및 사용했다.
+또한 순환 참조를 피하기 위해, 전역 로거 초기화 이전 단계에서 동작하는 모듈 용도로 `inspect` 기반 경량 로거(`chatbot_logger.py`) 별도 구현 및 사용했다.
 
 ---
 
@@ -357,9 +357,9 @@ Type Hints, `IntEnum`, `dataclass` 스타일 상수 관리, PEP 257 기반 Docst
 | 로깅 | `logging`, `zoneinfo`, `inspect` |
 | 컨테이너 | Docker (멀티 스테이지 빌드) |
 
-### 적용한 설계 디자인 패턴
+### 디자인 패턴 적용 사례 
 
-- **싱글톤 패턴** — `SingletonBase`를 상속받는 `MasterEntity`, `KSTFormatter`. AWS Lambda 웜 스타트 진행 시 인스턴스 재사용으로 초기화 비용 절감
+- **싱글톤 패턴** — `SingletonBase`를 상속받는 `MasterEntity`, `KSTFormatter`. AWS Lambda 웜 스타트(warmup) 진행 시 인스턴스 재사용으로 초기화 비용 절감
 - **Facade 패턴** — `KakaoResponseFormatter`가 복잡한 카카오 스킬 응답 스펙(basicCard / carousel / quickReplies)을 단일 인터페이스로 은닉 처리
 - **전략 패턴 (딕셔너리 디스패치)** — 조건 분기를 매핑 테이블로 대체
 - **참고 (파이썬 디자인패턴 스터디)** — [바로가기](https://github.com/minjaejeon0827/test_Python_Design_Pattern)
@@ -382,7 +382,7 @@ kakaoChatbot/
 │   ├── log.py                   전역 로거 초기화 (logging + KST + 환경변수 레벨 제어)
 │   ├── chatbot_logger.py        경량 로거 (전역 로거 초기화 이전 단계 전용)
 │   ├── aws.py                   AWS Lambda /tmp 임시 스토리지 입출력 유틸
-│   └── openAI.py                LLM·RAG 유틸 (2단계 AI Assistant - 개발 중단!)
+│   └── openAI.py                [PoC] LLM·RAG 유틸 (2단계 AI Assistant - 개발 중단!)
 ├── resources/
 |   ├── assets/                  카카오 챗봇 정적 자원 (Static Assets)
 |   ├── image/                   카카오 스킬 응답 데이터 이미지
@@ -392,7 +392,7 @@ kakaoChatbot/
 ├── tests/                       모듈별 테스트 코드
 ├── lambda_function.py           AWS Lambda 진입점 (handler)
 ├── Dockerfile                   멀티 스테이지 빌드 정의
-├── requirements.txt
+├── requirements.txt             파이썬 라이브러리 설치 목록
 └── README.md                    프로젝트 메인 README
 ```
 
@@ -506,7 +506,7 @@ AWS ECR 프라이빗 저장소 생성
 | 개발 | 전체 코드 작성 — 라우팅, 카카오 응답 포맷터, 동시성 처리, 유효성 검사, 로깅 |
 | 인프라 | AWS ECR · Lambda · API Gateway · EventBridge 구성, Docker 멀티 스테이지 빌드 |
 | 운영 | CloudWatch 기반 장애 대응, 제품/버전 변경 반영, 콘텐츠 갱신 |
-| 문서화 | 전체 모듈 Docstring 작성, 설계 의사결정 기록 |
+| 문서화 | Docstring 형식 기반 주요 사항 작성 |
 
 **이 과정에서 얻은 것**
 
@@ -523,14 +523,14 @@ AWS ECR 프라이빗 저장소 생성
 
 ### 1단계 — 규칙 기반 시나리오 카카오 챗봇 `완료 · 정석 서비스 오픈 중단!`
 
-마스터 데이터 기반의 계층형 버튼 응대. 정형화된 설치 문의를 100% 자동 처리한다.
+마스터 데이터 기반 계층형 버튼 응대. 정형화된 Autodesk 제품 설치 문의를 자동화 처리한다.
 
 ### 2단계 — LLM · RAG 기반 AI Assistant `개발 중단!`
 
 버튼 시나리오로 처리할 수 없는 **자유 형식 질문**에 대응하는 것이 목표이다.
-현시점 기준 `utils/openAI.py`에 RAG 파이프라인 PoC 관련 기능이 구현되어 있다.
+현시점 기준 `utils/openAI.py` 소스파일에 RAG 파이프라인 PoC 관련 기능이 구현되어 있다.
 향후 다른 프로젝트에서 LLM · RAG 기반 AI Assistant 개발 진행 시
-`utils/openAI.py`에 구현된 RAG 파이프라인 PoC 관련 기능을 참고할 것이다.
+`utils/openAI.py` 소스파일에 구현된 RAG 파이프라인 PoC 관련 기능을 참고할 것이다.
 
 ![RAG 파이프라인](resources/assets/rag-pipeline.png)
 
