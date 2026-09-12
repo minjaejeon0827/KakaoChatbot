@@ -24,8 +24,7 @@
 
 ## 시연
 
-<!-- TODO: assets/demo.gif 추가 후 아래 주석 해제 -->
-<!-- ![Demo](assets/demo.gif) -->
+![Demo](resources/assets/demo.gif)
 
 > 시작 화면 → 제품 선택 → 버전 선택 → 설치 가이드 제공까지 4단계 시나리오
 
@@ -142,36 +141,6 @@ masterEntity
 
 ![전체 구성](resources/assets/architecture.png)
 
-<details>
-<summary><strong>전체 구성</strong></summary>
-
-```mermaid
-flowchart TB
-    U["사용자<br/>카카오톡"] -->|"질문 입력"| KB["카카오 챗봇 관리자센터<br/>스킬 서버 연동"]
-    KB -->|"POST · JSON"| AG["Amazon<br/>API Gateway"]
-    AG --> L["AWS Lambda<br/>Container Image"]
-
-    subgraph LAMBDA["Lambda 실행 환경"]
-        direction TB
-        H["lambda_function<br/>handler"]
-        S["MasterEntity<br/>싱글톤 인스턴스"]
-        K["KakaoResponseFormatter<br/>응답 포맷터 인스턴스"]
-        T["/tmp<br/>사용자별 상태 저장"]
-        H --> S
-        H --> K
-        H --> T
-    end
-
-    L --> LAMBDA
-    S -.->|"기동 시 1회 로드"| J[("masterEntity.json<br/>마스터 데이터")]
-    EB["Amazon EventBridge<br/>Scheduler"] -.->|"주기적 warmup"| L
-    ECR[("Amazon ECR<br/>컨테이너 이미지")] -.->|"배포"| L
-    LAMBDA -->|"스킬 응답 JSON"| KB
-    KB -->|"답변 전달"| U
-```
-
-</details>
-
 ### 핵심 설계 원칙
 
 | 원칙 | 적용 내용 |
@@ -198,36 +167,6 @@ flowchart TB
 응답 생성을 데몬 스레드로 분리하고, 메인 핸들러는 큐를 논블로킹 폴링하도록 설계했다. 제한 시간 초과 시 직전 질문을 `/tmp`에 저장한 뒤, 재요청용 바로가기 버튼을 즉시 반환한다.
 
 ![카카오톡 5초 응답 제한 대응](resources/assets/sequence-5sec-limit.png)
-
-<details>
-<summary><strong>카카오톡 5초 응답 제한 대응</strong></summary>
-
-```mermaid
-sequenceDiagram
-    participant U as 사용자
-    participant H as handler<br/>(메인 스레드)
-    participant W as worker<br/>(데몬 스레드)
-    participant Q as res_queue / err_queue
-    participant F as /tmp 파일
-
-    U->>H: 질문 입력
-    H->>W: 응답 생성 스레드 시작
-    H->>Q: 0.01초 간격 논블로킹 폴링
-
-    alt 3.5초 이내 완료
-        W->>Q: 응답 payload 저장
-        Q-->>H: 응답 획득
-        H-->>U: 정상 응답 반환
-    else 3.5초 초과
-        H->>F: 직전 질문 저장
-        H-->>U: "요청사항 확인 중이에요"<br/>+ [생각 다 끝났나요?] 버튼
-        U->>H: 버튼 클릭 (재요청)
-        H->>F: 직전 질문 복원
-        H-->>U: 완성된 응답 반환
-    end
-```
-
-</details>
 
 **추가 고려**<br/>
 스레드 내부 예외가 메인 핸들러에서 유실되지 않도록 `thread_wrapper`를 두어 `err_queue`로 전파하고, 응답 큐보다 **오류 큐를 먼저 확인**하도록 폴링 순서를 정했다. 오류 상황에서 3.5초를 낭비하지 않기 위한 선택이다.
@@ -570,22 +509,6 @@ AWS ECR 프라이빗 저장소 생성
 `utils/openAI.py`에 구현된 RAG 파이프라인 PoC 관련 기능을 참고할 것이다.
 
 ![RAG 파이프라인](resources/assets/rag-pipeline.png)
-
-<details>
-<summary><strong>RAG 파이프라인</strong></summary>
-
-```mermaid
-flowchart TB
-    Q["사용자 자유 질문"] --> R{"시나리오<br/>매칭 여부"}
-    R -->|"매칭"| B["1단계ㆍ버튼 응답<br/>정형 설치 문의"]
-    R -->|"미매칭"| E["질문 임베딩<br/>text-embedding-3-small"]
-    E --> V[("FAISS<br/>벡터 저장소")]
-    V --> S["유사도 검색<br/>threshold 0.8"]
-    S --> L["LLM 답변 생성<br/>Retrieval Chain"]
-    L --> A["근거 기반 답변"]
-```
-
-</details>
 
 | 구성 요소 | 현재 구현 |
 |---|---|
